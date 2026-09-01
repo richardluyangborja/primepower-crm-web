@@ -421,7 +421,7 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
                 Average Score
               </span>
               <div className="mt-1">
-                <ScoreBar score={detail.average_score} />
+                <ScoreBar score={detail.average_score as number | null | undefined} />
               </div>
             </div>
             <div>

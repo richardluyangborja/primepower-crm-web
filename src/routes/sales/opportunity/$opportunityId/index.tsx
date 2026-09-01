@@ -37,6 +37,7 @@ export type OpportunityInfoPage = {
     | "lost"
   description: string
   company: {
+    id: number
     name: string
   }
   lead: {

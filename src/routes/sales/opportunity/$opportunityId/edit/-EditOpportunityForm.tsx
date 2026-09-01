@@ -5,7 +5,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -26,6 +25,7 @@ import {
   createOpportunitySchema,
   type CreateOpportunityFormValues,
 } from "../../create/-types"
+import type { CreateOpportunityPayload } from "../../create/-types"
 import {
   Card,
   CardAction,
@@ -60,14 +60,16 @@ export function EditOpportunityForm({
       description: "",
       estimated_contract_value: null,
       expected_close_date: null,
-    } satisfies CreateOpportunityFormValues,
+    } as CreateOpportunityFormValues,
 
     validators: {
-      onSubmit: createOpportunitySchema,
+      onSubmit: createOpportunitySchema as any,
     },
 
     onSubmit: async ({ value }) => {
-      await updateOpportunityMutation.mutateAsync(value)
+      await updateOpportunityMutation.mutateAsync(
+        value as CreateOpportunityPayload
+      )
       return navigate({ to: "/sales/opportunities" })
     },
   })
@@ -83,11 +85,11 @@ export function EditOpportunityForm({
       form.setFieldValue("description", opportunity.description)
       form.setFieldValue(
         "estimated_contract_value",
-        opportunity.estimatedContractValue
+        opportunity.estimated_contract_value
       )
       form.setFieldValue(
         "expected_close_date",
-        opportunity.expectedCloseDate ?? ""
+        opportunity.expected_close_date ?? ""
       )
     }
   }, [opportunity, form])

@@ -71,7 +71,7 @@ export function CreateCommunicationForm() {
       notes: "",
       duration_minutes: null,
       scheduled_at: null,
-    } satisfies CreateCommunicationFormValues,
+    } as CreateCommunicationFormValues,
 
     onSubmit: async ({ value }) => {
       await createMutation.mutateAsync(value)

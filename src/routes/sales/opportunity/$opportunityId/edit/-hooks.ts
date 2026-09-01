@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 import { updateOpportunity } from "./-api"
+import type { CreateOpportunityPayload } from "../../create/-types"
 
 export function useSalesCompanies() {
   return useQuery({
@@ -38,14 +39,4 @@ export function useUpdateOpportunity(opportunityId: number) {
       })
     },
   })
-}
-
-type CreateOpportunityPayload = {
-  company_id: number
-  lead_id: number | null
-  title: string
-  description: string
-  manpower_requirement: number | null
-  estimated_contract_value: number | null
-  expected_close_date: string | null
 }

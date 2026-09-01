@@ -183,8 +183,8 @@ function CommunicationCard({
 
             <Button variant="link" size="sm" asChild>
               <Link
-                to={`${basePath}/communications/$communicationId`}
-                params={{ communicationId: String(communication.id) }}
+                to={`${basePath}/communications/$communicationId` as any}
+                params={{ communicationId: String(communication.id) } as any}
               >
                 <span>View</span>
                 <MoveUpRight />

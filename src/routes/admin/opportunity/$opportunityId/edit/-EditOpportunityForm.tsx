@@ -5,7 +5,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -23,7 +22,6 @@ import {
 } from "@/components/ui/select"
 import {
   useUpdateOpportunity,
-  useSalesRepresentatives,
   useCompanies,
   useLeads,
 } from "./-hooks"
@@ -31,6 +29,7 @@ import {
   createOpportunitySchema,
   type CreateOpportunityFormValues,
 } from "../../create/-types"
+import type { CreateOpportunityPayload } from "../../create/-types"
 import {
   Card,
   CardAction,
@@ -43,11 +42,8 @@ import { useNavigate } from "@tanstack/react-router"
 import { useEffect } from "react"
 import useOpportunityDetailsQuery from "../-useOpportunityDetailsQuery"
 import { Spinner } from "@/components/ui/spinner"
-import { createFileRoute } from "@tanstack/react-router"
-import { ChevronLeft } from "lucide-react"
 
 export function EditOpportunityForm({ opportunityId }: { opportunityId: number }) {
-  const salesRepsQuery = useSalesRepresentatives()
   const companiesQuery = useCompanies()
   const leadsQuery = useLeads()
   const updateOpportunityMutation = useUpdateOpportunity(opportunityId)
@@ -60,19 +56,21 @@ export function EditOpportunityForm({ opportunityId }: { opportunityId: number }
     defaultValues: {
       company_id: 0,
       lead_id: null,
-      assigned_to_id: 0,
       title: "",
       description: "",
+      manpower_requirement: null,
       estimated_contract_value: null,
       expected_close_date: null,
-    } satisfies CreateOpportunityFormValues,
+    } as CreateOpportunityFormValues,
 
     validators: {
-      onSubmit: createOpportunitySchema,
+      onSubmit: createOpportunitySchema as any,
     },
 
     onSubmit: async ({ value }) => {
-      await updateOpportunityMutation.mutateAsync(value)
+      await updateOpportunityMutation.mutateAsync(
+        value as CreateOpportunityPayload
+      )
       return navigate({ to: "/admin/opportunities" })
     },
   })
@@ -84,16 +82,15 @@ export function EditOpportunityForm({ opportunityId }: { opportunityId: number }
       form.setFieldValue("company_id", opportunity.company.id)
       setSelectedCompanyId(opportunity.company.id)
       form.setFieldValue("lead_id", opportunity.lead?.id ?? null)
-      form.setFieldValue("assigned_to_id", opportunity.assignedTo.id)
       form.setFieldValue("title", opportunity.title)
       form.setFieldValue("description", opportunity.description)
       form.setFieldValue(
         "estimated_contract_value",
-        opportunity.estimatedContractValue
+        opportunity.estimated_contract_value
       )
       form.setFieldValue(
         "expected_close_date",
-        opportunity.expectedCloseDate ?? ""
+        opportunity.expected_close_date ?? ""
       )
     }
   }, [opportunity, form])
@@ -308,71 +305,6 @@ export function EditOpportunityForm({ opportunityId }: { opportunityId: number }
               </div>
 
               <form.Field
-                name="assigned_to_id"
-                children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
-
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Sales Representative
-                      </FieldLabel>
-
-                      <Select
-                        value={
-                          field.state.value > 0
-                            ? String(field.state.value)
-                            : ""
-                        }
-                        onValueChange={(value) =>
-                          field.handleChange(Number(value))
-                        }
-                        disabled={
-                          salesRepsQuery.isLoading ||
-                          salesRepsQuery.isError
-                        }
-                      >
-                        <SelectTrigger
-                          id={field.name}
-                          aria-invalid={isInvalid}
-                        >
-                          <SelectValue
-                            placeholder={
-                              salesRepsQuery.isLoading
-                                ? "Loading sales representatives..."
-                                : "Select sales representative"
-                            }
-                          />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                          {salesRepsQuery.data?.map((salesRep) => (
-                            <SelectItem
-                              key={salesRep.id}
-                              value={String(salesRep.id)}
-                            >
-                              {salesRep.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      {salesRepsQuery.isError && (
-                        <FieldError>
-                          Unable to load sales representatives.
-                        </FieldError>
-                      )}
-
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
-                    </Field>
-                  )
-                }}
-              />
-
-              <form.Field
                 name="description"
                 children={(field) => {
                   const isInvalid =
@@ -403,7 +335,7 @@ export function EditOpportunityForm({ opportunityId }: { opportunityId: number }
                 }}
               />
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <form.Field
                   name="estimated_contract_value"
                   children={(field) => {
@@ -467,6 +399,42 @@ export function EditOpportunityForm({ opportunityId }: { opportunityId: number }
                             )
                           }
                           aria-invalid={isInvalid}
+                        />
+
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    )
+                  }}
+                />
+
+                <form.Field
+                  name="manpower_requirement"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
+
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name}>
+                          Manpower Requirement
+                        </FieldLabel>
+
+                        <Input
+                          autoComplete="off"
+                          id={field.name}
+                          name={field.name}
+                          type="number"
+                          value={field.state.value ?? ""}
+                          onBlur={field.handleBlur}
+                          onChange={(e) =>
+                            field.handleChange(
+                              e.target.value ? Number(e.target.value) : null
+                            )
+                          }
+                          aria-invalid={isInvalid}
+                          placeholder="50"
                         />
 
                         {isInvalid && (

@@ -66,7 +66,7 @@ export default function LeadTable() {
         </div>
         <CardAction>
           <Button asChild>
-            <Link to="/sales/lead/create">
+            <Link to={"/sales/lead/create" as any}>
               <span>Create new lead</span>
               <MoveUpRight />
             </Link>

@@ -101,6 +101,7 @@ export type LeadInfoPage = {
     title: string
     email: string
     phone: string
+    is_primary: boolean
   }[]
   opportunities?: OpportunitySummary[]
   status_histories?: StatusHistoryEntry[]

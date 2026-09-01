@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
+import type { CreateOpportunityPayload } from "../../create/-types"
 import { updateOpportunity } from "./-api"
 
 export function useSalesRepresentatives() {

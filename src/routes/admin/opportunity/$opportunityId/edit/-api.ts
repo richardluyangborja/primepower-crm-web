@@ -1,5 +1,5 @@
 import api from "@/lib/api"
-import type { CreateOpportunityPayload } from "../create/-types"
+import type { CreateOpportunityPayload } from "../../create/-types"
 
 export async function updateOpportunity(
   opportunityId: number,

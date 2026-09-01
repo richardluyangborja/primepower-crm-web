@@ -16,12 +16,12 @@ export type LeadOption = {
 
 export type CreateOpportunityPayload = {
   company_id: number
-  lead_id: number | null
+  lead_id: number | null | undefined
   title: string
   description: string
-  manpower_requirement: number | null
-  estimated_contract_value: number | null
-  expected_close_date: string | null
+  manpower_requirement: number | null | undefined
+  estimated_contract_value: number | null | undefined
+  expected_close_date: string | null | undefined
 }
 
 export const createOpportunitySchema = z.object({

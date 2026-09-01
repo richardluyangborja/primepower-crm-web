@@ -326,7 +326,7 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
   const deleteSurvey = useDeleteSurvey(clientId)
 
   const hasPendingSurvey =
-    query.data?.surveys.some((s) => s.status === "pending") ?? false
+    query.data?.surveys.some((s: Survey) => s.status === "pending") ?? false
 
   const handleConfirmGenerate = async () => {
     setConfirmDialogOpen(false)
@@ -373,7 +373,7 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
                 <AvatarFallback>
                   {detail.company.name
                     .split(" ")
-                    .map((n) => n[0])
+                    .map((n: string) => n[0])
                     .join("")
                     .slice(0, 2)}
                 </AvatarFallback>
@@ -447,7 +447,7 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
                 <AvatarFallback>
                   {detail.primary_contact.name
                     .split(" ")
-                    .map((n) => n[0])
+                    .map((n: string) => n[0])
                     .join("")}
                 </AvatarFallback>
               </Avatar>
@@ -517,7 +517,7 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
         <h3 className="mb-3 font-heading text-lg">Survey History</h3>
         {detail.surveys.length > 0 ? (
           <div className="space-y-4">
-            {detail.surveys.map((survey) => (
+            {detail.surveys.map((survey: Survey) => (
               <SurveyDetailCard
                 key={survey.id}
                 survey={survey}

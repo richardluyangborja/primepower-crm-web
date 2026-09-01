@@ -26,6 +26,7 @@ import {
   createOpportunitySchema,
   type CreateOpportunityFormValues,
 } from "./-types"
+import type { CreateOpportunityPayload } from "./-types"
 import {
   Card,
   CardAction,
@@ -52,14 +53,16 @@ export function CreateOpportunityForm() {
       manpower_requirement: null,
       estimated_contract_value: null,
       expected_close_date: null,
-    } satisfies CreateOpportunityFormValues,
+    } as CreateOpportunityFormValues,
 
     validators: {
-      onSubmit: createOpportunitySchema,
+      onSubmit: createOpportunitySchema as any,
     },
 
     onSubmit: async ({ value }) => {
-      await createOpportunityMutation.mutateAsync(value)
+      await createOpportunityMutation.mutateAsync(
+        value as CreateOpportunityPayload
+      )
       form.reset()
       setSelectedCompanyId(0)
       return navigate({ to: "/admin/opportunities" })

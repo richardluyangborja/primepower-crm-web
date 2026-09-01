@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { Loader2, CheckCircle2, AlertCircle, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -84,7 +84,6 @@ type SurveyData = {
 }
 
 function RouteComponent() {
-  const navigate = useNavigate()
   const survey: SurveyData = Route.useLoaderData()
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)

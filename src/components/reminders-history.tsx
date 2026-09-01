@@ -272,8 +272,8 @@ function ReminderCard({ reminder, basePath = "/admin" }: { reminder: ReminderEnt
 
           <Button variant="link" size="sm" asChild>
             <Link
-              to={`${basePath}/reminders/$reminderId`}
-              params={{ reminderId: String(reminder.id) }}
+              to={`${basePath}/reminders/$reminderId` as any}
+              params={{ reminderId: String(reminder.id) } as any}
             >
               <span>View</span>
               <MoveUpRight />

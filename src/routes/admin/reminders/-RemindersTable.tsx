@@ -41,6 +41,8 @@ export type ReminderTableRow = {
   due_date: string
   priority: ReminderPriority
   is_completed: boolean
+  status: "pending" | "completed" | "incomplete"
+  related_to_status: string | null
   assigned_to: { id: number; name: string } | null
   created_at: string
 }

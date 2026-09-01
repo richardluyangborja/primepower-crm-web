@@ -4,7 +4,7 @@ import type {
   ClientSatisfactionDetail,
   ClientSatisfactionSummary,
   Survey,
-} from "../-types"
+} from "./-types"
 
 export function useSatisfactionQuery() {
   return useQuery({

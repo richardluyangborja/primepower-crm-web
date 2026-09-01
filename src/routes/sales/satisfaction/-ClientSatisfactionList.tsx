@@ -32,7 +32,7 @@ function TrendIcon({ trend }: { trend: ClientSatisfactionSummary["trend"] }) {
   return <Minus className="size-4" />
 }
 
-function ScoreBadge({ score }: { score: string | null | undefined }) {
+function ScoreBadge({ score }: { score: number | null | undefined }) {
   if (score === null || score === undefined) {
     return <span className="text-muted-foreground">—</span>
   }

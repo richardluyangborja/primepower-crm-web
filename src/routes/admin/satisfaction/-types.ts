@@ -19,7 +19,7 @@ export type Survey = {
   created_at: string
   completed_at: string | null
   responses: SurveyResponse[] | null
-  average_score: string | null
+  average_score: number | null
   respondent_name?: string | null
   respondent_position?: string | null
   feedback?: string | null
@@ -30,6 +30,7 @@ export type ClientSatisfactionSummary = {
   company: {
     name: string
     industry: string
+    logoFallback?: string
     address?: string
     phone?: string
     website?: string
@@ -42,7 +43,7 @@ export type ClientSatisfactionSummary = {
   completed_surveys: number
   pending_surveys: number
   last_survey_date: string | null
-  average_score: string | null
+  average_score: number | null
   trend: "up" | "down" | "stable" | null
 }
 
@@ -64,7 +65,7 @@ export type ClientSatisfactionDetail = {
   total_surveys: number
   completed_surveys: number
   pending_surveys: number
-  average_score: string | null
+  average_score: number | null
   surveys: Survey[]
 }
 

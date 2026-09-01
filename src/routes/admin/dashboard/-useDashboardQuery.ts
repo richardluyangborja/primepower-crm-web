@@ -27,6 +27,7 @@ export type DashboardData = {
     value_by_stage: { stage: string; value: number }[]
     monthly_won: { month: string; count: number; total_value: number }[]
     avg_deal_size: number
+    total_opportunities: number
   }
   communications: {
     total: number

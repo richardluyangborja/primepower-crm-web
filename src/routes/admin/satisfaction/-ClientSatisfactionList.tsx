@@ -29,7 +29,7 @@ function TrendIcon({ trend }: { trend: ClientSatisfactionSummary["trend"] }) {
   return <Minus className="size-4" />
 }
 
-function ScoreBadge({ score }: { score: string | null | undefined }) {
+function ScoreBadge({ score }: { score: number | null | undefined }) {
   if (score === null || score === undefined) {
     return <span className="text-muted-foreground">—</span>
   }
@@ -77,7 +77,7 @@ export default function ClientSatisfactionList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data?.map((client) => (
+              {data?.map((client: ClientSatisfactionSummary) => (
                 <TableRow
                   key={client.id}
                   onClick={() =>
@@ -93,7 +93,7 @@ export default function ClientSatisfactionList() {
                         <AvatarFallback>
                           {client.company.name
                             .split(" ")
-                            .map((n) => n[0])
+                            .map((n: string) => n[0])
                             .join("")
                             .slice(0, 2)}
                         </AvatarFallback>

@@ -100,6 +100,7 @@ export type ClientInfoPage = {
     title: string
     email: string
     phone: string
+    is_primary: boolean
   }[]
   opportunities?: OpportunitySummary[]
   lead?: {

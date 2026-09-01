@@ -10,3 +10,29 @@ export default function useOpportunitiesQuery() {
     },
   })
 }
+
+type Opportunity = {
+  id: number
+  title: string
+  stage:
+    | "initial_contact"
+    | "discussion"
+    | "proposal"
+    | "negotiation"
+    | "contract_processing"
+    | "won"
+    | "lost"
+  description: string | null
+  manpower_requirement: number | null
+  company: {
+    id: number
+    name: string
+    industry: string
+  }
+  assigned_to: {
+    id: number
+    name: string
+  }
+  estimated_contract_value: number | null
+  expected_close_date: string | null
+}
