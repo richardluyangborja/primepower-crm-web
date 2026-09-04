@@ -40,6 +40,7 @@ import {
   Plus,
   Star,
   Trash,
+  UserCog,
 } from "lucide-react"
 import useLeadDetailsQuery from "./-useLeadDetailsQuery"
 import { useUpdateLeadStatus } from "./-useUpdateLeadStatus"
@@ -69,6 +70,8 @@ import {
 } from "@/components/communication-history"
 import { ReminderHistorySection } from "@/components/reminders-history"
 import { useState } from "react"
+import { ReassignDialog } from "@/components/reassign-dialog"
+import { useCanManage } from "@/lib/queries/useCanManage"
 
 export type LeadInfoPage = {
   id: number
@@ -76,6 +79,7 @@ export type LeadInfoPage = {
   source: string
   notes?: string
   sales_representative: {
+    id: number
     name: string
     profileHref?: string
     profileFallback?: string
@@ -308,6 +312,8 @@ function LeadInfoCard({ lead }: { lead: LeadInfoPage }) {
   const statusMutation = useUpdateLeadStatus(lead.id)
   const transitions = leadStatusTransitions[status] ?? []
   const showQualificationAlert = shouldShowQualificationAlert(lead)
+  const canManage = useCanManage()
+  const [reassignOpen, setReassignOpen] = useState(false)
 
   const [modalOpen, setModalOpen] = useState(false)
   const [activeTransition, setActiveTransition] = useState<{
@@ -358,6 +364,16 @@ function LeadInfoCard({ lead }: { lead: LeadInfoPage }) {
             Created at {new Date(lead.created_at).toDateString()}
           </CardDescription>
           <CardAction className="flex flex-wrap gap-2">
+            {canManage && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setReassignOpen(true)}
+              >
+                <UserCog />
+                Reassign
+              </Button>
+            )}
             {transitions.map((t) => (
               <Button
                 key={t.value}
@@ -423,6 +439,15 @@ function LeadInfoCard({ lead }: { lead: LeadInfoPage }) {
         description={modalDescription}
         isPending={statusMutation.isPending}
         onSubmit={handleModalSubmit}
+      />
+
+      <ReassignDialog
+        open={reassignOpen}
+        onOpenChange={setReassignOpen}
+        endpoint={`/api/leads/${lead.id}/reassign`}
+        currentOwnerId={(lead.sales_representative as { id?: number }).id ?? 0}
+        currentOwnerName={lead.sales_representative.name}
+        subjectName={`lead for ${lead.company.name}`}
       />
     </section>
   )

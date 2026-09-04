@@ -35,7 +35,9 @@ import {
 } from "@/components/ui/alert"
 import {
   communicationTypeLabels,
+  communicationOutcomeLabels,
   type CommunicationType,
+  type CommunicationOutcome,
   formatDuration,
 } from "@/components/communication-history"
 import useCompanies from "@/lib/queries/useCompanies"
@@ -44,6 +46,7 @@ import { useCreateCommunication } from "../-useCreateCommunication"
 export type CreateCommunicationFormValues = {
   type: CommunicationType
   direction: "incoming" | "outgoing"
+  outcome: CommunicationOutcome | null
   company_id: number
   contact_id: number | null
   subject: string
@@ -65,6 +68,7 @@ export function CreateCommunicationForm() {
     defaultValues: {
       type: "email" as CommunicationType,
       direction: "outgoing" as "incoming" | "outgoing",
+      outcome: null as CommunicationOutcome | null,
       company_id: 0,
       contact_id: null,
       subject: "",
@@ -170,6 +174,41 @@ export function CreateCommunicationForm() {
                     </Field>
                   )
                 }}
+              </form.Field>
+
+              <form.Field name="outcome">
+                {(field) => (
+                  <Field>
+                    <FieldLabel htmlFor="outcome">Outcome (optional)</FieldLabel>
+                    <Select
+                      value={field.state.value ?? "none"}
+                      onValueChange={(val) =>
+                        field.handleChange(
+                          val === "none" ? null : (val as CommunicationOutcome),
+                        )
+                      }
+                    >
+                      <SelectTrigger id="outcome">
+                        <SelectValue placeholder="Pick an outcome" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No outcome yet</SelectItem>
+                        {(
+                          Object.keys(
+                            communicationOutcomeLabels,
+                          ) as CommunicationOutcome[]
+                        ).map((outcome) => (
+                          <SelectItem key={outcome} value={outcome}>
+                            {communicationOutcomeLabels[outcome]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FieldDescription>
+                      Feeds the AI suggestion engine and pipeline analytics.
+                    </FieldDescription>
+                  </Field>
+                )}
               </form.Field>
 
               <Alert>

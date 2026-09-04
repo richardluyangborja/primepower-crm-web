@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   Loader2,
   Pencil,
+  Repeat,
   User,
   XCircle,
 } from "lucide-react"
@@ -26,11 +27,16 @@ import { Spinner } from "@/components/ui/spinner"
 import {
   ReminderPriorityBadge,
   ReminderStatusBadge,
+  recurrenceLabels,
   type ReminderEntry,
 } from "@/components/reminders-history"
 import useReminderDetailsQuery from "../-useReminderDetailsQuery"
-import { useUpdateReminder } from "../-useUpdateReminder"
+import { useMarkReminderComplete } from "../-useMarkReminderComplete"
 import { useMarkReminderIncomplete } from "../-useMarkReminderIncomplete"
+import { SnoozeReminderDialog } from "../-SnoozeReminderDialog"
+import { DeleteReminderButton } from "../-DeleteReminderButton"
+import { Badge } from "@/components/ui/badge"
+import { useCanManage } from "@/lib/queries/useCanManage"
 
 export const Route = createFileRoute("/admin/reminders/$reminderId/")({
   component: RouteComponent,
@@ -41,8 +47,9 @@ function RouteComponent() {
   const { reminderId } = Route.useParams()
   const query = useReminderDetailsQuery(reminderId)
   const reminder = query.data
-  const updateMutation = useUpdateReminder()
+  const updateMutation = useMarkReminderComplete()
   const markIncompleteMutation = useMarkReminderIncomplete()
+  const canManage = useCanManage()
 
   const dueDate = reminder ? new Date(reminder.due_date) : null
   const dueFormatted = dueDate
@@ -114,6 +121,7 @@ function RouteComponent() {
                 onMarkComplete={() => updateMutation.mutate(Number(reminderId))}
                 onMarkIncomplete={() => markIncompleteMutation.mutate(Number(reminderId))}
                 isMarkingComplete={updateMutation.isPending || markIncompleteMutation.isPending}
+                canManage={canManage}
               />
             </div>
           </>
@@ -130,6 +138,7 @@ function ReminderDetailCard({
   onMarkComplete,
   onMarkIncomplete,
   isMarkingComplete,
+  canManage,
 }: {
   reminder: ReminderEntry
   dueFormatted: string | null
@@ -137,6 +146,7 @@ function ReminderDetailCard({
   onMarkComplete: () => void
   onMarkIncomplete: () => void
   isMarkingComplete: boolean
+  canManage: boolean
 }) {
   return (
     <section>
@@ -144,7 +154,7 @@ function ReminderDetailCard({
         <CardHeader>
           <CardTitle>Reminder Details</CardTitle>
           <CardDescription>Created on {createdAtFormatted}</CardDescription>
-          <CardAction className="flex items-center gap-2">
+          <CardAction className="flex flex-wrap items-center gap-2">
             <Button
               size="sm"
               variant="outline"
@@ -171,6 +181,11 @@ function ReminderDetailCard({
               )}
               {isMarkingComplete ? "Marking..." : "Mark as Incomplete"}
             </Button>
+            <SnoozeReminderDialog
+              reminderId={reminder.id}
+              disabled={reminder.is_completed}
+            />
+            {canManage && <DeleteReminderButton reminderId={reminder.id} />}
             <Link
               to="/admin/reminders/create"
               className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs hover:bg-accent"
@@ -209,6 +224,19 @@ function ReminderDetailCard({
                   Description
                 </span>
                 <p className="mt-1 text-sm">{reminder.description}</p>
+              </div>
+            )}
+            {reminder.recurrence_rule && (
+              <div>
+                <span className="block text-sm text-muted-foreground">
+                  Recurrence
+                </span>
+                <div className="mt-1 flex items-center gap-1.5">
+                  <Repeat size={16} className="text-muted-foreground" />
+                  <Badge variant="outline" className="text-xs">
+                    {recurrenceLabels[reminder.recurrence_rule]}
+                  </Badge>
+                </div>
               </div>
             )}
             <div>

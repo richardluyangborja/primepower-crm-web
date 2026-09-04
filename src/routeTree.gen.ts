@@ -23,6 +23,7 @@ import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboar
 import { Route as AdminOpportunitiesIndexRouteImport } from './routes/admin/opportunities/index'
 import { Route as AdminRemindersIndexRouteImport } from './routes/admin/reminders/index'
 import { Route as AdminSatisfactionIndexRouteImport } from './routes/admin/satisfaction/index'
+import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
 import { Route as SalesAccountIndexRouteImport } from './routes/sales/account/index'
 import { Route as SalesCommunicationsIndexRouteImport } from './routes/sales/communications/index'
 import { Route as SalesOpportunitiesIndexRouteImport } from './routes/sales/opportunities/index'
@@ -40,6 +41,8 @@ import { Route as AdminOpportunityCreateIndexRouteImport } from './routes/admin/
 import { Route as AdminRemindersReminderIdIndexRouteImport } from './routes/admin/reminders/$reminderId/index'
 import { Route as AdminRemindersCreateIndexRouteImport } from './routes/admin/reminders/create/index'
 import { Route as AdminSatisfactionClientIdIndexRouteImport } from './routes/admin/satisfaction/$clientId/index'
+import { Route as AdminUsersUserIdIndexRouteImport } from './routes/admin/users/$userId/index'
+import { Route as AdminUsersCreateIndexRouteImport } from './routes/admin/users/create/index'
 import { Route as SalesClientClientIdIndexRouteImport } from './routes/sales/client/$clientId/index'
 import { Route as SalesCommunicationsCommunicationIdIndexRouteImport } from './routes/sales/communications/$communicationId/index'
 import { Route as SalesCommunicationsCreateIndexRouteImport } from './routes/sales/communications/create/index'
@@ -123,6 +126,11 @@ const AdminRemindersIndexRoute = AdminRemindersIndexRouteImport.update({
 const AdminSatisfactionIndexRoute = AdminSatisfactionIndexRouteImport.update({
   id: '/satisfaction/',
   path: '/satisfaction/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const SalesAccountIndexRoute = SalesAccountIndexRouteImport.update({
@@ -221,6 +229,16 @@ const AdminSatisfactionClientIdIndexRoute =
     path: '/satisfaction/$clientId/',
     getParentRoute: () => AdminRouteRoute,
   } as any)
+const AdminUsersUserIdIndexRoute = AdminUsersUserIdIndexRouteImport.update({
+  id: '/users/$userId/',
+  path: '/users/$userId/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminUsersCreateIndexRoute = AdminUsersCreateIndexRouteImport.update({
+  id: '/users/create/',
+  path: '/users/create/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const SalesClientClientIdIndexRoute =
   SalesClientClientIdIndexRouteImport.update({
     id: '/client/$clientId/',
@@ -314,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
   '/admin/reminders/': typeof AdminRemindersIndexRoute
   '/admin/satisfaction/': typeof AdminSatisfactionIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
   '/sales/account/': typeof SalesAccountIndexRoute
   '/sales/communications/': typeof SalesCommunicationsIndexRoute
   '/sales/opportunities/': typeof SalesOpportunitiesIndexRoute
@@ -331,6 +350,8 @@ export interface FileRoutesByFullPath {
   '/admin/reminders/$reminderId/': typeof AdminRemindersReminderIdIndexRoute
   '/admin/reminders/create/': typeof AdminRemindersCreateIndexRoute
   '/admin/satisfaction/$clientId/': typeof AdminSatisfactionClientIdIndexRoute
+  '/admin/users/$userId/': typeof AdminUsersUserIdIndexRoute
+  '/admin/users/create/': typeof AdminUsersCreateIndexRoute
   '/sales/client/$clientId/': typeof SalesClientClientIdIndexRoute
   '/sales/communications/$communicationId/': typeof SalesCommunicationsCommunicationIdIndexRoute
   '/sales/communications/create/': typeof SalesCommunicationsCreateIndexRoute
@@ -360,6 +381,7 @@ export interface FileRoutesByTo {
   '/admin/opportunities': typeof AdminOpportunitiesIndexRoute
   '/admin/reminders': typeof AdminRemindersIndexRoute
   '/admin/satisfaction': typeof AdminSatisfactionIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
   '/sales/account': typeof SalesAccountIndexRoute
   '/sales/communications': typeof SalesCommunicationsIndexRoute
   '/sales/opportunities': typeof SalesOpportunitiesIndexRoute
@@ -377,6 +399,8 @@ export interface FileRoutesByTo {
   '/admin/reminders/$reminderId': typeof AdminRemindersReminderIdIndexRoute
   '/admin/reminders/create': typeof AdminRemindersCreateIndexRoute
   '/admin/satisfaction/$clientId': typeof AdminSatisfactionClientIdIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdIndexRoute
+  '/admin/users/create': typeof AdminUsersCreateIndexRoute
   '/sales/client/$clientId': typeof SalesClientClientIdIndexRoute
   '/sales/communications/$communicationId': typeof SalesCommunicationsCommunicationIdIndexRoute
   '/sales/communications/create': typeof SalesCommunicationsCreateIndexRoute
@@ -407,6 +431,7 @@ export interface FileRoutesById {
   '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
   '/admin/reminders/': typeof AdminRemindersIndexRoute
   '/admin/satisfaction/': typeof AdminSatisfactionIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
   '/sales/account/': typeof SalesAccountIndexRoute
   '/sales/communications/': typeof SalesCommunicationsIndexRoute
   '/sales/opportunities/': typeof SalesOpportunitiesIndexRoute
@@ -424,6 +449,8 @@ export interface FileRoutesById {
   '/admin/reminders/$reminderId/': typeof AdminRemindersReminderIdIndexRoute
   '/admin/reminders/create/': typeof AdminRemindersCreateIndexRoute
   '/admin/satisfaction/$clientId/': typeof AdminSatisfactionClientIdIndexRoute
+  '/admin/users/$userId/': typeof AdminUsersUserIdIndexRoute
+  '/admin/users/create/': typeof AdminUsersCreateIndexRoute
   '/sales/client/$clientId/': typeof SalesClientClientIdIndexRoute
   '/sales/communications/$communicationId/': typeof SalesCommunicationsCommunicationIdIndexRoute
   '/sales/communications/create/': typeof SalesCommunicationsCreateIndexRoute
@@ -455,6 +482,7 @@ export interface FileRouteTypes {
     | '/admin/opportunities/'
     | '/admin/reminders/'
     | '/admin/satisfaction/'
+    | '/admin/users/'
     | '/sales/account/'
     | '/sales/communications/'
     | '/sales/opportunities/'
@@ -472,6 +500,8 @@ export interface FileRouteTypes {
     | '/admin/reminders/$reminderId/'
     | '/admin/reminders/create/'
     | '/admin/satisfaction/$clientId/'
+    | '/admin/users/$userId/'
+    | '/admin/users/create/'
     | '/sales/client/$clientId/'
     | '/sales/communications/$communicationId/'
     | '/sales/communications/create/'
@@ -501,6 +531,7 @@ export interface FileRouteTypes {
     | '/admin/opportunities'
     | '/admin/reminders'
     | '/admin/satisfaction'
+    | '/admin/users'
     | '/sales/account'
     | '/sales/communications'
     | '/sales/opportunities'
@@ -518,6 +549,8 @@ export interface FileRouteTypes {
     | '/admin/reminders/$reminderId'
     | '/admin/reminders/create'
     | '/admin/satisfaction/$clientId'
+    | '/admin/users/$userId'
+    | '/admin/users/create'
     | '/sales/client/$clientId'
     | '/sales/communications/$communicationId'
     | '/sales/communications/create'
@@ -547,6 +580,7 @@ export interface FileRouteTypes {
     | '/admin/opportunities/'
     | '/admin/reminders/'
     | '/admin/satisfaction/'
+    | '/admin/users/'
     | '/sales/account/'
     | '/sales/communications/'
     | '/sales/opportunities/'
@@ -564,6 +598,8 @@ export interface FileRouteTypes {
     | '/admin/reminders/$reminderId/'
     | '/admin/reminders/create/'
     | '/admin/satisfaction/$clientId/'
+    | '/admin/users/$userId/'
+    | '/admin/users/create/'
     | '/sales/client/$clientId/'
     | '/sales/communications/$communicationId/'
     | '/sales/communications/create/'
@@ -687,6 +723,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSatisfactionIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/sales/account/': {
       id: '/sales/account/'
       path: '/account'
@@ -804,6 +847,20 @@ declare module '@tanstack/react-router' {
       path: '/satisfaction/$clientId'
       fullPath: '/admin/satisfaction/$clientId/'
       preLoaderRoute: typeof AdminSatisfactionClientIdIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/users/$userId/': {
+      id: '/admin/users/$userId/'
+      path: '/users/$userId'
+      fullPath: '/admin/users/$userId/'
+      preLoaderRoute: typeof AdminUsersUserIdIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/users/create/': {
+      id: '/admin/users/create/'
+      path: '/users/create'
+      fullPath: '/admin/users/create/'
+      preLoaderRoute: typeof AdminUsersCreateIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/sales/client/$clientId/': {
@@ -925,6 +982,7 @@ interface AdminRouteRouteChildren {
   AdminOpportunitiesIndexRoute: typeof AdminOpportunitiesIndexRoute
   AdminRemindersIndexRoute: typeof AdminRemindersIndexRoute
   AdminSatisfactionIndexRoute: typeof AdminSatisfactionIndexRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
   AdminClientClientIdIndexRoute: typeof AdminClientClientIdIndexRoute
   AdminCommunicationsCommunicationIdIndexRoute: typeof AdminCommunicationsCommunicationIdIndexRoute
   AdminCommunicationsCreateIndexRoute: typeof AdminCommunicationsCreateIndexRoute
@@ -935,6 +993,8 @@ interface AdminRouteRouteChildren {
   AdminRemindersReminderIdIndexRoute: typeof AdminRemindersReminderIdIndexRoute
   AdminRemindersCreateIndexRoute: typeof AdminRemindersCreateIndexRoute
   AdminSatisfactionClientIdIndexRoute: typeof AdminSatisfactionClientIdIndexRoute
+  AdminUsersUserIdIndexRoute: typeof AdminUsersUserIdIndexRoute
+  AdminUsersCreateIndexRoute: typeof AdminUsersCreateIndexRoute
   AdminOpportunityOpportunityIdEditIndexRoute: typeof AdminOpportunityOpportunityIdEditIndexRoute
 }
 
@@ -947,6 +1007,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminOpportunitiesIndexRoute: AdminOpportunitiesIndexRoute,
   AdminRemindersIndexRoute: AdminRemindersIndexRoute,
   AdminSatisfactionIndexRoute: AdminSatisfactionIndexRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
   AdminClientClientIdIndexRoute: AdminClientClientIdIndexRoute,
   AdminCommunicationsCommunicationIdIndexRoute:
     AdminCommunicationsCommunicationIdIndexRoute,
@@ -959,6 +1020,8 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminRemindersReminderIdIndexRoute: AdminRemindersReminderIdIndexRoute,
   AdminRemindersCreateIndexRoute: AdminRemindersCreateIndexRoute,
   AdminSatisfactionClientIdIndexRoute: AdminSatisfactionClientIdIndexRoute,
+  AdminUsersUserIdIndexRoute: AdminUsersUserIdIndexRoute,
+  AdminUsersCreateIndexRoute: AdminUsersCreateIndexRoute,
   AdminOpportunityOpportunityIdEditIndexRoute:
     AdminOpportunityOpportunityIdEditIndexRoute,
 }

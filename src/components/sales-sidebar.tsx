@@ -84,6 +84,13 @@ export function SalesSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
   const navigate = useNavigate()
   const userQuery = useAuthUser()
 
+  const roleLabel =
+    userQuery.data?.role === "admin"
+      ? "Administrator"
+      : userQuery.data?.role === "manager"
+        ? "Manager"
+        : "Sales Representative"
+
   return (
     <Sidebar className="py-0" variant="inset" {...props}>
       <SidebarHeader className="pt-4">
@@ -145,11 +152,7 @@ export function SalesSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
           <AccountDropdown />
           <div className="flex flex-col text-xs">
             <div>{userQuery.data?.name ?? "Loading..."}</div>
-            <div className="text-muted-foreground">
-              {userQuery.data?.role === "admin"
-                ? "Administrator"
-                : "Sales Representative"}
-            </div>
+            <div className="text-muted-foreground">{roleLabel}</div>
           </div>
           <Button variant="outline" size="icon-lg" className="ml-auto">
             <Bell />

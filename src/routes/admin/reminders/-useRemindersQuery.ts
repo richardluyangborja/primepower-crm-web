@@ -2,11 +2,19 @@ import api from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 import type { ReminderTableRow } from "./-RemindersTable"
 
-export default function useRemindersQuery() {
+export type ReminderScope = "all" | "mine" | "team"
+
+export default function useRemindersQuery(scope: ReminderScope = "all") {
   return useQuery({
-    queryKey: ["reminders"],
+    queryKey: ["reminders", scope],
     queryFn: async () => {
-      const response = await api.get("/api/reminders")
+      const url =
+        scope === "mine"
+          ? "/api/reminders/mine"
+          : scope === "team"
+            ? "/api/reminders/team"
+            : "/api/reminders"
+      const response = await api.get(url)
       return response.data.data as ReminderTableRow[]
     },
   })

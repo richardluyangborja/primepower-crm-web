@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card"
@@ -19,18 +20,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Ellipsis, FunnelPlus, Plus, Search } from "lucide-react"
+import {
+  ChevronDown,
+  Ellipsis,
+  Plus,
+  Search,
+  X,
+} from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { Spinner } from "@/components/ui/spinner"
 import {
+  CommunicationOutcomeBadge,
   communicationTypeIcons,
   communicationTypeLabels,
   communicationDirectionLabels,
   type CommunicationEntry,
   type CommunicationType,
+  type CommunicationOutcome,
+  communicationOutcomeLabels,
 } from "@/components/communication-history"
 import useCommunicationsQuery from "./-useCommunicationsQuery"
+import { useDeleteCommunication } from "./-useCreateCommunication"
 
 export type CommunicationTableRow = CommunicationEntry
 
@@ -92,22 +110,126 @@ function trimSubject(subject: string, max = 30): string {
 
 export default function CommunicationsTable() {
   const navigate = useNavigate()
-  const query = useCommunicationsQuery()
+  const [search, setSearch] = useState("")
+  const [type, setType] = useState<string>("all")
+  const [direction, setDirection] = useState<string>("all")
+  const [outcome, setOutcome] = useState<string>("all")
+  const [from, setFrom] = useState<string>("")
+  const [to, setTo] = useState<string>("")
+
+  const params = useMemo(
+    () => ({
+      q: search || undefined,
+      type: type === "all" ? undefined : type,
+      direction:
+        direction === "all" ? undefined : (direction as "incoming" | "outgoing"),
+      outcome: outcome === "all" ? undefined : outcome,
+      from: from || undefined,
+      to: to || undefined,
+    }),
+    [search, type, direction, outcome, from, to],
+  )
+
+  const query = useCommunicationsQuery(params)
+  const deleteMutation = useDeleteCommunication()
   const data = query.data
+
+  const hasActiveFilters =
+    Boolean(search) ||
+    type !== "all" ||
+    direction !== "all" ||
+    outcome !== "all" ||
+    Boolean(from) ||
+    Boolean(to)
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-start gap-2">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon">
-              <Search />
-            </Button>
-            <Input placeholder="Search communications..." className="w-xs" />
-            <Button variant="outline" size="icon">
-              <FunnelPlus />
-            </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[12rem]">
+            <Search className="text-muted-foreground absolute top-1/2 left-2 size-4 -translate-y-1/2" />
+            <Input
+              placeholder="Search subject or notes..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8"
+            />
           </div>
+          <Select value={type} onValueChange={setType}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All types</SelectItem>
+              {(
+                Object.keys(communicationTypeLabels) as CommunicationType[]
+              ).map((t) => (
+                <SelectItem key={t} value={t}>
+                  {communicationTypeLabels[t]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={direction} onValueChange={setDirection}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Direction" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="incoming">Inbound</SelectItem>
+              <SelectItem value="outgoing">Outbound</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={outcome} onValueChange={setOutcome}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Outcome" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All outcomes</SelectItem>
+              {(
+                Object.keys(communicationOutcomeLabels) as CommunicationOutcome[]
+              ).map((o) => (
+                <SelectItem key={o} value={o}>
+                  {communicationOutcomeLabels[o]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input
+            type="date"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            className="w-40"
+            placeholder="From"
+          />
+          <Input
+            type="date"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            className="w-40"
+            placeholder="To"
+          />
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSearch("")
+                setType("all")
+                setDirection("all")
+                setOutcome("all")
+                setFrom("")
+                setTo("")
+              }}
+            >
+              <X />
+              Clear
+            </Button>
+          )}
+          <Button variant="outline" size="sm" disabled>
+            <ChevronDown />
+            Saved views
+          </Button>
         </div>
         <CardAction>
           <Button
@@ -130,6 +252,7 @@ export default function CommunicationsTable() {
                 <TableHead>Company</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>{"Type & Direction"}</TableHead>
+                <TableHead>Outcome</TableHead>
                 <TableHead>Subject</TableHead>
                 <TableHead>{"Logged By & Date"}</TableHead>
                 <TableHead />
@@ -183,6 +306,9 @@ export default function CommunicationsTable() {
                       <CommunicationTypeCell type={comm.type} />
                       <CommunicationDirectionCell direction={comm.direction} />
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <CommunicationOutcomeBadge outcome={comm.outcome} />
                   </TableCell>
                   <TableCell className="max-w-xs">
                     {comm.subject ? (
@@ -243,19 +369,24 @@ export default function CommunicationsTable() {
                               })
                             }}
                           >
-                            View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Edit
+                            View / Edit
                           </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                           <DropdownMenuItem
                             variant="destructive"
-                            onClick={(e) => e.stopPropagation()}
+                            disabled={deleteMutation.isPending}
+                            onClick={async (e) => {
+                              e.stopPropagation()
+                              if (
+                                window.confirm(
+                                  "Delete this communication? This cannot be undone.",
+                                )
+                              ) {
+                                await deleteMutation.mutateAsync(comm.id)
+                              }
+                            }}
                           >
                             Delete
                           </DropdownMenuItem>
@@ -265,6 +396,13 @@ export default function CommunicationsTable() {
                   </TableCell>
                 </TableRow>
               ))}
+              {data?.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center">
+                    No communications found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         )}

@@ -23,13 +23,25 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Ellipsis, FunnelPlus, Plus, Search } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { Spinner } from "@/components/ui/spinner"
+import { useState } from "react"
 import {
   ReminderPriorityBadge,
   ReminderStatusBadge,
   isOverdue,
+  recurrenceLabels,
   type ReminderPriority,
 } from "@/components/reminders-history"
-import useRemindersQuery from "./-useRemindersQuery"
+import useRemindersQuery, {
+  type ReminderScope,
+} from "./-useRemindersQuery"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import useAuthUser from "@/lib/queries/useAuthUser"
 
 export type ReminderTableRow = {
   id: number
@@ -41,9 +53,10 @@ export type ReminderTableRow = {
   due_date: string
   priority: ReminderPriority
   is_completed: boolean
-  status: "pending" | "completed" | "incomplete"
+  status: "pending" | "completed" | "incomplete" | "snoozed"
   related_to_status: string | null
   assigned_to: { id: number; name: string } | null
+  recurrence_rule: "daily" | "weekly" | "monthly" | null
   created_at: string
 }
 
@@ -56,15 +69,40 @@ function formatDate(dateString: string): string {
   })
 }
 
-export default function RemindersTable() {
+export default function RemindersTable({
+  defaultScope = "all",
+}: {
+  defaultScope?: ReminderScope
+}) {
   const navigate = useNavigate()
-  const query = useRemindersQuery()
+  const userQuery = useAuthUser()
+  const canSeeTeam = userQuery.data?.role === "admin" || userQuery.data?.role === "manager"
+  const [scope, setScope] = useState<ReminderScope>(defaultScope)
+  const query = useRemindersQuery(scope)
   const data = query.data
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">View</span>
+            <Select
+              value={scope}
+              onValueChange={(v) => setScope(v as ReminderScope)}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Reminders</SelectItem>
+                <SelectItem value="mine">My Reminders</SelectItem>
+                {canSeeTeam && (
+                  <SelectItem value="team">Team Reminders</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="icon">
               <Search />
@@ -73,11 +111,11 @@ export default function RemindersTable() {
             <Button variant="outline" size="icon">
               <FunnelPlus />
             </Button>
+            <Button onClick={() => navigate({ to: "/admin/reminders/create" })}>
+              <Plus />
+              <span>Create Reminder</span>
+            </Button>
           </div>
-          <Button onClick={() => navigate({ to: "/admin/reminders/create" })}>
-            <Plus />
-            <span>Create Reminder</span>
-          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -94,6 +132,7 @@ export default function RemindersTable() {
                 <TableHead>Due Date</TableHead>
                 <TableHead>Priority</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Recurrence</TableHead>
                 <TableHead>Assigned To</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead />
@@ -150,6 +189,15 @@ export default function RemindersTable() {
                         </Badge>
                       )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {reminder.recurrence_rule ? (
+                      <Badge variant="outline" className="text-xs">
+                        {recurrenceLabels[reminder.recurrence_rule]}
+                      </Badge>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {reminder.assigned_to ? (

@@ -25,6 +25,7 @@ import {
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -37,6 +38,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 import useAuthUser from "@/lib/queries/useAuthUser"
+import { useUnreadCountQuery } from "@/lib/queries/useNotifications"
 
 const sidebarConfig = [
   {
@@ -105,6 +107,9 @@ const sidebarConfig = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate()
   const userQuery = useAuthUser()
+  const isAdmin = userQuery.data?.role === "admin"
+  const unreadCountQuery = useUnreadCountQuery()
+  const unreadCount = unreadCountQuery.data ?? 0
 
   const roleLabel =
     userQuery.data?.role === "admin"
@@ -135,39 +140,52 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {sidebarConfig.map((group) => (
-          <SidebarGroup key={group.group}>
-            <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
-            <SidebarMenu>
-              {group.items.map((item) =>
-                item.tooltip ? (
-                  <Tooltip key={item.path}>
-                    <TooltipTrigger asChild>
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          onClick={() => navigate({ to: item.path })}
-                        >
-                          <item.icon />
-                          <span>{item.label}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">{item.label}</TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      onClick={() => navigate({ to: item.path })}
-                    >
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              )}
-            </SidebarMenu>
-          </SidebarGroup>
-        ))}
+        {sidebarConfig.map((group) => {
+          const items = group.items.filter((item) => {
+            if (item.path === "/admin/users" && !isAdmin) {
+              return false
+            }
+            return true
+          })
+
+          if (items.length === 0) {
+            return null
+          }
+
+          return (
+            <SidebarGroup key={group.group}>
+              <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
+              <SidebarMenu>
+                {items.map((item) =>
+                  item.tooltip ? (
+                    <Tooltip key={item.path}>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuItem>
+                          <SidebarMenuButton
+                            onClick={() => navigate({ to: item.path })}
+                          >
+                            <item.icon />
+                            <span>{item.label}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">{item.label}</TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <SidebarMenuItem key={item.path}>
+                      <SidebarMenuButton
+                        onClick={() => navigate({ to: item.path })}
+                      >
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                )}
+              </SidebarMenu>
+            </SidebarGroup>
+          )
+        })}
       </SidebarContent>
       <SidebarFooter className="pb-4">
         <div className="flex items-center gap-4">
@@ -176,9 +194,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div>{userQuery.data?.name ?? "Loading..."}</div>
             <div className="text-muted-foreground">{roleLabel}</div>
           </div>
-          <Button variant="outline" size="icon-lg" className="ml-auto">
-            <Bell />
-          </Button>
+          <NotificationsPanel
+            trigger={
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="relative ml-auto"
+                aria-label="Notifications"
+              >
+                <Bell />
+                {unreadCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px]"
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </Badge>
+                )}
+              </Button>
+            }
+          />
         </div>
       </SidebarFooter>
     </Sidebar>
@@ -186,6 +221,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 }
 
 import { Spinner } from "@/components/ui/spinner"
+import { NotificationsPanel } from "./notifications-panel"
 
 function AccountDropdown() {
   const navigate = useNavigate()

@@ -33,6 +33,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   reminderPriorityLabels,
+  recurrenceLabels,
   type ReminderPriority,
 } from "@/components/reminders-history"
 import useCompanies from "@/lib/queries/useCompanies"
@@ -47,6 +48,7 @@ export type CreateReminderFormValues = {
   due_date: string
   priority: ReminderPriority
   assigned_to_name: string
+  recurrence_rule: "daily" | "weekly" | "monthly" | ""
 }
 
 type SelectedRecord = {
@@ -78,6 +80,7 @@ export function CreateReminderForm() {
       due_date: "",
       priority: "medium" as ReminderPriority,
       assigned_to_name: "",
+      recurrence_rule: "" as "daily" | "weekly" | "monthly" | "",
     } satisfies CreateReminderFormValues,
 
     onSubmit: async ({ value }) => {
@@ -371,6 +374,47 @@ export function CreateReminderForm() {
                   }}
                 </form.Field>
               </div>
+
+              <form.Field name="recurrence_rule">
+                {(field) => {
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor="recurrence_rule">
+                        Recurrence (optional)
+                      </FieldLabel>
+
+                      <Select
+                        value={field.state.value}
+                        onValueChange={(val) =>
+                          field.handleChange(
+                            val as "daily" | "weekly" | "monthly" | ""
+                          )
+                        }
+                      >
+                        <SelectTrigger id="recurrence_rule">
+                          <SelectValue placeholder="No recurrence" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectItem value="">No recurrence</SelectItem>
+                          {(
+                            ["daily", "weekly", "monthly"] as const
+                          ).map((rule) => (
+                            <SelectItem key={rule} value={rule}>
+                              {recurrenceLabels[rule]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <FieldDescription>
+                        When set, completing this reminder will automatically
+                        create the next occurrence.
+                      </FieldDescription>
+                    </Field>
+                  )
+                }}
+              </form.Field>
             </FieldGroup>
           </FieldSet>
 

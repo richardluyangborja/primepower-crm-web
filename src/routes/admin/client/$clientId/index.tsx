@@ -42,6 +42,7 @@ import {
   Trash,
   TrendingDown,
   TrendingUp,
+  UserCog,
 } from "lucide-react"
 import useClientDetailsQuery from "./-useClientDetailsQuery"
 import { useUpdateClientStatus } from "./-useUpdateClientStatus"
@@ -72,6 +73,8 @@ import {
 import { Link } from "@tanstack/react-router"
 import { StageTransitionModal } from "@/components/stage-transition-modal"
 import type { StatusHistoryEntry } from "@/components/stage-transition-modal"
+import { ReassignDialog } from "@/components/reassign-dialog"
+import { useCanManage } from "@/lib/queries/useCanManage"
 import { useState } from "react"
 
 export type ClientInfoPage = {
@@ -110,6 +113,7 @@ export type ClientInfoPage = {
   communications?: CommunicationEntry[]
   reminders?: ReminderEntry[]
   sales_representative: {
+    id: number
     name: string
     profileHref?: string
     profileFallback?: string
@@ -292,6 +296,8 @@ function CompanyInfoCard({ client }: { client: ClientInfoPage }) {
 
 function ClientInfoCard({ client }: { client: ClientInfoPage }) {
   const updateStatusMutation = useUpdateClientStatus(client.id)
+  const canManage = useCanManage()
+  const [reassignOpen, setReassignOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [targetStatus, setTargetStatus] = useState<"active" | "inactive">(
     "inactive"
@@ -343,7 +349,17 @@ function ClientInfoCard({ client }: { client: ClientInfoPage }) {
           <CardDescription>
             Client since {new Date(client.client_since).toDateString()}
           </CardDescription>
-          <CardAction className="flex items-center gap-2">
+          <CardAction className="flex flex-wrap items-center gap-2">
+            {canManage && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setReassignOpen(true)}
+              >
+                <UserCog />
+                Reassign
+              </Button>
+            )}
             {client.lead && (
               <Button variant="link" size="sm" asChild>
                 <a href={`/admin/lead/${client.lead.id}`}>
@@ -421,6 +437,15 @@ function ClientInfoCard({ client }: { client: ClientInfoPage }) {
         description={modalDescription}
         isPending={updateStatusMutation.isPending}
         onSubmit={handleModalSubmit}
+      />
+
+      <ReassignDialog
+        open={reassignOpen}
+        onOpenChange={setReassignOpen}
+        endpoint={`/api/clients/${client.id}/reassign`}
+        currentOwnerId={client.sales_representative.id}
+        currentOwnerName={client.sales_representative.name}
+        subjectName={`client ${client.company.name}`}
       />
     </section>
   )

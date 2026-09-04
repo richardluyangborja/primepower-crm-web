@@ -26,7 +26,7 @@ export type ReminderEntry = {
   description: string | null
   due_date: string
   priority: ReminderPriority
-  status: "pending" | "completed" | "incomplete"
+  status: "pending" | "completed" | "incomplete" | "snoozed"
   is_completed: boolean
   completed_at: string | null
   assigned_to: { id: number; name: string } | null
@@ -35,7 +35,19 @@ export type ReminderEntry = {
   related_to_name: string
   related_to_status: string | null
   company: { id: number; name: string; industry: string }
+  recurrence_rule: "daily" | "weekly" | "monthly" | null
+  recurrence_parent_id: number | null
   created_at: string
+  updated_at: string
+}
+
+export const recurrenceLabels: Record<
+  NonNullable<ReminderEntry["recurrence_rule"]>,
+  string
+> = {
+  daily: "Daily",
+  weekly: "Weekly",
+  monthly: "Monthly",
 }
 
 export const reminderPriorityLabels: Record<ReminderPriority, string> = {
@@ -91,9 +103,16 @@ export function ReminderPriorityBadge({
 export function ReminderStatusBadge({ status }: { status: string }) {
   const isCompleted = status === "completed"
   const isIncomplete = status === "incomplete"
+  const isSnoozed = status === "snoozed"
   return (
     <Badge
-      variant={isCompleted || isIncomplete ? "secondary" : "outline"}
+      variant={
+        isCompleted || isIncomplete
+          ? "secondary"
+          : isSnoozed
+            ? "outline"
+            : "outline"
+      }
       className="flex items-center gap-1 text-xs"
     >
       {isCompleted ? (
@@ -105,6 +124,11 @@ export function ReminderStatusBadge({ status }: { status: string }) {
         <>
           <XCircle size={10} />
           <span>Incomplete</span>
+        </>
+      ) : isSnoozed ? (
+        <>
+          <Clock size={10} />
+          <span>Snoozed</span>
         </>
       ) : (
         <>

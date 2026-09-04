@@ -10,19 +10,25 @@ import { Input } from "@/components/ui/input"
 import * as z from "zod"
 import { useForm } from "@tanstack/react-form"
 import { useMutation } from "@tanstack/react-query"
-import api from "@/lib/api"
-import { isAxiosError } from "axios"
+import api, { isAxiosError } from "@/lib/api"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate } from "@tanstack/react-router"
 import { useQueryClient } from "@tanstack/react-query"
 import { Info } from "lucide-react"
+import { getDefaultRouteForRole } from "@/lib/role-redirect"
 
 const demoAccounts = [
   {
     role: "Admin",
     name: "Daniel Balisi",
     email: "daniel@primepower.com",
+    password: "password",
+  },
+  {
+    role: "Manager",
+    name: "Ana Reyes",
+    email: "ana@primepower.com",
     password: "password",
   },
   {
@@ -53,9 +59,10 @@ export function LoginForm({
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["auth_user"] })
-      if (response.data.user.role === "admin")
-        return navigate({ to: "/admin/dashboard" })
-      return navigate({ to: "/sales/lead-and-client/leads" })
+      const role = response.data?.two_factor
+        ? null
+        : response.data?.user?.role ?? response.data?.role
+      return navigate({ to: getDefaultRouteForRole(role) })
     },
   })
 

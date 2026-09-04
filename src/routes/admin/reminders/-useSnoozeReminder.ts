@@ -1,29 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
-import type { ReminderEntry } from "@/components/reminders-history"
 
-export type UpdateReminderPayload = Partial<{
-  title: string
-  description: string | null
-  due_date: string
-  priority: ReminderEntry["priority"]
-  status: ReminderEntry["status"]
-  recurrence_rule: ReminderEntry["recurrence_rule"] | ""
-  assigned_to_name: string | null
-}>
-
-export function useUpdateReminder() {
+export function useSnoozeReminder() {
   const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: async ({
       id,
-      payload,
+      dueDate,
     }: {
       id: number
-      payload: UpdateReminderPayload
+      dueDate: string
     }) => {
-      const response = await api.patch(`/api/reminders/${id}`, payload)
+      const response = await api.patch(`/api/reminders/${id}/snooze`, {
+        due_date: dueDate,
+      })
       return response.data.data
     },
     onSuccess: () => {

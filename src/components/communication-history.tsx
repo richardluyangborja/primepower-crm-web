@@ -19,18 +19,30 @@ import { Button } from "./ui/button"
 export type CommunicationType =
   "email" | "phone" | "text" | "meeting" | "in_person" | "video"
 
+export type CommunicationOutcome =
+  | "interested"
+  | "not_now"
+  | "no_response"
+  | "voicemail"
+  | "meeting_booked"
+  | "unsubscribe"
+  | "other"
+
 export type CommunicationEntry = {
   id: number
   company: { id: number; name: string; industry: string }
   contact: { id: number; name: string; title: string } | null
   type: CommunicationType
   direction: "incoming" | "outgoing"
+  outcome: CommunicationOutcome | null
+  outcome_label: string | null
   subject: string | null
   notes: string | null
   duration_minutes: number | null
   scheduled_at: string | null
   user: { id: number; name: string } | null
   created_at: string
+  updated_at?: string
 }
 
 export const communicationTypeLabels: Record<CommunicationType, string> = {
@@ -173,6 +185,7 @@ function CommunicationCard({
           <div className="flex flex-wrap items-center gap-2">
             <CommunicationTypeBadge type={communication.type} />
             <CommunicationDirectionBadge direction={communication.direction} />
+            <CommunicationOutcomeBadge outcome={communication.outcome} />
           </div>
 
           <div className="flex items-center gap-2">
@@ -243,4 +256,43 @@ export const communicationDirectionLabels: Record<
 > = {
   incoming: "Inbound",
   outgoing: "Outbound",
+}
+
+export const communicationOutcomeLabels: Record<CommunicationOutcome, string> = {
+  interested: "Interested",
+  not_now: "Not right now",
+  no_response: "No response",
+  voicemail: "Left voicemail",
+  meeting_booked: "Meeting booked",
+  unsubscribe: "Unsubscribed",
+  other: "Other",
+}
+
+export const communicationOutcomeVariant: Record<
+  CommunicationOutcome,
+  "default" | "secondary" | "outline" | "destructive"
+> = {
+  interested: "default",
+  meeting_booked: "default",
+  voicemail: "secondary",
+  no_response: "outline",
+  not_now: "outline",
+  other: "outline",
+  unsubscribe: "destructive",
+}
+
+export function CommunicationOutcomeBadge({
+  outcome,
+}: {
+  outcome: CommunicationOutcome | null
+}) {
+  if (!outcome) return null
+  return (
+    <Badge
+      variant={communicationOutcomeVariant[outcome]}
+      className="text-xs"
+    >
+      {communicationOutcomeLabels[outcome]}
+    </Badge>
+  )
 }

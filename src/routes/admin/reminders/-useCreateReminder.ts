@@ -16,6 +16,7 @@ export function useCreateReminder() {
         due_date: values.due_date,
         priority: values.priority,
         assigned_to_name: values.assigned_to_name,
+        recurrence_rule: values.recurrence_rule,
       })
       return response.data.data
     },
