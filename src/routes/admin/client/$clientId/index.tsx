@@ -70,7 +70,7 @@ import {
   ReminderHistorySection,
   type ReminderEntry,
 } from "@/components/reminders-history"
-import { Link } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { StageTransitionModal } from "@/components/stage-transition-modal"
 import type { StatusHistoryEntry } from "@/components/stage-transition-modal"
 import { ReassignDialog } from "@/components/reassign-dialog"
@@ -167,9 +167,14 @@ function TrendIcon({ trend }: { trend: "up" | "down" | "stable" }) {
   return <Minus className="size-4" />
 }
 
-function RouteComponent() {
+export function ClientDetailContent({
+  clientId,
+  basePath = "/admin",
+}: {
+  clientId: string
+  basePath?: string
+}) {
   const router = useRouter()
-  const { clientId } = Route.useParams()
   const query = useClientDetailsQuery(clientId)
   const client = query.data!
 
@@ -214,31 +219,43 @@ function RouteComponent() {
             </header>
             <div className="mt-6 flex flex-col gap-6">
               <CompanyInfoCard client={client} />
-              <ClientInfoCard client={client} />
+              <ClientInfoCard client={client} basePath={basePath} />
               {client.status_histories &&
                 client.status_histories.length > 0 && (
                   <StatusHistorySection histories={client.status_histories} />
                 )}
               <Separator />
-              <ContactInfoSection client={client} />
+              <ContactInfoSection client={client} basePath={basePath} />
               <Separator />
               {client.opportunities && client.opportunities.length > 0 && (
-                <OpportunitiesSummary opportunities={client.opportunities} />
+                <OpportunitiesSummary
+                  opportunities={client.opportunities}
+                  basePath={basePath}
+                />
               )}
               <Separator />
-              <ClientSurveySummary client={client} />
+              <ClientSurveySummary client={client} basePath={basePath} />
               <Separator />
               <CommunicationHistorySection
                 communications={client.communications ?? []}
+                basePath={basePath}
               />
               <Separator />
-              <ReminderHistorySection reminders={client.reminders ?? []} />
+              <ReminderHistorySection
+                reminders={client.reminders ?? []}
+                basePath={basePath}
+              />
             </div>
           </>
         )}
       </main>
     </div>
   )
+}
+
+function RouteComponent() {
+  const { clientId } = Route.useParams()
+  return <ClientDetailContent clientId={clientId} />
 }
 
 function CompanyInfoCard({ client }: { client: ClientInfoPage }) {
@@ -294,7 +311,13 @@ function CompanyInfoCard({ client }: { client: ClientInfoPage }) {
   )
 }
 
-function ClientInfoCard({ client }: { client: ClientInfoPage }) {
+function ClientInfoCard({
+  client,
+  basePath = "/admin",
+}: {
+  client: ClientInfoPage
+  basePath?: string
+}) {
   const updateStatusMutation = useUpdateClientStatus(client.id)
   const canManage = useCanManage()
   const [reassignOpen, setReassignOpen] = useState(false)
@@ -362,7 +385,7 @@ function ClientInfoCard({ client }: { client: ClientInfoPage }) {
             )}
             {client.lead && (
               <Button variant="link" size="sm" asChild>
-                <a href={`/admin/lead/${client.lead.id}`}>
+                <a href={`${basePath}/lead/${client.lead.id}`}>
                   <span>View Lead Profile</span>
                   <MoveUpRight />
                 </a>
@@ -487,7 +510,13 @@ function StatusHistorySection({
   )
 }
 
-function ContactInfoSection({ client }: { client: ClientInfoPage }) {
+function ContactInfoSection({
+  client,
+  basePath = "/admin",
+}: {
+  client: ClientInfoPage
+  basePath?: string
+}) {
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const createContactMutation = useCreateContact(String(client.id))
   const deleteContactMutation = useDeleteContact(String(client.id))
@@ -554,7 +583,7 @@ function ContactInfoSection({ client }: { client: ClientInfoPage }) {
               <CardAction className="flex flex-wrap gap-2">
                 {client.lead && (
                   <Button variant="link" size="sm" asChild>
-                    <a href={`/admin/lead/${client.lead.id}`}>
+                    <a href={`${basePath}/lead/${client.lead.id}`}>
                       View Lead Profile
                     </a>
                   </Button>
@@ -750,7 +779,14 @@ function ContactInfoSection({ client }: { client: ClientInfoPage }) {
   )
 }
 
-function ClientSurveySummary({ client }: { client: ClientInfoPage }) {
+function ClientSurveySummary({
+  client,
+  basePath = "/admin",
+}: {
+  client: ClientInfoPage
+  basePath?: string
+}) {
+  const navigate = useNavigate()
   const score = client.average_score !== null
     ? Number(client.average_score)
     : null
@@ -762,14 +798,18 @@ function ClientSurveySummary({ client }: { client: ClientInfoPage }) {
           <CardTitle>Client Satisfaction</CardTitle>
           <CardDescription>Survey performance overview</CardDescription>
           <CardAction>
-            <Button variant="link" size="sm" asChild>
-              <Link
-                to="/admin/satisfaction/$clientId"
-                params={{ clientId: client.id.toString() }}
-              >
-                <span>View All Surveys</span>
-                <MoveUpRight />
-              </Link>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() =>
+                navigate({
+                  to: `${basePath}/satisfaction/$clientId`,
+                  params: { clientId: client.id.toString() },
+                })
+              }
+            >
+              <span>View All Surveys</span>
+              <MoveUpRight />
             </Button>
           </CardAction>
         </CardHeader>

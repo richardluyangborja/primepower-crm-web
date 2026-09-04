@@ -7,9 +7,8 @@ export const Route = createFileRoute("/admin/satisfaction/$clientId/")({
   component: RouteComponent,
 })
 
-function RouteComponent() {
+export function SatisfactionDetailPage({ clientId }: { clientId: number }) {
   const router = useRouter()
-  const { clientId } = Route.useParams()
 
   return (
     <div className="px-4 pb-8">
@@ -20,8 +19,13 @@ function RouteComponent() {
         </Button>
       </header>
       <main>
-        <ClientSatisfactionDetail clientId={Number(clientId)} />
+        <ClientSatisfactionDetail clientId={clientId} />
       </main>
     </div>
   )
+}
+
+function RouteComponent() {
+  const { clientId } = Route.useParams()
+  return <SatisfactionDetailPage clientId={Number(clientId)} />
 }

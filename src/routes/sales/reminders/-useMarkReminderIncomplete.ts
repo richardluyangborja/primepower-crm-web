@@ -12,9 +12,9 @@ export function useMarkReminderIncomplete() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sales_reminders"] })
       queryClient.invalidateQueries({ queryKey: ["sales_reminder_details"] })
-      queryClient.invalidateQueries({ queryKey: ["lead_details"] })
-      queryClient.invalidateQueries({ queryKey: ["client_details"] })
-      queryClient.invalidateQueries({ queryKey: ["opportunity_details"] })
+      queryClient.invalidateQueries({ queryKey: ["sales_lead_details"] })
+      queryClient.invalidateQueries({ queryKey: ["sales_client_details"] })
+      queryClient.invalidateQueries({ queryKey: ["sales_opportunity_details"] })
     },
   })
 }

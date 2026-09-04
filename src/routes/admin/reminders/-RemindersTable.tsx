@@ -71,8 +71,10 @@ function formatDate(dateString: string): string {
 
 export default function RemindersTable({
   defaultScope = "all",
+  basePath = "/admin",
 }: {
   defaultScope?: ReminderScope
+  basePath?: string
 }) {
   const navigate = useNavigate()
   const userQuery = useAuthUser()
@@ -111,7 +113,7 @@ export default function RemindersTable({
             <Button variant="outline" size="icon">
               <FunnelPlus />
             </Button>
-            <Button onClick={() => navigate({ to: "/admin/reminders/create" })}>
+            <Button onClick={() => navigate({ to: `${basePath}/reminders/create` })}>
               <Plus />
               <span>Create Reminder</span>
             </Button>
@@ -144,7 +146,7 @@ export default function RemindersTable({
                   key={reminder.id}
                   onClick={() =>
                     navigate({
-                      to: "/admin/reminders/$reminderId",
+                      to: `${basePath}/reminders/$reminderId`,
                       params: { reminderId: reminder.id.toString() },
                     })
                   }
@@ -244,7 +246,7 @@ export default function RemindersTable({
                             onClick={(e) => {
                               e.stopPropagation()
                               navigate({
-                                to: "/admin/reminders/$reminderId",
+                                to: `${basePath}/reminders/$reminderId`,
                                 params: {
                                   reminderId: reminder.id.toString(),
                                 },

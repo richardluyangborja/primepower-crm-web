@@ -76,9 +76,14 @@ export const Route = createFileRoute("/admin/communications/$communicationId/")(
   }
 )
 
-function RouteComponent() {
+export function CommunicationDetailContent({
+  communicationId,
+  basePath = "/admin",
+}: {
+  communicationId: string
+  basePath?: string
+}) {
   const router = useRouter()
-  const { communicationId } = Route.useParams()
   const navigate = useNavigate()
   const query = useCommunicationDetailsQuery(communicationId)
   const deleteMutation = useDeleteCommunication()
@@ -169,7 +174,7 @@ function RouteComponent() {
                     onClick={async () => {
                       await deleteMutation.mutateAsync(comm.id)
                       setConfirmDeleteOpen(false)
-                      navigate({ to: "/admin/communications" })
+                      navigate({ to: `${basePath}/communications` })
                     }}
                   >
                     {deleteMutation.isPending && (
@@ -185,6 +190,11 @@ function RouteComponent() {
       </main>
     </div>
   )
+}
+
+function RouteComponent() {
+  const { communicationId } = Route.useParams()
+  return <CommunicationDetailContent communicationId={communicationId} />
 }
 
 function CommunicationDetailCard({

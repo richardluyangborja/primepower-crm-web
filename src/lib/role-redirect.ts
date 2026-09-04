@@ -7,7 +7,7 @@ export function getDefaultRouteForRole(role: string | undefined | null): string 
     case "admin":
       return "/admin/dashboard"
     case "manager":
-      return "/admin/dashboard"
+      return "/manager/dashboard"
     case "sales_rep":
       return "/sales/lead-and-client/leads"
     default:
@@ -19,7 +19,11 @@ export function isAllowedForRole(role: string | null | undefined, pathname: stri
   if (!role) return false
 
   if (pathname.startsWith("/admin")) {
-    return role === "admin" || role === "manager"
+    return role === "admin"
+  }
+
+  if (pathname.startsWith("/manager")) {
+    return role === "manager"
   }
 
   if (pathname.startsWith("/sales")) {

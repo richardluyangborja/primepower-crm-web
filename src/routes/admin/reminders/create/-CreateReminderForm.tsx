@@ -56,7 +56,7 @@ type SelectedRecord = {
   id: number
 } | null
 
-export function CreateReminderForm() {
+export function CreateReminderForm({ basePath = "/admin" }: { basePath?: string }) {
   const companiesQuery = useCompanies()
   const createMutation = useCreateReminder()
   const navigate = useNavigate()
@@ -95,7 +95,7 @@ export function CreateReminderForm() {
       form.reset()
       setSelectedCompanyId(null)
       setSelectedRecord(null)
-      return navigate({ to: "/admin/reminders" })
+      return navigate({ to: `${basePath}/reminders` })
     },
   })
 

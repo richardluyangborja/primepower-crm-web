@@ -52,7 +52,7 @@ export type ClientTableRow = {
   }
 }
 
-export default function ClientTable() {
+export default function ClientTable({ basePath = "/admin" }: { basePath?: string }) {
   const navigate = useNavigate()
   const query = useClientsQuery()
   const data = query.data
@@ -90,7 +90,7 @@ export default function ClientTable() {
                   key={client.id}
                   onClick={() =>
                     navigate({
-                      to: "/admin/client/$clientId",
+                      to: `${basePath}/client/$clientId`,
                       params: { clientId: client.id.toString() },
                     })
                   }

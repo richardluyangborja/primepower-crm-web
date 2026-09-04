@@ -108,7 +108,7 @@ function trimSubject(subject: string, max = 30): string {
   return `${subject.slice(0, max).trimEnd()}...`
 }
 
-export default function CommunicationsTable() {
+export default function CommunicationsTable({ basePath = "/admin" }: { basePath?: string }) {
   const navigate = useNavigate()
   const [search, setSearch] = useState("")
   const [type, setType] = useState<string>("all")
@@ -233,7 +233,7 @@ export default function CommunicationsTable() {
         </div>
         <CardAction>
           <Button
-            onClick={() => navigate({ to: "/admin/communications/create" })}
+            onClick={() => navigate({ to: `${basePath}/communications/create` })}
           >
             <Plus />
             <span>Log Communication</span>
@@ -264,7 +264,7 @@ export default function CommunicationsTable() {
                   key={comm.id}
                   onClick={() =>
                     navigate({
-                      to: "/admin/communications/$communicationId",
+                      to: `${basePath}/communications/$communicationId`,
                       params: { communicationId: comm.id.toString() },
                     })
                   }
@@ -362,7 +362,7 @@ export default function CommunicationsTable() {
                             onClick={(e) => {
                               e.stopPropagation()
                               navigate({
-                                to: "/admin/communications/$communicationId",
+                                to: `${basePath}/communications/$communicationId`,
                                 params: {
                                   communicationId: comm.id.toString(),
                                 },

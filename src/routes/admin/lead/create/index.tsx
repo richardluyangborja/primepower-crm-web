@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "@tanstack/react-router"
 import { createFileRoute } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
-import { CreateLeadForm } from "./-CreateLeadForm"
+import { CreateLeadForm } from "@/components/create-lead-form"
 
 export const Route = createFileRoute("/admin/lead/create/")({
   component: RouteComponent,
@@ -20,7 +20,7 @@ function RouteComponent() {
         </Button>
       </header>
       <main>
-        <CreateLeadForm />
+        <CreateLeadForm mode="select" successPath="/admin/lead-and-client/leads" />
       </main>
     </div>
   )

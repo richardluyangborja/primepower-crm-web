@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { useNavigate, Link } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { formatCurrency } from "@/lib/utils"
 import {
   Calendar,
@@ -80,7 +80,7 @@ export type OpportunityPipelineCard = {
   expected_close_date: string | null
 }
 
-export default function OpportunityPipeline() {
+export default function OpportunityPipeline({ basePath = "/admin" }: { basePath?: string }) {
   const navigate = useNavigate()
   const query = useOpportunitiesQuery()
   const data = query.data
@@ -199,11 +199,14 @@ export default function OpportunityPipeline() {
                 </Badge>
               </div>
               {stage.key === "initial_contact" && (
-                <Button asChild className="w-full">
-                  <Link to="/admin/opportunity/create">
-                    <Plus className="mr-2 size-4" />
-                    Create opportunity
-                  </Link>
+                <Button
+                  className="w-full"
+                  onClick={() =>
+                    navigate({ to: `${basePath}/opportunity/create` })
+                  }
+                >
+                  <Plus className="mr-2 size-4" />
+                  Create opportunity
                 </Button>
               )}
               <ScrollArea className="h-[calc(100vh-220px)]">
@@ -214,7 +217,7 @@ export default function OpportunityPipeline() {
                       className="cursor-pointer hover:border-primary/50"
                       onClick={() =>
                         navigate({
-                          to: "/admin/opportunity/$opportunityId",
+                          to: `${basePath}/opportunity/$opportunityId`,
                           params: {
                             opportunityId: opportunity.id.toString(),
                           },

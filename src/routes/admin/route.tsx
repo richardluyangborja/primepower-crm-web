@@ -12,7 +12,7 @@ export const Route = createFileRoute("/admin")({
       if (!role) {
         throw redirect({ to: "/login" })
       }
-      if (role !== "admin" && role !== "manager") {
+      if (role !== "admin") {
         throw redirect({ to: getDefaultRouteForRole(role) })
       }
       if (location.pathname === "/admin" || location.pathname === "/admin/") {

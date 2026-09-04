@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
+import { useState } from "react"
 import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Area, AreaChart } from "recharts"
@@ -37,13 +38,25 @@ import {
   CheckCircle2,
 } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import useDashboardQuery, { type DashboardData } from "./-useDashboardQuery"
+import useSalesRepresentatives from "@/lib/queries/useSalesRepresentatives"
 import { Spinner } from "@/components/ui/spinner"
 import { formatCurrency } from "@/lib/utils"
 
 export const Route = createFileRoute("/admin/dashboard/")({
   component: RouteComponent,
 })
+
+function RouteComponent() {
+  return <DashboardContent />
+}
 
 const CHART_COLORS = [
   "var(--chart-1)",
@@ -53,8 +66,18 @@ const CHART_COLORS = [
   "var(--chart-5)",
 ]
 
-function RouteComponent() {
-  const { data, isLoading } = useDashboardQuery()
+export function DashboardContent({
+  showRepFilter = false,
+}: {
+  showRepFilter?: boolean
+}) {
+  const [repId, setRepId] = useState<number | null>(null)
+  const repsQuery = useSalesRepresentatives()
+  const { data, isLoading } = useDashboardQuery(repId ? { repId } : {})
+
+  const handleRepChange = (value: string) => {
+    setRepId(value === "all" ? null : Number(value))
+  }
 
   if (isLoading) {
     return (
@@ -70,13 +93,35 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <div>
-        <h1 className="font-heading text-2xl font-medium">
-          Dashboard and Analytics
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Overview of your CRM performance metrics
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="font-heading text-2xl font-medium">
+            Dashboard and Analytics
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Overview of your CRM performance metrics
+          </p>
+        </div>
+        {showRepFilter && (
+          <div className="w-56">
+            <Select
+              value={repId ? String(repId) : "all"}
+              onValueChange={handleRepChange}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All representatives</SelectItem>
+                {(repsQuery.data ?? []).map((rep) => (
+                  <SelectItem key={rep.id} value={String(rep.id)}>
+                    {rep.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       <SummaryCards summary={data.summary} />

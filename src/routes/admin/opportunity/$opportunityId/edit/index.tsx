@@ -8,9 +8,14 @@ export const Route = createFileRoute("/admin/opportunity/$opportunityId/edit/")(
   component: RouteComponent,
 })
 
-function RouteComponent() {
+export function OpportunityEditPage({
+  opportunityId,
+  basePath = "/admin",
+}: {
+  opportunityId: number
+  basePath?: string
+}) {
   const router = useRouter()
-  const { opportunityId } = Route.useParams()
 
   return (
     <div className="px-4 pb-8">
@@ -21,8 +26,13 @@ function RouteComponent() {
         </Button>
       </header>
       <main>
-        <EditOpportunityForm opportunityId={Number(opportunityId)} />
+        <EditOpportunityForm opportunityId={opportunityId} basePath={basePath} />
       </main>
     </div>
   )
+}
+
+function RouteComponent() {
+  const { opportunityId } = Route.useParams()
+  return <OpportunityEditPage opportunityId={Number(opportunityId)} />
 }

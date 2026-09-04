@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form"
 import { Loader2 } from "lucide-react"
+import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,8 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useCreateLead, useSalesRepresentatives } from "./-hooks"
-import { createLeadSchema, type CreateLeadFormValues } from "./-types"
 import {
   Card,
   CardAction,
@@ -31,11 +30,115 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useNavigate } from "@tanstack/react-router"
+import api from "@/lib/api"
+import useAuthUser from "@/lib/queries/useAuthUser"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-export function CreateLeadForm() {
-  const salesRepsQuery = useSalesRepresentatives()
-  const createLeadMutation = useCreateLead()
+type SalesRepresentative = {
+  id: number
+  name: string
+}
+
+const createLeadSchema = z.object({
+  company: z.object({
+    name: z.string().min(1, "Company name is required").max(255),
+
+    industry: z.string().min(1, "Industry is required").max(100),
+
+    address: z.string().min(1, "Address is required").max(500),
+
+    phone: z.string().min(1, "Phone number is required").max(50),
+
+    email: z
+      .string()
+      .min(1, "Company email is required")
+      .email("Enter a valid email address")
+      .max(255),
+
+    website: z.string().url("Enter a valid URL").max(255).or(z.literal("")),
+  }),
+
+  primary_contact: z.object({
+    first_name: z.string().min(1, "First name is required").max(100),
+
+    last_name: z.string().min(1, "Last name is required").max(100),
+
+    title: z.string().min(1, "Job title is required").max(100),
+
+    email: z
+      .string()
+      .min(1, "Contact email is required")
+      .email("Enter a valid email address")
+      .max(255),
+
+    phone: z.string().min(1, "Phone number is required").max(50),
+  }),
+
+  source: z.string().min(1, "Lead source is required").max(100),
+
+  assigned_to_id: z.number().int().positive("Select a sales representative"),
+
+  notes: z.string().max(5000, "Notes cannot exceed 5000 characters"),
+})
+
+type CreateLeadFormValues = z.infer<typeof createLeadSchema>
+
+async function getSalesRepresentatives() {
+  const response = await api.get<{ data: SalesRepresentative[] }>(
+    "/api/sales-representatives",
+  )
+
+  return response.data.data
+}
+
+async function createLead(payload: CreateLeadFormValues) {
+  const response = await api.post<{ data: unknown }>("/api/leads", payload)
+
+  return response.data.data
+}
+
+function useSalesRepresentativesQuery() {
+  return useQuery({
+    queryKey: ["sales-representatives"],
+    queryFn: getSalesRepresentatives,
+  })
+}
+
+function useCreateLeadMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: createLead,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["leads"],
+      })
+    },
+  })
+}
+
+/**
+ * Shared "create lead" form used by both the admin and sales surfaces.
+ *
+ * - `mode="select"` (admin): an "assign to sales representative" dropdown is
+ *   shown, so admin/manager can choose who owns the lead.
+ * - `mode="self"` (sales rep): the dropdown is hidden and the lead is always
+ *   assigned to the current user (own-data model).
+ */
+export function CreateLeadForm({
+  mode = "self",
+  successPath,
+}: {
+  mode?: "select" | "self"
+  successPath: string
+}) {
+  const salesRepsQuery = useSalesRepresentativesQuery()
+  const createLeadMutation = useCreateLeadMutation()
+  const userQuery = useAuthUser()
   const navigate = useNavigate()
+
+  const selfId = mode === "self" ? (userQuery.data?.id ?? 0) : 0
 
   const form = useForm({
     defaultValues: {
@@ -57,7 +160,7 @@ export function CreateLeadForm() {
       },
 
       source: "",
-      assigned_to_id: 0,
+      assigned_to_id: selfId,
       notes: "",
     } satisfies CreateLeadFormValues,
 
@@ -66,9 +169,15 @@ export function CreateLeadForm() {
     },
 
     onSubmit: async ({ value }) => {
-      await createLeadMutation.mutateAsync(value)
+      const payload = {
+        ...value,
+        // sales reps always create for themselves; admin/manager pick via the dropdown
+        assigned_to_id: mode === "self" ? selfId : value.assigned_to_id,
+      }
+
+      await createLeadMutation.mutateAsync(payload)
       form.reset()
-      return navigate({ to: "/admin/lead-and-client/leads" })
+      return navigate({ to: successPath })
     },
   })
 
@@ -497,64 +606,69 @@ export function CreateLeadForm() {
                 }}
               />
 
-              <form.Field
-                name="assigned_to_id"
-                children={(field) => {
-                  const isInvalid =
-                    field.state.meta.isTouched && !field.state.meta.isValid
+              {mode === "select" && (
+                <form.Field
+                  name="assigned_to_id"
+                  children={(field) => {
+                    const isInvalid =
+                      field.state.meta.isTouched && !field.state.meta.isValid
 
-                  return (
-                    <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Sales Representative
-                      </FieldLabel>
+                    return (
+                      <Field data-invalid={isInvalid}>
+                        <FieldLabel htmlFor={field.name}>
+                          Sales Representative
+                        </FieldLabel>
 
-                      <Select
-                        value={
-                          field.state.value > 0 ? String(field.state.value) : ""
-                        }
-                        onValueChange={(value) =>
-                          field.handleChange(Number(value))
-                        }
-                        disabled={
-                          salesRepsQuery.isLoading || salesRepsQuery.isError
-                        }
-                      >
-                        <SelectTrigger id={field.name} aria-invalid={isInvalid}>
-                          <SelectValue
-                            placeholder={
-                              salesRepsQuery.isLoading
-                                ? "Loading sales representatives..."
-                                : "Select sales representative"
-                            }
-                          />
-                        </SelectTrigger>
+                        <Select
+                          value={
+                            field.state.value > 0 ? String(field.state.value) : ""
+                          }
+                          onValueChange={(value) =>
+                            field.handleChange(Number(value))
+                          }
+                          disabled={
+                            salesRepsQuery.isLoading || salesRepsQuery.isError
+                          }
+                        >
+                          <SelectTrigger
+                            id={field.name}
+                            aria-invalid={isInvalid}
+                          >
+                            <SelectValue
+                              placeholder={
+                                salesRepsQuery.isLoading
+                                  ? "Loading sales representatives..."
+                                  : "Select sales representative"
+                              }
+                            />
+                          </SelectTrigger>
 
-                        <SelectContent>
-                          {salesRepsQuery.data?.map((salesRep) => (
-                            <SelectItem
-                              key={salesRep.id}
-                              value={String(salesRep.id)}
-                            >
-                              {salesRep.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                          <SelectContent>
+                            {salesRepsQuery.data?.map((salesRep) => (
+                              <SelectItem
+                                key={salesRep.id}
+                                value={String(salesRep.id)}
+                              >
+                                {salesRep.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
 
-                      {salesRepsQuery.isError && (
-                        <FieldError>
-                          Unable to load sales representatives.
-                        </FieldError>
-                      )}
+                        {salesRepsQuery.isError && (
+                          <FieldError>
+                            Unable to load sales representatives.
+                          </FieldError>
+                        )}
 
-                      {isInvalid && (
-                        <FieldError errors={field.state.meta.errors} />
-                      )}
-                    </Field>
-                  )
-                }}
-              />
+                        {isInvalid && (
+                          <FieldError errors={field.state.meta.errors} />
+                        )}
+                      </Field>
+                    )
+                  }}
+                />
+              )}
 
               <form.Field
                 name="notes"

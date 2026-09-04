@@ -19,10 +19,12 @@ import {
   MessageCircleMore,
   Network,
   UserRound,
+  Zap,
 } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -35,6 +37,8 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 import useAuthUser from "@/lib/queries/useAuthUser"
+import { useUnreadCountQuery } from "@/lib/queries/useNotifications"
+import { NotificationsPanel } from "./notifications-panel"
 
 const sidebarConfig = [
   {
@@ -78,11 +82,25 @@ const sidebarConfig = [
       },
     ],
   },
+  {
+    group: "Administration",
+    items: [
+      {
+        path: "/sales/escalation",
+        label: "Escalation Rules",
+        icon: Zap,
+      },
+    ],
+  },
 ]
 
-export function SalesSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function SalesSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate()
   const userQuery = useAuthUser()
+  const unreadCountQuery = useUnreadCountQuery()
+  const unreadCount = unreadCountQuery.data ?? 0
 
   const roleLabel =
     userQuery.data?.role === "admin"
@@ -154,9 +172,26 @@ export function SalesSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
             <div>{userQuery.data?.name ?? "Loading..."}</div>
             <div className="text-muted-foreground">{roleLabel}</div>
           </div>
-          <Button variant="outline" size="icon-lg" className="ml-auto">
-            <Bell />
-          </Button>
+          <NotificationsPanel
+            trigger={
+              <Button
+                variant="outline"
+                size="icon-lg"
+                className="relative ml-auto"
+                aria-label="Notifications"
+              >
+                <Bell />
+                {unreadCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px]"
+                  >
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </Badge>
+                )}
+              </Button>
+            }
+          />
         </div>
       </SidebarFooter>
     </Sidebar>
@@ -171,11 +206,12 @@ function AccountDropdown() {
   const userQuery = useAuthUser()
 
   const user = userQuery.data
-  const initials = user?.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2) ?? "?"
+  const initials =
+    user?.name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2) ?? "?"
 
   const mutation = useMutation({
     mutationFn: async () => {

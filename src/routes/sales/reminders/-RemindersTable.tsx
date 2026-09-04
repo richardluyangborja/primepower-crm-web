@@ -27,6 +27,7 @@ import {
   ReminderPriorityBadge,
   ReminderStatusBadge,
   isOverdue,
+  recurrenceLabels,
   type ReminderPriority,
 } from "@/components/reminders-history"
 import useRemindersQuery from "./-useRemindersQuery"
@@ -41,9 +42,10 @@ export type ReminderTableRow = {
   related_to_status: string | null
   due_date: string
   priority: ReminderPriority
-  status: "pending" | "completed" | "incomplete"
+  status: "pending" | "completed" | "incomplete" | "snoozed"
   is_completed: boolean
   assigned_to: { id: number; name: string } | null
+  recurrence_rule: "daily" | "weekly" | "monthly" | null
   created_at: string
 }
 
@@ -94,6 +96,7 @@ export default function RemindersTable() {
                 <TableHead>Due Date</TableHead>
                 <TableHead>Priority</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Recurrence</TableHead>
                 <TableHead>Assigned To</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead />
@@ -142,7 +145,7 @@ export default function RemindersTable() {
                     <ReminderPriorityBadge priority={reminder.priority} />
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-col gap-1">
                       <ReminderStatusBadge status={reminder.status} />
                       {isOverdue(reminder.due_date, reminder.status) && (
                         <Badge variant="destructive" className="text-xs">
@@ -150,6 +153,15 @@ export default function RemindersTable() {
                         </Badge>
                       )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {reminder.recurrence_rule ? (
+                      <Badge variant="outline" className="text-xs">
+                        {recurrenceLabels[reminder.recurrence_rule]}
+                      </Badge>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {reminder.assigned_to ? (

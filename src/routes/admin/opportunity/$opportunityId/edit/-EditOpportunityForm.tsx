@@ -43,7 +43,7 @@ import { useEffect } from "react"
 import useOpportunityDetailsQuery from "../-useOpportunityDetailsQuery"
 import { Spinner } from "@/components/ui/spinner"
 
-export function EditOpportunityForm({ opportunityId }: { opportunityId: number }) {
+export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { opportunityId: number; basePath?: string }) {
   const companiesQuery = useCompanies()
   const leadsQuery = useLeads()
   const updateOpportunityMutation = useUpdateOpportunity(opportunityId)
@@ -71,7 +71,7 @@ export function EditOpportunityForm({ opportunityId }: { opportunityId: number }
       await updateOpportunityMutation.mutateAsync(
         value as CreateOpportunityPayload
       )
-      return navigate({ to: "/admin/opportunities" })
+      return navigate({ to: `${basePath}/opportunities` as any })
     },
   })
 

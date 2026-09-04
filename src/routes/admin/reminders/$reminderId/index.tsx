@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
-import { createFileRoute, useRouter, Link } from "@tanstack/react-router"
+import { createFileRoute, useRouter, useNavigate } from "@tanstack/react-router"
 import {
   AlertTriangle,
   Bell,
@@ -42,9 +42,14 @@ export const Route = createFileRoute("/admin/reminders/$reminderId/")({
   component: RouteComponent,
 })
 
-function RouteComponent() {
+export function ReminderDetailContent({
+  reminderId,
+  basePath = "/admin",
+}: {
+  reminderId: string
+  basePath?: string
+}) {
   const router = useRouter()
-  const { reminderId } = Route.useParams()
   const query = useReminderDetailsQuery(reminderId)
   const reminder = query.data
   const updateMutation = useMarkReminderComplete()
@@ -122,6 +127,7 @@ function RouteComponent() {
                 onMarkIncomplete={() => markIncompleteMutation.mutate(Number(reminderId))}
                 isMarkingComplete={updateMutation.isPending || markIncompleteMutation.isPending}
                 canManage={canManage}
+                basePath={basePath}
               />
             </div>
           </>
@@ -129,6 +135,11 @@ function RouteComponent() {
       </main>
     </div>
   )
+}
+
+function RouteComponent() {
+  const { reminderId } = Route.useParams()
+  return <ReminderDetailContent reminderId={reminderId} />
 }
 
 function ReminderDetailCard({
@@ -139,6 +150,7 @@ function ReminderDetailCard({
   onMarkIncomplete,
   isMarkingComplete,
   canManage,
+  basePath = "/admin",
 }: {
   reminder: ReminderEntry
   dueFormatted: string | null
@@ -147,7 +159,9 @@ function ReminderDetailCard({
   onMarkIncomplete: () => void
   isMarkingComplete: boolean
   canManage: boolean
+  basePath?: string
 }) {
+  const navigate = useNavigate()
   return (
     <section>
       <Card>
@@ -186,13 +200,13 @@ function ReminderDetailCard({
               disabled={reminder.is_completed}
             />
             {canManage && <DeleteReminderButton reminderId={reminder.id} />}
-            <Link
-              to="/admin/reminders/create"
-              className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs hover:bg-accent"
+            <Button
+              variant="outline"
+              onClick={() => navigate({ to: `${basePath}/reminders/create` })}
             >
               <Pencil className="mr-2 h-4 w-4" />
               Edit
-            </Link>
+            </Button>
           </CardAction>
         </CardHeader>
         <CardContent>

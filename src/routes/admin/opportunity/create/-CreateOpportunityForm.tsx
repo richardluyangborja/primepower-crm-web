@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/card"
 import { useNavigate } from "@tanstack/react-router"
 
-export function CreateOpportunityForm() {
+export function CreateOpportunityForm({ basePath = "/admin" }: { basePath?: string }) {
   const companiesQuery = useCompanies()
   const leadsQuery = useLeads()
   const createOpportunityMutation = useCreateOpportunity()
@@ -65,7 +65,7 @@ export function CreateOpportunityForm() {
       )
       form.reset()
       setSelectedCompanyId(0)
-      return navigate({ to: "/admin/opportunities" })
+      return navigate({ to: `${basePath}/opportunities` as any })
     },
   })
 

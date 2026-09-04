@@ -21,6 +21,8 @@ import {
   Network,
   SlidersHorizontal,
   UserRound,
+  UsersRound,
+  Zap,
 } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip"
 import { Link, useNavigate } from "@tanstack/react-router"
@@ -89,6 +91,16 @@ const sidebarConfig = [
         path: "/admin/users",
         label: "User Management",
         icon: SlidersHorizontal,
+      },
+      {
+        path: "/admin/teams",
+        label: "Team Management",
+        icon: UsersRound,
+      },
+      {
+        path: "/admin/escalation",
+        label: "Escalation Rules",
+        icon: Zap,
       },
       {
         path: "/admin/audit-log",
@@ -206,7 +218,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {unreadCount > 0 && (
                   <Badge
                     variant="destructive"
-                    className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px]"
+                    className="absolute -top-1 -right-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px]"
                   >
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </Badge>

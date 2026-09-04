@@ -169,9 +169,14 @@ function shouldShowQualificationAlert(lead: LeadInfoPage): boolean {
   )
 }
 
-function RouteComponent() {
+export function LeadDetailContent({
+  leadId,
+  basePath = "/admin",
+}: {
+  leadId: string
+  basePath?: string
+}) {
   const router = useRouter()
-  const { leadId } = Route.useParams()
   const query = useLeadDetailsQuery(leadId)
   const lead = query.data!
 
@@ -226,11 +231,15 @@ function RouteComponent() {
               <ContactInfoSection lead={lead} />
               <Separator />
               {lead.opportunities && lead.opportunities.length > 0 && (
-                <OpportunitiesSummary opportunities={lead.opportunities} />
+                <OpportunitiesSummary
+                  opportunities={lead.opportunities}
+                  basePath={basePath}
+                />
               )}
               <Separator />
               <CommunicationHistorySection
                 communications={lead.communications ?? []}
+                basePath={basePath}
               />
               <Separator />
               {lead.status === "converted" &&
@@ -245,13 +254,21 @@ function RouteComponent() {
                     </AlertDescription>
                   </Alert>
                 )}
-              <ReminderHistorySection reminders={lead.reminders ?? []} />
+              <ReminderHistorySection
+                reminders={lead.reminders ?? []}
+                basePath={basePath}
+              />
             </div>{" "}
           </>
         )}
       </main>
     </div>
   )
+}
+
+function RouteComponent() {
+  const { leadId } = Route.useParams()
+  return <LeadDetailContent leadId={leadId} />
 }
 
 function CompanyInfoCard({ lead }: { lead: LeadInfoPage }) {

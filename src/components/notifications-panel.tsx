@@ -22,8 +22,10 @@ import {
 
 export function NotificationsPanel({
   trigger,
+  basePath = "/admin",
 }: {
   trigger?: React.ReactNode
+  basePath?: string
 }) {
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
@@ -109,7 +111,7 @@ export function NotificationsPanel({
                       if (n.reminder_id) {
                         setOpen(false)
                         navigate({
-                          to: "/admin/reminders/$reminderId",
+                          to: `${basePath}/reminders/$reminderId`,
                           params: { reminderId: String(n.reminder_id) },
                         })
                       }

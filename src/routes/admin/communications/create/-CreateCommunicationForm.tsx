@@ -55,7 +55,7 @@ export type CreateCommunicationFormValues = {
   scheduled_at: string | null
 }
 
-export function CreateCommunicationForm() {
+export function CreateCommunicationForm({ basePath = "/admin" }: { basePath?: string }) {
   const companiesQuery = useCompanies()
   const createMutation = useCreateCommunication()
   const navigate = useNavigate()
@@ -81,7 +81,7 @@ export function CreateCommunicationForm() {
       await createMutation.mutateAsync(value)
       form.reset()
       setSelectedCompanyId(null)
-      return navigate({ to: "/admin/communications" })
+      return navigate({ to: `${basePath}/communications` })
     },
   })
 

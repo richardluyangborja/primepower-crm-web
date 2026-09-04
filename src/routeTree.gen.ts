@@ -11,21 +11,33 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as ManagerRouteRouteImport } from './routes/manager/route'
 import { Route as SalesRouteRouteImport } from './routes/sales/route'
 import { Route as AdminLeadAndClientRouteRouteImport } from './routes/admin/lead-and-client/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as ManagerLeadAndClientRouteRouteImport } from './routes/manager/lead-and-client/route'
 import { Route as SalesLeadAndClientRouteRouteImport } from './routes/sales/lead-and-client/route'
 import { Route as SurveyTokenRouteImport } from './routes/survey/$token'
 import { Route as AdminAccountIndexRouteImport } from './routes/admin/account/index'
 import { Route as AdminAuditLogIndexRouteImport } from './routes/admin/audit-log/index'
 import { Route as AdminCommunicationsIndexRouteImport } from './routes/admin/communications/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
+import { Route as AdminEscalationIndexRouteImport } from './routes/admin/escalation/index'
 import { Route as AdminOpportunitiesIndexRouteImport } from './routes/admin/opportunities/index'
 import { Route as AdminRemindersIndexRouteImport } from './routes/admin/reminders/index'
 import { Route as AdminSatisfactionIndexRouteImport } from './routes/admin/satisfaction/index'
+import { Route as AdminTeamsIndexRouteImport } from './routes/admin/teams/index'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
+import { Route as ManagerAccountIndexRouteImport } from './routes/manager/account/index'
+import { Route as ManagerCommunicationsIndexRouteImport } from './routes/manager/communications/index'
+import { Route as ManagerDashboardIndexRouteImport } from './routes/manager/dashboard/index'
+import { Route as ManagerEscalationIndexRouteImport } from './routes/manager/escalation/index'
+import { Route as ManagerOpportunitiesIndexRouteImport } from './routes/manager/opportunities/index'
+import { Route as ManagerRemindersIndexRouteImport } from './routes/manager/reminders/index'
+import { Route as ManagerSatisfactionIndexRouteImport } from './routes/manager/satisfaction/index'
 import { Route as SalesAccountIndexRouteImport } from './routes/sales/account/index'
 import { Route as SalesCommunicationsIndexRouteImport } from './routes/sales/communications/index'
+import { Route as SalesEscalationIndexRouteImport } from './routes/sales/escalation/index'
 import { Route as SalesOpportunitiesIndexRouteImport } from './routes/sales/opportunities/index'
 import { Route as SalesRemindersIndexRouteImport } from './routes/sales/reminders/index'
 import { Route as SalesSatisfactionIndexRouteImport } from './routes/sales/satisfaction/index'
@@ -43,18 +55,32 @@ import { Route as AdminRemindersCreateIndexRouteImport } from './routes/admin/re
 import { Route as AdminSatisfactionClientIdIndexRouteImport } from './routes/admin/satisfaction/$clientId/index'
 import { Route as AdminUsersUserIdIndexRouteImport } from './routes/admin/users/$userId/index'
 import { Route as AdminUsersCreateIndexRouteImport } from './routes/admin/users/create/index'
+import { Route as ManagerClientClientIdIndexRouteImport } from './routes/manager/client/$clientId/index'
+import { Route as ManagerCommunicationsCommunicationIdIndexRouteImport } from './routes/manager/communications/$communicationId/index'
+import { Route as ManagerCommunicationsCreateIndexRouteImport } from './routes/manager/communications/create/index'
+import { Route as ManagerLeadAndClientClientsIndexRouteImport } from './routes/manager/lead-and-client/clients/index'
+import { Route as ManagerLeadAndClientLeadsIndexRouteImport } from './routes/manager/lead-and-client/leads/index'
+import { Route as ManagerLeadLeadIdIndexRouteImport } from './routes/manager/lead/$leadId/index'
+import { Route as ManagerLeadCreateIndexRouteImport } from './routes/manager/lead/create/index'
+import { Route as ManagerOpportunityOpportunityIdIndexRouteImport } from './routes/manager/opportunity/$opportunityId/index'
+import { Route as ManagerOpportunityCreateIndexRouteImport } from './routes/manager/opportunity/create/index'
+import { Route as ManagerRemindersReminderIdIndexRouteImport } from './routes/manager/reminders/$reminderId/index'
+import { Route as ManagerRemindersCreateIndexRouteImport } from './routes/manager/reminders/create/index'
+import { Route as ManagerSatisfactionClientIdIndexRouteImport } from './routes/manager/satisfaction/$clientId/index'
 import { Route as SalesClientClientIdIndexRouteImport } from './routes/sales/client/$clientId/index'
 import { Route as SalesCommunicationsCommunicationIdIndexRouteImport } from './routes/sales/communications/$communicationId/index'
 import { Route as SalesCommunicationsCreateIndexRouteImport } from './routes/sales/communications/create/index'
 import { Route as SalesLeadAndClientClientsIndexRouteImport } from './routes/sales/lead-and-client/clients/index'
 import { Route as SalesLeadAndClientLeadsIndexRouteImport } from './routes/sales/lead-and-client/leads/index'
 import { Route as SalesLeadLeadIdIndexRouteImport } from './routes/sales/lead/$leadId/index'
+import { Route as SalesLeadCreateIndexRouteImport } from './routes/sales/lead/create/index'
 import { Route as SalesOpportunityOpportunityIdIndexRouteImport } from './routes/sales/opportunity/$opportunityId/index'
 import { Route as SalesOpportunityCreateIndexRouteImport } from './routes/sales/opportunity/create/index'
 import { Route as SalesRemindersReminderIdIndexRouteImport } from './routes/sales/reminders/$reminderId/index'
 import { Route as SalesRemindersCreateIndexRouteImport } from './routes/sales/reminders/create/index'
 import { Route as SalesSatisfactionClientIdIndexRouteImport } from './routes/sales/satisfaction/$clientId/index'
 import { Route as AdminOpportunityOpportunityIdEditIndexRouteImport } from './routes/admin/opportunity/$opportunityId/edit/index'
+import { Route as ManagerOpportunityOpportunityIdEditIndexRouteImport } from './routes/manager/opportunity/$opportunityId/edit/index'
 import { Route as SalesOpportunityOpportunityIdEditIndexRouteImport } from './routes/sales/opportunity/$opportunityId/edit/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -65,6 +91,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManagerRouteRoute = ManagerRouteRouteImport.update({
+  id: '/manager',
+  path: '/manager',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SalesRouteRoute = SalesRouteRouteImport.update({
@@ -82,6 +113,12 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ManagerLeadAndClientRouteRoute =
+  ManagerLeadAndClientRouteRouteImport.update({
+    id: '/lead-and-client',
+    path: '/lead-and-client',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
 const SalesLeadAndClientRouteRoute = SalesLeadAndClientRouteRouteImport.update({
   id: '/lead-and-client',
   path: '/lead-and-client',
@@ -113,6 +150,11 @@ const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminEscalationIndexRoute = AdminEscalationIndexRouteImport.update({
+  id: '/escalation/',
+  path: '/escalation/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminOpportunitiesIndexRoute = AdminOpportunitiesIndexRouteImport.update({
   id: '/opportunities/',
   path: '/opportunities/',
@@ -128,11 +170,54 @@ const AdminSatisfactionIndexRoute = AdminSatisfactionIndexRouteImport.update({
   path: '/satisfaction/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminTeamsIndexRoute = AdminTeamsIndexRouteImport.update({
+  id: '/teams/',
+  path: '/teams/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const ManagerAccountIndexRoute = ManagerAccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerCommunicationsIndexRoute =
+  ManagerCommunicationsIndexRouteImport.update({
+    id: '/communications/',
+    path: '/communications/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerDashboardIndexRoute = ManagerDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerEscalationIndexRoute = ManagerEscalationIndexRouteImport.update({
+  id: '/escalation/',
+  path: '/escalation/',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerOpportunitiesIndexRoute =
+  ManagerOpportunitiesIndexRouteImport.update({
+    id: '/opportunities/',
+    path: '/opportunities/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerRemindersIndexRoute = ManagerRemindersIndexRouteImport.update({
+  id: '/reminders/',
+  path: '/reminders/',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerSatisfactionIndexRoute =
+  ManagerSatisfactionIndexRouteImport.update({
+    id: '/satisfaction/',
+    path: '/satisfaction/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
 const SalesAccountIndexRoute = SalesAccountIndexRouteImport.update({
   id: '/account/',
   path: '/account/',
@@ -144,6 +229,11 @@ const SalesCommunicationsIndexRoute =
     path: '/communications/',
     getParentRoute: () => SalesRouteRoute,
   } as any)
+const SalesEscalationIndexRoute = SalesEscalationIndexRouteImport.update({
+  id: '/escalation/',
+  path: '/escalation/',
+  getParentRoute: () => SalesRouteRoute,
+} as any)
 const SalesOpportunitiesIndexRoute = SalesOpportunitiesIndexRouteImport.update({
   id: '/opportunities/',
   path: '/opportunities/',
@@ -239,6 +329,76 @@ const AdminUsersCreateIndexRoute = AdminUsersCreateIndexRouteImport.update({
   path: '/users/create/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const ManagerClientClientIdIndexRoute =
+  ManagerClientClientIdIndexRouteImport.update({
+    id: '/client/$clientId/',
+    path: '/client/$clientId/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerCommunicationsCommunicationIdIndexRoute =
+  ManagerCommunicationsCommunicationIdIndexRouteImport.update({
+    id: '/communications/$communicationId/',
+    path: '/communications/$communicationId/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerCommunicationsCreateIndexRoute =
+  ManagerCommunicationsCreateIndexRouteImport.update({
+    id: '/communications/create/',
+    path: '/communications/create/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerLeadAndClientClientsIndexRoute =
+  ManagerLeadAndClientClientsIndexRouteImport.update({
+    id: '/clients/',
+    path: '/clients/',
+    getParentRoute: () => ManagerLeadAndClientRouteRoute,
+  } as any)
+const ManagerLeadAndClientLeadsIndexRoute =
+  ManagerLeadAndClientLeadsIndexRouteImport.update({
+    id: '/leads/',
+    path: '/leads/',
+    getParentRoute: () => ManagerLeadAndClientRouteRoute,
+  } as any)
+const ManagerLeadLeadIdIndexRoute = ManagerLeadLeadIdIndexRouteImport.update({
+  id: '/lead/$leadId/',
+  path: '/lead/$leadId/',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerLeadCreateIndexRoute = ManagerLeadCreateIndexRouteImport.update({
+  id: '/lead/create/',
+  path: '/lead/create/',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
+const ManagerOpportunityOpportunityIdIndexRoute =
+  ManagerOpportunityOpportunityIdIndexRouteImport.update({
+    id: '/opportunity/$opportunityId/',
+    path: '/opportunity/$opportunityId/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerOpportunityCreateIndexRoute =
+  ManagerOpportunityCreateIndexRouteImport.update({
+    id: '/opportunity/create/',
+    path: '/opportunity/create/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerRemindersReminderIdIndexRoute =
+  ManagerRemindersReminderIdIndexRouteImport.update({
+    id: '/reminders/$reminderId/',
+    path: '/reminders/$reminderId/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerRemindersCreateIndexRoute =
+  ManagerRemindersCreateIndexRouteImport.update({
+    id: '/reminders/create/',
+    path: '/reminders/create/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
+const ManagerSatisfactionClientIdIndexRoute =
+  ManagerSatisfactionClientIdIndexRouteImport.update({
+    id: '/satisfaction/$clientId/',
+    path: '/satisfaction/$clientId/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
 const SalesClientClientIdIndexRoute =
   SalesClientClientIdIndexRouteImport.update({
     id: '/client/$clientId/',
@@ -272,6 +432,11 @@ const SalesLeadAndClientLeadsIndexRoute =
 const SalesLeadLeadIdIndexRoute = SalesLeadLeadIdIndexRouteImport.update({
   id: '/lead/$leadId/',
   path: '/lead/$leadId/',
+  getParentRoute: () => SalesRouteRoute,
+} as any)
+const SalesLeadCreateIndexRoute = SalesLeadCreateIndexRouteImport.update({
+  id: '/lead/create/',
+  path: '/lead/create/',
   getParentRoute: () => SalesRouteRoute,
 } as any)
 const SalesOpportunityOpportunityIdIndexRoute =
@@ -310,6 +475,12 @@ const AdminOpportunityOpportunityIdEditIndexRoute =
     path: '/opportunity/$opportunityId/edit/',
     getParentRoute: () => AdminRouteRoute,
   } as any)
+const ManagerOpportunityOpportunityIdEditIndexRoute =
+  ManagerOpportunityOpportunityIdEditIndexRouteImport.update({
+    id: '/opportunity/$opportunityId/edit/',
+    path: '/opportunity/$opportunityId/edit/',
+    getParentRoute: () => ManagerRouteRoute,
+  } as any)
 const SalesOpportunityOpportunityIdEditIndexRoute =
   SalesOpportunityOpportunityIdEditIndexRouteImport.update({
     id: '/opportunity/$opportunityId/edit/',
@@ -320,8 +491,10 @@ const SalesOpportunityOpportunityIdEditIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/manager': typeof ManagerRouteRouteWithChildren
   '/sales': typeof SalesRouteRouteWithChildren
   '/admin/lead-and-client': typeof AdminLeadAndClientRouteRouteWithChildren
+  '/manager/lead-and-client': typeof ManagerLeadAndClientRouteRouteWithChildren
   '/sales/lead-and-client': typeof SalesLeadAndClientRouteRouteWithChildren
   '/survey/$token': typeof SurveyTokenRoute
   '/login/': typeof LoginIndexRoute
@@ -329,12 +502,22 @@ export interface FileRoutesByFullPath {
   '/admin/audit-log/': typeof AdminAuditLogIndexRoute
   '/admin/communications/': typeof AdminCommunicationsIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/admin/escalation/': typeof AdminEscalationIndexRoute
   '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
   '/admin/reminders/': typeof AdminRemindersIndexRoute
   '/admin/satisfaction/': typeof AdminSatisfactionIndexRoute
+  '/admin/teams/': typeof AdminTeamsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
+  '/manager/account/': typeof ManagerAccountIndexRoute
+  '/manager/communications/': typeof ManagerCommunicationsIndexRoute
+  '/manager/dashboard/': typeof ManagerDashboardIndexRoute
+  '/manager/escalation/': typeof ManagerEscalationIndexRoute
+  '/manager/opportunities/': typeof ManagerOpportunitiesIndexRoute
+  '/manager/reminders/': typeof ManagerRemindersIndexRoute
+  '/manager/satisfaction/': typeof ManagerSatisfactionIndexRoute
   '/sales/account/': typeof SalesAccountIndexRoute
   '/sales/communications/': typeof SalesCommunicationsIndexRoute
+  '/sales/escalation/': typeof SalesEscalationIndexRoute
   '/sales/opportunities/': typeof SalesOpportunitiesIndexRoute
   '/sales/reminders/': typeof SalesRemindersIndexRoute
   '/sales/satisfaction/': typeof SalesSatisfactionIndexRoute
@@ -352,25 +535,41 @@ export interface FileRoutesByFullPath {
   '/admin/satisfaction/$clientId/': typeof AdminSatisfactionClientIdIndexRoute
   '/admin/users/$userId/': typeof AdminUsersUserIdIndexRoute
   '/admin/users/create/': typeof AdminUsersCreateIndexRoute
+  '/manager/client/$clientId/': typeof ManagerClientClientIdIndexRoute
+  '/manager/communications/$communicationId/': typeof ManagerCommunicationsCommunicationIdIndexRoute
+  '/manager/communications/create/': typeof ManagerCommunicationsCreateIndexRoute
+  '/manager/lead-and-client/clients/': typeof ManagerLeadAndClientClientsIndexRoute
+  '/manager/lead-and-client/leads/': typeof ManagerLeadAndClientLeadsIndexRoute
+  '/manager/lead/$leadId/': typeof ManagerLeadLeadIdIndexRoute
+  '/manager/lead/create/': typeof ManagerLeadCreateIndexRoute
+  '/manager/opportunity/$opportunityId/': typeof ManagerOpportunityOpportunityIdIndexRoute
+  '/manager/opportunity/create/': typeof ManagerOpportunityCreateIndexRoute
+  '/manager/reminders/$reminderId/': typeof ManagerRemindersReminderIdIndexRoute
+  '/manager/reminders/create/': typeof ManagerRemindersCreateIndexRoute
+  '/manager/satisfaction/$clientId/': typeof ManagerSatisfactionClientIdIndexRoute
   '/sales/client/$clientId/': typeof SalesClientClientIdIndexRoute
   '/sales/communications/$communicationId/': typeof SalesCommunicationsCommunicationIdIndexRoute
   '/sales/communications/create/': typeof SalesCommunicationsCreateIndexRoute
   '/sales/lead-and-client/clients/': typeof SalesLeadAndClientClientsIndexRoute
   '/sales/lead-and-client/leads/': typeof SalesLeadAndClientLeadsIndexRoute
   '/sales/lead/$leadId/': typeof SalesLeadLeadIdIndexRoute
+  '/sales/lead/create/': typeof SalesLeadCreateIndexRoute
   '/sales/opportunity/$opportunityId/': typeof SalesOpportunityOpportunityIdIndexRoute
   '/sales/opportunity/create/': typeof SalesOpportunityCreateIndexRoute
   '/sales/reminders/$reminderId/': typeof SalesRemindersReminderIdIndexRoute
   '/sales/reminders/create/': typeof SalesRemindersCreateIndexRoute
   '/sales/satisfaction/$clientId/': typeof SalesSatisfactionClientIdIndexRoute
   '/admin/opportunity/$opportunityId/edit/': typeof AdminOpportunityOpportunityIdEditIndexRoute
+  '/manager/opportunity/$opportunityId/edit/': typeof ManagerOpportunityOpportunityIdEditIndexRoute
   '/sales/opportunity/$opportunityId/edit/': typeof SalesOpportunityOpportunityIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/manager': typeof ManagerRouteRouteWithChildren
   '/sales': typeof SalesRouteRouteWithChildren
   '/admin/lead-and-client': typeof AdminLeadAndClientRouteRouteWithChildren
+  '/manager/lead-and-client': typeof ManagerLeadAndClientRouteRouteWithChildren
   '/sales/lead-and-client': typeof SalesLeadAndClientRouteRouteWithChildren
   '/survey/$token': typeof SurveyTokenRoute
   '/login': typeof LoginIndexRoute
@@ -378,12 +577,22 @@ export interface FileRoutesByTo {
   '/admin/audit-log': typeof AdminAuditLogIndexRoute
   '/admin/communications': typeof AdminCommunicationsIndexRoute
   '/admin/dashboard': typeof AdminDashboardIndexRoute
+  '/admin/escalation': typeof AdminEscalationIndexRoute
   '/admin/opportunities': typeof AdminOpportunitiesIndexRoute
   '/admin/reminders': typeof AdminRemindersIndexRoute
   '/admin/satisfaction': typeof AdminSatisfactionIndexRoute
+  '/admin/teams': typeof AdminTeamsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/manager/account': typeof ManagerAccountIndexRoute
+  '/manager/communications': typeof ManagerCommunicationsIndexRoute
+  '/manager/dashboard': typeof ManagerDashboardIndexRoute
+  '/manager/escalation': typeof ManagerEscalationIndexRoute
+  '/manager/opportunities': typeof ManagerOpportunitiesIndexRoute
+  '/manager/reminders': typeof ManagerRemindersIndexRoute
+  '/manager/satisfaction': typeof ManagerSatisfactionIndexRoute
   '/sales/account': typeof SalesAccountIndexRoute
   '/sales/communications': typeof SalesCommunicationsIndexRoute
+  '/sales/escalation': typeof SalesEscalationIndexRoute
   '/sales/opportunities': typeof SalesOpportunitiesIndexRoute
   '/sales/reminders': typeof SalesRemindersIndexRoute
   '/sales/satisfaction': typeof SalesSatisfactionIndexRoute
@@ -401,26 +610,42 @@ export interface FileRoutesByTo {
   '/admin/satisfaction/$clientId': typeof AdminSatisfactionClientIdIndexRoute
   '/admin/users/$userId': typeof AdminUsersUserIdIndexRoute
   '/admin/users/create': typeof AdminUsersCreateIndexRoute
+  '/manager/client/$clientId': typeof ManagerClientClientIdIndexRoute
+  '/manager/communications/$communicationId': typeof ManagerCommunicationsCommunicationIdIndexRoute
+  '/manager/communications/create': typeof ManagerCommunicationsCreateIndexRoute
+  '/manager/lead-and-client/clients': typeof ManagerLeadAndClientClientsIndexRoute
+  '/manager/lead-and-client/leads': typeof ManagerLeadAndClientLeadsIndexRoute
+  '/manager/lead/$leadId': typeof ManagerLeadLeadIdIndexRoute
+  '/manager/lead/create': typeof ManagerLeadCreateIndexRoute
+  '/manager/opportunity/$opportunityId': typeof ManagerOpportunityOpportunityIdIndexRoute
+  '/manager/opportunity/create': typeof ManagerOpportunityCreateIndexRoute
+  '/manager/reminders/$reminderId': typeof ManagerRemindersReminderIdIndexRoute
+  '/manager/reminders/create': typeof ManagerRemindersCreateIndexRoute
+  '/manager/satisfaction/$clientId': typeof ManagerSatisfactionClientIdIndexRoute
   '/sales/client/$clientId': typeof SalesClientClientIdIndexRoute
   '/sales/communications/$communicationId': typeof SalesCommunicationsCommunicationIdIndexRoute
   '/sales/communications/create': typeof SalesCommunicationsCreateIndexRoute
   '/sales/lead-and-client/clients': typeof SalesLeadAndClientClientsIndexRoute
   '/sales/lead-and-client/leads': typeof SalesLeadAndClientLeadsIndexRoute
   '/sales/lead/$leadId': typeof SalesLeadLeadIdIndexRoute
+  '/sales/lead/create': typeof SalesLeadCreateIndexRoute
   '/sales/opportunity/$opportunityId': typeof SalesOpportunityOpportunityIdIndexRoute
   '/sales/opportunity/create': typeof SalesOpportunityCreateIndexRoute
   '/sales/reminders/$reminderId': typeof SalesRemindersReminderIdIndexRoute
   '/sales/reminders/create': typeof SalesRemindersCreateIndexRoute
   '/sales/satisfaction/$clientId': typeof SalesSatisfactionClientIdIndexRoute
   '/admin/opportunity/$opportunityId/edit': typeof AdminOpportunityOpportunityIdEditIndexRoute
+  '/manager/opportunity/$opportunityId/edit': typeof ManagerOpportunityOpportunityIdEditIndexRoute
   '/sales/opportunity/$opportunityId/edit': typeof SalesOpportunityOpportunityIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/manager': typeof ManagerRouteRouteWithChildren
   '/sales': typeof SalesRouteRouteWithChildren
   '/admin/lead-and-client': typeof AdminLeadAndClientRouteRouteWithChildren
+  '/manager/lead-and-client': typeof ManagerLeadAndClientRouteRouteWithChildren
   '/sales/lead-and-client': typeof SalesLeadAndClientRouteRouteWithChildren
   '/survey/$token': typeof SurveyTokenRoute
   '/login/': typeof LoginIndexRoute
@@ -428,12 +653,22 @@ export interface FileRoutesById {
   '/admin/audit-log/': typeof AdminAuditLogIndexRoute
   '/admin/communications/': typeof AdminCommunicationsIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/admin/escalation/': typeof AdminEscalationIndexRoute
   '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
   '/admin/reminders/': typeof AdminRemindersIndexRoute
   '/admin/satisfaction/': typeof AdminSatisfactionIndexRoute
+  '/admin/teams/': typeof AdminTeamsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
+  '/manager/account/': typeof ManagerAccountIndexRoute
+  '/manager/communications/': typeof ManagerCommunicationsIndexRoute
+  '/manager/dashboard/': typeof ManagerDashboardIndexRoute
+  '/manager/escalation/': typeof ManagerEscalationIndexRoute
+  '/manager/opportunities/': typeof ManagerOpportunitiesIndexRoute
+  '/manager/reminders/': typeof ManagerRemindersIndexRoute
+  '/manager/satisfaction/': typeof ManagerSatisfactionIndexRoute
   '/sales/account/': typeof SalesAccountIndexRoute
   '/sales/communications/': typeof SalesCommunicationsIndexRoute
+  '/sales/escalation/': typeof SalesEscalationIndexRoute
   '/sales/opportunities/': typeof SalesOpportunitiesIndexRoute
   '/sales/reminders/': typeof SalesRemindersIndexRoute
   '/sales/satisfaction/': typeof SalesSatisfactionIndexRoute
@@ -451,18 +686,32 @@ export interface FileRoutesById {
   '/admin/satisfaction/$clientId/': typeof AdminSatisfactionClientIdIndexRoute
   '/admin/users/$userId/': typeof AdminUsersUserIdIndexRoute
   '/admin/users/create/': typeof AdminUsersCreateIndexRoute
+  '/manager/client/$clientId/': typeof ManagerClientClientIdIndexRoute
+  '/manager/communications/$communicationId/': typeof ManagerCommunicationsCommunicationIdIndexRoute
+  '/manager/communications/create/': typeof ManagerCommunicationsCreateIndexRoute
+  '/manager/lead-and-client/clients/': typeof ManagerLeadAndClientClientsIndexRoute
+  '/manager/lead-and-client/leads/': typeof ManagerLeadAndClientLeadsIndexRoute
+  '/manager/lead/$leadId/': typeof ManagerLeadLeadIdIndexRoute
+  '/manager/lead/create/': typeof ManagerLeadCreateIndexRoute
+  '/manager/opportunity/$opportunityId/': typeof ManagerOpportunityOpportunityIdIndexRoute
+  '/manager/opportunity/create/': typeof ManagerOpportunityCreateIndexRoute
+  '/manager/reminders/$reminderId/': typeof ManagerRemindersReminderIdIndexRoute
+  '/manager/reminders/create/': typeof ManagerRemindersCreateIndexRoute
+  '/manager/satisfaction/$clientId/': typeof ManagerSatisfactionClientIdIndexRoute
   '/sales/client/$clientId/': typeof SalesClientClientIdIndexRoute
   '/sales/communications/$communicationId/': typeof SalesCommunicationsCommunicationIdIndexRoute
   '/sales/communications/create/': typeof SalesCommunicationsCreateIndexRoute
   '/sales/lead-and-client/clients/': typeof SalesLeadAndClientClientsIndexRoute
   '/sales/lead-and-client/leads/': typeof SalesLeadAndClientLeadsIndexRoute
   '/sales/lead/$leadId/': typeof SalesLeadLeadIdIndexRoute
+  '/sales/lead/create/': typeof SalesLeadCreateIndexRoute
   '/sales/opportunity/$opportunityId/': typeof SalesOpportunityOpportunityIdIndexRoute
   '/sales/opportunity/create/': typeof SalesOpportunityCreateIndexRoute
   '/sales/reminders/$reminderId/': typeof SalesRemindersReminderIdIndexRoute
   '/sales/reminders/create/': typeof SalesRemindersCreateIndexRoute
   '/sales/satisfaction/$clientId/': typeof SalesSatisfactionClientIdIndexRoute
   '/admin/opportunity/$opportunityId/edit/': typeof AdminOpportunityOpportunityIdEditIndexRoute
+  '/manager/opportunity/$opportunityId/edit/': typeof ManagerOpportunityOpportunityIdEditIndexRoute
   '/sales/opportunity/$opportunityId/edit/': typeof SalesOpportunityOpportunityIdEditIndexRoute
 }
 export interface FileRouteTypes {
@@ -470,8 +719,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/manager'
     | '/sales'
     | '/admin/lead-and-client'
+    | '/manager/lead-and-client'
     | '/sales/lead-and-client'
     | '/survey/$token'
     | '/login/'
@@ -479,12 +730,22 @@ export interface FileRouteTypes {
     | '/admin/audit-log/'
     | '/admin/communications/'
     | '/admin/dashboard/'
+    | '/admin/escalation/'
     | '/admin/opportunities/'
     | '/admin/reminders/'
     | '/admin/satisfaction/'
+    | '/admin/teams/'
     | '/admin/users/'
+    | '/manager/account/'
+    | '/manager/communications/'
+    | '/manager/dashboard/'
+    | '/manager/escalation/'
+    | '/manager/opportunities/'
+    | '/manager/reminders/'
+    | '/manager/satisfaction/'
     | '/sales/account/'
     | '/sales/communications/'
+    | '/sales/escalation/'
     | '/sales/opportunities/'
     | '/sales/reminders/'
     | '/sales/satisfaction/'
@@ -502,25 +763,41 @@ export interface FileRouteTypes {
     | '/admin/satisfaction/$clientId/'
     | '/admin/users/$userId/'
     | '/admin/users/create/'
+    | '/manager/client/$clientId/'
+    | '/manager/communications/$communicationId/'
+    | '/manager/communications/create/'
+    | '/manager/lead-and-client/clients/'
+    | '/manager/lead-and-client/leads/'
+    | '/manager/lead/$leadId/'
+    | '/manager/lead/create/'
+    | '/manager/opportunity/$opportunityId/'
+    | '/manager/opportunity/create/'
+    | '/manager/reminders/$reminderId/'
+    | '/manager/reminders/create/'
+    | '/manager/satisfaction/$clientId/'
     | '/sales/client/$clientId/'
     | '/sales/communications/$communicationId/'
     | '/sales/communications/create/'
     | '/sales/lead-and-client/clients/'
     | '/sales/lead-and-client/leads/'
     | '/sales/lead/$leadId/'
+    | '/sales/lead/create/'
     | '/sales/opportunity/$opportunityId/'
     | '/sales/opportunity/create/'
     | '/sales/reminders/$reminderId/'
     | '/sales/reminders/create/'
     | '/sales/satisfaction/$clientId/'
     | '/admin/opportunity/$opportunityId/edit/'
+    | '/manager/opportunity/$opportunityId/edit/'
     | '/sales/opportunity/$opportunityId/edit/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/manager'
     | '/sales'
     | '/admin/lead-and-client'
+    | '/manager/lead-and-client'
     | '/sales/lead-and-client'
     | '/survey/$token'
     | '/login'
@@ -528,12 +805,22 @@ export interface FileRouteTypes {
     | '/admin/audit-log'
     | '/admin/communications'
     | '/admin/dashboard'
+    | '/admin/escalation'
     | '/admin/opportunities'
     | '/admin/reminders'
     | '/admin/satisfaction'
+    | '/admin/teams'
     | '/admin/users'
+    | '/manager/account'
+    | '/manager/communications'
+    | '/manager/dashboard'
+    | '/manager/escalation'
+    | '/manager/opportunities'
+    | '/manager/reminders'
+    | '/manager/satisfaction'
     | '/sales/account'
     | '/sales/communications'
+    | '/sales/escalation'
     | '/sales/opportunities'
     | '/sales/reminders'
     | '/sales/satisfaction'
@@ -551,25 +838,41 @@ export interface FileRouteTypes {
     | '/admin/satisfaction/$clientId'
     | '/admin/users/$userId'
     | '/admin/users/create'
+    | '/manager/client/$clientId'
+    | '/manager/communications/$communicationId'
+    | '/manager/communications/create'
+    | '/manager/lead-and-client/clients'
+    | '/manager/lead-and-client/leads'
+    | '/manager/lead/$leadId'
+    | '/manager/lead/create'
+    | '/manager/opportunity/$opportunityId'
+    | '/manager/opportunity/create'
+    | '/manager/reminders/$reminderId'
+    | '/manager/reminders/create'
+    | '/manager/satisfaction/$clientId'
     | '/sales/client/$clientId'
     | '/sales/communications/$communicationId'
     | '/sales/communications/create'
     | '/sales/lead-and-client/clients'
     | '/sales/lead-and-client/leads'
     | '/sales/lead/$leadId'
+    | '/sales/lead/create'
     | '/sales/opportunity/$opportunityId'
     | '/sales/opportunity/create'
     | '/sales/reminders/$reminderId'
     | '/sales/reminders/create'
     | '/sales/satisfaction/$clientId'
     | '/admin/opportunity/$opportunityId/edit'
+    | '/manager/opportunity/$opportunityId/edit'
     | '/sales/opportunity/$opportunityId/edit'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/manager'
     | '/sales'
     | '/admin/lead-and-client'
+    | '/manager/lead-and-client'
     | '/sales/lead-and-client'
     | '/survey/$token'
     | '/login/'
@@ -577,12 +880,22 @@ export interface FileRouteTypes {
     | '/admin/audit-log/'
     | '/admin/communications/'
     | '/admin/dashboard/'
+    | '/admin/escalation/'
     | '/admin/opportunities/'
     | '/admin/reminders/'
     | '/admin/satisfaction/'
+    | '/admin/teams/'
     | '/admin/users/'
+    | '/manager/account/'
+    | '/manager/communications/'
+    | '/manager/dashboard/'
+    | '/manager/escalation/'
+    | '/manager/opportunities/'
+    | '/manager/reminders/'
+    | '/manager/satisfaction/'
     | '/sales/account/'
     | '/sales/communications/'
+    | '/sales/escalation/'
     | '/sales/opportunities/'
     | '/sales/reminders/'
     | '/sales/satisfaction/'
@@ -600,24 +913,39 @@ export interface FileRouteTypes {
     | '/admin/satisfaction/$clientId/'
     | '/admin/users/$userId/'
     | '/admin/users/create/'
+    | '/manager/client/$clientId/'
+    | '/manager/communications/$communicationId/'
+    | '/manager/communications/create/'
+    | '/manager/lead-and-client/clients/'
+    | '/manager/lead-and-client/leads/'
+    | '/manager/lead/$leadId/'
+    | '/manager/lead/create/'
+    | '/manager/opportunity/$opportunityId/'
+    | '/manager/opportunity/create/'
+    | '/manager/reminders/$reminderId/'
+    | '/manager/reminders/create/'
+    | '/manager/satisfaction/$clientId/'
     | '/sales/client/$clientId/'
     | '/sales/communications/$communicationId/'
     | '/sales/communications/create/'
     | '/sales/lead-and-client/clients/'
     | '/sales/lead-and-client/leads/'
     | '/sales/lead/$leadId/'
+    | '/sales/lead/create/'
     | '/sales/opportunity/$opportunityId/'
     | '/sales/opportunity/create/'
     | '/sales/reminders/$reminderId/'
     | '/sales/reminders/create/'
     | '/sales/satisfaction/$clientId/'
     | '/admin/opportunity/$opportunityId/edit/'
+    | '/manager/opportunity/$opportunityId/edit/'
     | '/sales/opportunity/$opportunityId/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  ManagerRouteRoute: typeof ManagerRouteRouteWithChildren
   SalesRouteRoute: typeof SalesRouteRouteWithChildren
   SurveyTokenRoute: typeof SurveyTokenRoute
   LoginIndexRoute: typeof LoginIndexRoute
@@ -637,6 +965,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manager': {
+      id: '/manager'
+      path: '/manager'
+      fullPath: '/manager'
+      preLoaderRoute: typeof ManagerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sales': {
@@ -659,6 +994,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/login/'
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/manager/lead-and-client': {
+      id: '/manager/lead-and-client'
+      path: '/lead-and-client'
+      fullPath: '/manager/lead-and-client'
+      preLoaderRoute: typeof ManagerLeadAndClientRouteRouteImport
+      parentRoute: typeof ManagerRouteRoute
     }
     '/sales/lead-and-client': {
       id: '/sales/lead-and-client'
@@ -702,6 +1044,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/escalation/': {
+      id: '/admin/escalation/'
+      path: '/escalation'
+      fullPath: '/admin/escalation/'
+      preLoaderRoute: typeof AdminEscalationIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/opportunities/': {
       id: '/admin/opportunities/'
       path: '/opportunities'
@@ -723,12 +1072,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSatisfactionIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/teams/': {
+      id: '/admin/teams/'
+      path: '/teams'
+      fullPath: '/admin/teams/'
+      preLoaderRoute: typeof AdminTeamsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/users/': {
       id: '/admin/users/'
       path: '/users'
       fullPath: '/admin/users/'
       preLoaderRoute: typeof AdminUsersIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/manager/account/': {
+      id: '/manager/account/'
+      path: '/account'
+      fullPath: '/manager/account/'
+      preLoaderRoute: typeof ManagerAccountIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/communications/': {
+      id: '/manager/communications/'
+      path: '/communications'
+      fullPath: '/manager/communications/'
+      preLoaderRoute: typeof ManagerCommunicationsIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/dashboard/': {
+      id: '/manager/dashboard/'
+      path: '/dashboard'
+      fullPath: '/manager/dashboard/'
+      preLoaderRoute: typeof ManagerDashboardIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/escalation/': {
+      id: '/manager/escalation/'
+      path: '/escalation'
+      fullPath: '/manager/escalation/'
+      preLoaderRoute: typeof ManagerEscalationIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/opportunities/': {
+      id: '/manager/opportunities/'
+      path: '/opportunities'
+      fullPath: '/manager/opportunities/'
+      preLoaderRoute: typeof ManagerOpportunitiesIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/reminders/': {
+      id: '/manager/reminders/'
+      path: '/reminders'
+      fullPath: '/manager/reminders/'
+      preLoaderRoute: typeof ManagerRemindersIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/satisfaction/': {
+      id: '/manager/satisfaction/'
+      path: '/satisfaction'
+      fullPath: '/manager/satisfaction/'
+      preLoaderRoute: typeof ManagerSatisfactionIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
     }
     '/sales/account/': {
       id: '/sales/account/'
@@ -742,6 +1147,13 @@ declare module '@tanstack/react-router' {
       path: '/communications'
       fullPath: '/sales/communications/'
       preLoaderRoute: typeof SalesCommunicationsIndexRouteImport
+      parentRoute: typeof SalesRouteRoute
+    }
+    '/sales/escalation/': {
+      id: '/sales/escalation/'
+      path: '/escalation'
+      fullPath: '/sales/escalation/'
+      preLoaderRoute: typeof SalesEscalationIndexRouteImport
       parentRoute: typeof SalesRouteRoute
     }
     '/sales/opportunities/': {
@@ -863,6 +1275,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersCreateIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/manager/client/$clientId/': {
+      id: '/manager/client/$clientId/'
+      path: '/client/$clientId'
+      fullPath: '/manager/client/$clientId/'
+      preLoaderRoute: typeof ManagerClientClientIdIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/communications/$communicationId/': {
+      id: '/manager/communications/$communicationId/'
+      path: '/communications/$communicationId'
+      fullPath: '/manager/communications/$communicationId/'
+      preLoaderRoute: typeof ManagerCommunicationsCommunicationIdIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/communications/create/': {
+      id: '/manager/communications/create/'
+      path: '/communications/create'
+      fullPath: '/manager/communications/create/'
+      preLoaderRoute: typeof ManagerCommunicationsCreateIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/lead-and-client/clients/': {
+      id: '/manager/lead-and-client/clients/'
+      path: '/clients'
+      fullPath: '/manager/lead-and-client/clients/'
+      preLoaderRoute: typeof ManagerLeadAndClientClientsIndexRouteImport
+      parentRoute: typeof ManagerLeadAndClientRouteRoute
+    }
+    '/manager/lead-and-client/leads/': {
+      id: '/manager/lead-and-client/leads/'
+      path: '/leads'
+      fullPath: '/manager/lead-and-client/leads/'
+      preLoaderRoute: typeof ManagerLeadAndClientLeadsIndexRouteImport
+      parentRoute: typeof ManagerLeadAndClientRouteRoute
+    }
+    '/manager/lead/$leadId/': {
+      id: '/manager/lead/$leadId/'
+      path: '/lead/$leadId'
+      fullPath: '/manager/lead/$leadId/'
+      preLoaderRoute: typeof ManagerLeadLeadIdIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/lead/create/': {
+      id: '/manager/lead/create/'
+      path: '/lead/create'
+      fullPath: '/manager/lead/create/'
+      preLoaderRoute: typeof ManagerLeadCreateIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/opportunity/$opportunityId/': {
+      id: '/manager/opportunity/$opportunityId/'
+      path: '/opportunity/$opportunityId'
+      fullPath: '/manager/opportunity/$opportunityId/'
+      preLoaderRoute: typeof ManagerOpportunityOpportunityIdIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/opportunity/create/': {
+      id: '/manager/opportunity/create/'
+      path: '/opportunity/create'
+      fullPath: '/manager/opportunity/create/'
+      preLoaderRoute: typeof ManagerOpportunityCreateIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/reminders/$reminderId/': {
+      id: '/manager/reminders/$reminderId/'
+      path: '/reminders/$reminderId'
+      fullPath: '/manager/reminders/$reminderId/'
+      preLoaderRoute: typeof ManagerRemindersReminderIdIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/reminders/create/': {
+      id: '/manager/reminders/create/'
+      path: '/reminders/create'
+      fullPath: '/manager/reminders/create/'
+      preLoaderRoute: typeof ManagerRemindersCreateIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/satisfaction/$clientId/': {
+      id: '/manager/satisfaction/$clientId/'
+      path: '/satisfaction/$clientId'
+      fullPath: '/manager/satisfaction/$clientId/'
+      preLoaderRoute: typeof ManagerSatisfactionClientIdIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
     '/sales/client/$clientId/': {
       id: '/sales/client/$clientId/'
       path: '/client/$clientId'
@@ -903,6 +1399,13 @@ declare module '@tanstack/react-router' {
       path: '/lead/$leadId'
       fullPath: '/sales/lead/$leadId/'
       preLoaderRoute: typeof SalesLeadLeadIdIndexRouteImport
+      parentRoute: typeof SalesRouteRoute
+    }
+    '/sales/lead/create/': {
+      id: '/sales/lead/create/'
+      path: '/lead/create'
+      fullPath: '/sales/lead/create/'
+      preLoaderRoute: typeof SalesLeadCreateIndexRouteImport
       parentRoute: typeof SalesRouteRoute
     }
     '/sales/opportunity/$opportunityId/': {
@@ -947,6 +1450,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOpportunityOpportunityIdEditIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/manager/opportunity/$opportunityId/edit/': {
+      id: '/manager/opportunity/$opportunityId/edit/'
+      path: '/opportunity/$opportunityId/edit'
+      fullPath: '/manager/opportunity/$opportunityId/edit/'
+      preLoaderRoute: typeof ManagerOpportunityOpportunityIdEditIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
     '/sales/opportunity/$opportunityId/edit/': {
       id: '/sales/opportunity/$opportunityId/edit/'
       path: '/opportunity/$opportunityId/edit'
@@ -979,9 +1489,11 @@ interface AdminRouteRouteChildren {
   AdminAuditLogIndexRoute: typeof AdminAuditLogIndexRoute
   AdminCommunicationsIndexRoute: typeof AdminCommunicationsIndexRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
+  AdminEscalationIndexRoute: typeof AdminEscalationIndexRoute
   AdminOpportunitiesIndexRoute: typeof AdminOpportunitiesIndexRoute
   AdminRemindersIndexRoute: typeof AdminRemindersIndexRoute
   AdminSatisfactionIndexRoute: typeof AdminSatisfactionIndexRoute
+  AdminTeamsIndexRoute: typeof AdminTeamsIndexRoute
   AdminUsersIndexRoute: typeof AdminUsersIndexRoute
   AdminClientClientIdIndexRoute: typeof AdminClientClientIdIndexRoute
   AdminCommunicationsCommunicationIdIndexRoute: typeof AdminCommunicationsCommunicationIdIndexRoute
@@ -1004,9 +1516,11 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAuditLogIndexRoute: AdminAuditLogIndexRoute,
   AdminCommunicationsIndexRoute: AdminCommunicationsIndexRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
+  AdminEscalationIndexRoute: AdminEscalationIndexRoute,
   AdminOpportunitiesIndexRoute: AdminOpportunitiesIndexRoute,
   AdminRemindersIndexRoute: AdminRemindersIndexRoute,
   AdminSatisfactionIndexRoute: AdminSatisfactionIndexRoute,
+  AdminTeamsIndexRoute: AdminTeamsIndexRoute,
   AdminUsersIndexRoute: AdminUsersIndexRoute,
   AdminClientClientIdIndexRoute: AdminClientClientIdIndexRoute,
   AdminCommunicationsCommunicationIdIndexRoute:
@@ -1030,6 +1544,74 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface ManagerLeadAndClientRouteRouteChildren {
+  ManagerLeadAndClientClientsIndexRoute: typeof ManagerLeadAndClientClientsIndexRoute
+  ManagerLeadAndClientLeadsIndexRoute: typeof ManagerLeadAndClientLeadsIndexRoute
+}
+
+const ManagerLeadAndClientRouteRouteChildren: ManagerLeadAndClientRouteRouteChildren =
+  {
+    ManagerLeadAndClientClientsIndexRoute:
+      ManagerLeadAndClientClientsIndexRoute,
+    ManagerLeadAndClientLeadsIndexRoute: ManagerLeadAndClientLeadsIndexRoute,
+  }
+
+const ManagerLeadAndClientRouteRouteWithChildren =
+  ManagerLeadAndClientRouteRoute._addFileChildren(
+    ManagerLeadAndClientRouteRouteChildren,
+  )
+
+interface ManagerRouteRouteChildren {
+  ManagerLeadAndClientRouteRoute: typeof ManagerLeadAndClientRouteRouteWithChildren
+  ManagerAccountIndexRoute: typeof ManagerAccountIndexRoute
+  ManagerCommunicationsIndexRoute: typeof ManagerCommunicationsIndexRoute
+  ManagerDashboardIndexRoute: typeof ManagerDashboardIndexRoute
+  ManagerEscalationIndexRoute: typeof ManagerEscalationIndexRoute
+  ManagerOpportunitiesIndexRoute: typeof ManagerOpportunitiesIndexRoute
+  ManagerRemindersIndexRoute: typeof ManagerRemindersIndexRoute
+  ManagerSatisfactionIndexRoute: typeof ManagerSatisfactionIndexRoute
+  ManagerClientClientIdIndexRoute: typeof ManagerClientClientIdIndexRoute
+  ManagerCommunicationsCommunicationIdIndexRoute: typeof ManagerCommunicationsCommunicationIdIndexRoute
+  ManagerCommunicationsCreateIndexRoute: typeof ManagerCommunicationsCreateIndexRoute
+  ManagerLeadLeadIdIndexRoute: typeof ManagerLeadLeadIdIndexRoute
+  ManagerLeadCreateIndexRoute: typeof ManagerLeadCreateIndexRoute
+  ManagerOpportunityOpportunityIdIndexRoute: typeof ManagerOpportunityOpportunityIdIndexRoute
+  ManagerOpportunityCreateIndexRoute: typeof ManagerOpportunityCreateIndexRoute
+  ManagerRemindersReminderIdIndexRoute: typeof ManagerRemindersReminderIdIndexRoute
+  ManagerRemindersCreateIndexRoute: typeof ManagerRemindersCreateIndexRoute
+  ManagerSatisfactionClientIdIndexRoute: typeof ManagerSatisfactionClientIdIndexRoute
+  ManagerOpportunityOpportunityIdEditIndexRoute: typeof ManagerOpportunityOpportunityIdEditIndexRoute
+}
+
+const ManagerRouteRouteChildren: ManagerRouteRouteChildren = {
+  ManagerLeadAndClientRouteRoute: ManagerLeadAndClientRouteRouteWithChildren,
+  ManagerAccountIndexRoute: ManagerAccountIndexRoute,
+  ManagerCommunicationsIndexRoute: ManagerCommunicationsIndexRoute,
+  ManagerDashboardIndexRoute: ManagerDashboardIndexRoute,
+  ManagerEscalationIndexRoute: ManagerEscalationIndexRoute,
+  ManagerOpportunitiesIndexRoute: ManagerOpportunitiesIndexRoute,
+  ManagerRemindersIndexRoute: ManagerRemindersIndexRoute,
+  ManagerSatisfactionIndexRoute: ManagerSatisfactionIndexRoute,
+  ManagerClientClientIdIndexRoute: ManagerClientClientIdIndexRoute,
+  ManagerCommunicationsCommunicationIdIndexRoute:
+    ManagerCommunicationsCommunicationIdIndexRoute,
+  ManagerCommunicationsCreateIndexRoute: ManagerCommunicationsCreateIndexRoute,
+  ManagerLeadLeadIdIndexRoute: ManagerLeadLeadIdIndexRoute,
+  ManagerLeadCreateIndexRoute: ManagerLeadCreateIndexRoute,
+  ManagerOpportunityOpportunityIdIndexRoute:
+    ManagerOpportunityOpportunityIdIndexRoute,
+  ManagerOpportunityCreateIndexRoute: ManagerOpportunityCreateIndexRoute,
+  ManagerRemindersReminderIdIndexRoute: ManagerRemindersReminderIdIndexRoute,
+  ManagerRemindersCreateIndexRoute: ManagerRemindersCreateIndexRoute,
+  ManagerSatisfactionClientIdIndexRoute: ManagerSatisfactionClientIdIndexRoute,
+  ManagerOpportunityOpportunityIdEditIndexRoute:
+    ManagerOpportunityOpportunityIdEditIndexRoute,
+}
+
+const ManagerRouteRouteWithChildren = ManagerRouteRoute._addFileChildren(
+  ManagerRouteRouteChildren,
+)
+
 interface SalesLeadAndClientRouteRouteChildren {
   SalesLeadAndClientClientsIndexRoute: typeof SalesLeadAndClientClientsIndexRoute
   SalesLeadAndClientLeadsIndexRoute: typeof SalesLeadAndClientLeadsIndexRoute
@@ -1050,6 +1632,7 @@ interface SalesRouteRouteChildren {
   SalesLeadAndClientRouteRoute: typeof SalesLeadAndClientRouteRouteWithChildren
   SalesAccountIndexRoute: typeof SalesAccountIndexRoute
   SalesCommunicationsIndexRoute: typeof SalesCommunicationsIndexRoute
+  SalesEscalationIndexRoute: typeof SalesEscalationIndexRoute
   SalesOpportunitiesIndexRoute: typeof SalesOpportunitiesIndexRoute
   SalesRemindersIndexRoute: typeof SalesRemindersIndexRoute
   SalesSatisfactionIndexRoute: typeof SalesSatisfactionIndexRoute
@@ -1057,6 +1640,7 @@ interface SalesRouteRouteChildren {
   SalesCommunicationsCommunicationIdIndexRoute: typeof SalesCommunicationsCommunicationIdIndexRoute
   SalesCommunicationsCreateIndexRoute: typeof SalesCommunicationsCreateIndexRoute
   SalesLeadLeadIdIndexRoute: typeof SalesLeadLeadIdIndexRoute
+  SalesLeadCreateIndexRoute: typeof SalesLeadCreateIndexRoute
   SalesOpportunityOpportunityIdIndexRoute: typeof SalesOpportunityOpportunityIdIndexRoute
   SalesOpportunityCreateIndexRoute: typeof SalesOpportunityCreateIndexRoute
   SalesRemindersReminderIdIndexRoute: typeof SalesRemindersReminderIdIndexRoute
@@ -1069,6 +1653,7 @@ const SalesRouteRouteChildren: SalesRouteRouteChildren = {
   SalesLeadAndClientRouteRoute: SalesLeadAndClientRouteRouteWithChildren,
   SalesAccountIndexRoute: SalesAccountIndexRoute,
   SalesCommunicationsIndexRoute: SalesCommunicationsIndexRoute,
+  SalesEscalationIndexRoute: SalesEscalationIndexRoute,
   SalesOpportunitiesIndexRoute: SalesOpportunitiesIndexRoute,
   SalesRemindersIndexRoute: SalesRemindersIndexRoute,
   SalesSatisfactionIndexRoute: SalesSatisfactionIndexRoute,
@@ -1077,6 +1662,7 @@ const SalesRouteRouteChildren: SalesRouteRouteChildren = {
     SalesCommunicationsCommunicationIdIndexRoute,
   SalesCommunicationsCreateIndexRoute: SalesCommunicationsCreateIndexRoute,
   SalesLeadLeadIdIndexRoute: SalesLeadLeadIdIndexRoute,
+  SalesLeadCreateIndexRoute: SalesLeadCreateIndexRoute,
   SalesOpportunityOpportunityIdIndexRoute:
     SalesOpportunityOpportunityIdIndexRoute,
   SalesOpportunityCreateIndexRoute: SalesOpportunityCreateIndexRoute,
@@ -1094,6 +1680,7 @@ const SalesRouteRouteWithChildren = SalesRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  ManagerRouteRoute: ManagerRouteRouteWithChildren,
   SalesRouteRoute: SalesRouteRouteWithChildren,
   SurveyTokenRoute: SurveyTokenRoute,
   LoginIndexRoute: LoginIndexRoute,

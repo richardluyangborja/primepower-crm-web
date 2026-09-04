@@ -42,7 +42,7 @@ function ScoreBadge({ score }: { score: number | null | undefined }) {
   return <Badge variant={variant}>{numScore.toFixed(1)}</Badge>
 }
 
-export default function ClientSatisfactionList() {
+export default function ClientSatisfactionList({ basePath = "/admin" }: { basePath?: string }) {
   const navigate = useNavigate()
   const query = useSatisfactionQuery()
   const data = query.data
@@ -82,7 +82,7 @@ export default function ClientSatisfactionList() {
                   key={client.id}
                   onClick={() =>
                     navigate({
-                      to: "/admin/satisfaction/$clientId",
+                      to: `${basePath}/satisfaction/$clientId`,
                       params: { clientId: client.id.toString() },
                     })
                   }

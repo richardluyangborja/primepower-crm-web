@@ -20,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { useNavigate } from "@tanstack/react-router"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import useLeadsQuery from "./-useLeadsQuery"
 import { Spinner } from "@/components/ui/spinner"
@@ -47,7 +47,7 @@ export type LeadTableRow = {
   }
 }
 
-export default function LeadTable() {
+export default function LeadTable({ basePath = "/admin" }: { basePath?: string }) {
   const query = useLeadsQuery()
   const navigate = useNavigate()
   const data = query.data
@@ -65,11 +65,11 @@ export default function LeadTable() {
           </Button>
         </div>
         <CardAction>
-          <Button asChild>
-            <Link to="/admin/lead/create">
-              <span>Create new lead</span>
-              <MoveUpRight />
-            </Link>
+          <Button
+            onClick={() => navigate({ to: `${basePath}/lead/create` })}
+          >
+            <span>Create new lead</span>
+            <MoveUpRight />
           </Button>
         </CardAction>
       </CardHeader>
@@ -93,7 +93,7 @@ export default function LeadTable() {
                   key={lead.id}
                   onClick={() =>
                     navigate({
-                      to: "/admin/lead/$leadId",
+                      to: `${basePath}/lead/$leadId`,
                       params: { leadId: lead.id.toString() },
                     })
                   }

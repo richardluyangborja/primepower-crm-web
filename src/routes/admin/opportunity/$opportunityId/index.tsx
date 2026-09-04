@@ -106,9 +106,14 @@ const stageTransitions: Record<string, { label: string; value: string }[]> = {
   ],
 }
 
-function RouteComponent() {
+export function OpportunityDetailContent({
+  opportunityId,
+  basePath = "/admin",
+}: {
+  opportunityId: string
+  basePath?: string
+}) {
   const router = useRouter()
-  const { opportunityId } = Route.useParams()
   const query = useOpportunityDetailsQuery(opportunityId)
   const opportunity = query.data!
 
@@ -130,6 +135,7 @@ function RouteComponent() {
             <OpportunityInfoCard
               opportunity={opportunity}
               opportunityId={Number(opportunityId)}
+              basePath={basePath}
             />
           </div>
         )}
@@ -138,12 +144,19 @@ function RouteComponent() {
   )
 }
 
+function RouteComponent() {
+  const { opportunityId } = Route.useParams()
+  return <OpportunityDetailContent opportunityId={opportunityId} />
+}
+
 function OpportunityInfoCard({
   opportunity,
   opportunityId,
+  basePath = "/admin",
 }: {
   opportunity: OpportunityInfoPage
   opportunityId: number
+  basePath?: string
 }) {
   const winMutation = useWinOpportunity(opportunityId)
   const stageMutation = useUpdateOpportunityStage(opportunityId)
@@ -307,7 +320,10 @@ function OpportunityInfoCard({
         )}
 
       {opportunity.reminders && opportunity.reminders.length > 0 && (
-        <ReminderHistorySection reminders={opportunity.reminders} />
+        <ReminderHistorySection
+          reminders={opportunity.reminders}
+          basePath={basePath}
+        />
       )}
 
       <StageTransitionModal
