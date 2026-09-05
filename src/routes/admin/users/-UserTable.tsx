@@ -1,7 +1,4 @@
-import {
-  Avatar,
-  AvatarFallback,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -31,6 +28,13 @@ import { useNavigate } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 import useUsersQuery, { type UserRow } from "@/lib/queries/useUsers"
 import { Spinner } from "@/components/ui/spinner"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
 
 const roleLabels: Record<UserRow["role"], string> = {
   admin: "Administrator",
@@ -38,7 +42,10 @@ const roleLabels: Record<UserRow["role"], string> = {
   sales_rep: "Sales Representative",
 }
 
-const roleVariants: Record<UserRow["role"], "default" | "secondary" | "destructive"> = {
+const roleVariants: Record<
+  UserRow["role"],
+  "default" | "secondary" | "destructive"
+> = {
   admin: "default",
   manager: "secondary",
   sales_rep: "outline" as "secondary",
@@ -54,10 +61,9 @@ export default function UserTable() {
     () => ({
       search: search || undefined,
       role: role === "all" ? undefined : role,
-      is_active:
-        isActive === "all" ? undefined : isActive === "active",
+      is_active: isActive === "all" ? undefined : isActive === "active",
     }),
-    [search, role, isActive],
+    [search, role, isActive]
   )
 
   const query = useUsersQuery(params)
@@ -66,8 +72,8 @@ export default function UserTable() {
     <Card>
       <CardHeader className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[12rem]">
-            <Search className="text-muted-foreground absolute top-1/2 left-2 size-4 -translate-y-1/2" />
+          <div className="relative min-w-[12rem] flex-1">
+            <Search className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search by name or email..."
               value={search}

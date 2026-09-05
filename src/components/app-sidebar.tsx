@@ -44,7 +44,20 @@ import api from "@/lib/api"
 import useAuthUser from "@/lib/queries/useAuthUser"
 import { useUnreadCountQuery } from "@/lib/queries/useNotifications"
 
-const sidebarConfig = [
+type SidebarItem = {
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+  path?: string
+  children?: { path: string; label: string }[]
+  tooltip?: boolean
+}
+
+type SidebarGroup = {
+  group: string
+  items: SidebarItem[]
+}
+
+const sidebarConfig: SidebarGroup[] = [
   {
     group: "Overview",
     items: [
@@ -218,7 +231,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 {items.map((item) => (
                   <SidebarMenuItem key={item.path ?? item.label}>
                     {item.children ? (
-                      <CollapsibleMenuItem item={item} navigate={navigate} />
+                      <CollapsibleMenuItem item={item as { label: string; icon: React.ComponentType<{ className?: string }>; children: { path: string; label: string }[] }} navigate={navigate} />
                     ) : item.tooltip ? (
                       <Tooltip>
                         <TooltipTrigger asChild>

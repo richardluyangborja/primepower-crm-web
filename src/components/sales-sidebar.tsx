@@ -43,7 +43,20 @@ import useAuthUser from "@/lib/queries/useAuthUser"
 import { useUnreadCountQuery } from "@/lib/queries/useNotifications"
 import { NotificationsPanel } from "./notifications-panel"
 
-const sidebarConfig = [
+type SidebarItem = {
+  label: string
+  icon: React.ComponentType<{ className?: string }>
+  path?: string
+  children?: { path: string; label: string }[]
+  tooltip?: boolean
+}
+
+type SidebarGroup = {
+  group: string
+  items: SidebarItem[]
+}
+
+const sidebarConfig: SidebarGroup[] = [
   {
     group: "Overview",
     items: [
@@ -194,10 +207,10 @@ export function SalesSidebar({
             <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
             <SidebarMenu>
               {group.items.map((item) => (
-                <SidebarMenuItem key={item.path ?? item.label}>
-                  {item.children ? (
-                    <CollapsibleMenuItem item={item} navigate={navigate} />
-                  ) : item.tooltip ? (
+                  <SidebarMenuItem key={item.path ?? item.label}>
+                    {item.children ? (
+                      <CollapsibleMenuItem item={item as { label: string; icon: React.ComponentType<{ className?: string }>; children: { path: string; label: string }[] }} navigate={navigate} />
+                    ) : item.tooltip ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <SidebarMenuButton

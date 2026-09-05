@@ -41,7 +41,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import useAuthUser from "@/lib/queries/useAuthUser"
-
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
 export const Route = createFileRoute("/admin/users/$userId/")({
   component: RouteComponent,
 })
@@ -71,7 +77,9 @@ function RouteComponent() {
   const [confirmAction, setConfirmAction] = useState<
     null | "deactivate" | "activate" | "delete" | "reset"
   >(null)
-  const [generatedPassword, setGeneratedPassword] = useState<string | null>(null)
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(
+    null
+  )
 
   const isSelf = Number(userId) === authUser.data?.id
 
@@ -132,9 +140,7 @@ function RouteComponent() {
       name: (userQuery.data?.name as string) ?? "",
       email: (userQuery.data?.email as string) ?? "",
       role: ((userQuery.data?.role as string) ?? "sales_rep") as
-        | "admin"
-        | "manager"
-        | "sales_rep",
+        "admin" | "manager" | "sales_rep",
       manager_id: userQuery.data?.manager_id
         ? String(userQuery.data.manager_id)
         : "",
@@ -163,10 +169,7 @@ function RouteComponent() {
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button
-          variant="link"
-          onClick={() => navigate({ to: "/admin/users" })}
-        >
+        <Button variant="link" onClick={() => navigate({ to: "/admin/users" })}>
           <ChevronLeft />
           <span>Back to users</span>
         </Button>
@@ -186,7 +189,9 @@ function RouteComponent() {
               </Badge>
               <Badge
                 variant={
-                  (userQuery.data.is_active as boolean) ? "default" : "destructive"
+                  (userQuery.data.is_active as boolean)
+                    ? "default"
+                    : "destructive"
                 }
               >
                 {(userQuery.data.is_active as boolean) ? "Active" : "Inactive"}
@@ -246,8 +251,8 @@ function RouteComponent() {
                 <AlertTitle>Could not save changes</AlertTitle>
                 <AlertDescription>
                   {isAxiosError(updateMutation.error)
-                    ? (updateMutation.error.response?.data?.message as string) ??
-                      "Validation error"
+                    ? ((updateMutation.error.response?.data
+                        ?.message as string) ?? "Validation error")
                     : String(updateMutation.error)}
                 </AlertDescription>
               </Alert>
@@ -308,7 +313,9 @@ function RouteComponent() {
                       <Select
                         value={field.state.value}
                         onValueChange={(value) =>
-                          field.handleChange(value as "admin" | "manager" | "sales_rep")
+                          field.handleChange(
+                            value as "admin" | "manager" | "sales_rep"
+                          )
                         }
                       >
                         <SelectTrigger>
@@ -407,9 +414,7 @@ function RouteComponent() {
                 Cancel
               </Button>
               <Button
-                variant={
-                  confirmAction === "delete" ? "destructive" : "default"
-                }
+                variant={confirmAction === "delete" ? "destructive" : "default"}
                 onClick={async () => {
                   if (confirmAction === "deactivate") {
                     await deactivateMutation.mutateAsync()
@@ -451,7 +456,11 @@ function RouteComponent() {
                 Share this securely with the user. It will not be shown again.
               </DialogDescription>
             </DialogHeader>
-            <Input readOnly value={generatedPassword ?? ""} className="font-mono" />
+            <Input
+              readOnly
+              value={generatedPassword ?? ""}
+              className="font-mono"
+            />
             <DialogFooter>
               <Button onClick={() => setGeneratedPassword(null)}>Done</Button>
             </DialogFooter>
