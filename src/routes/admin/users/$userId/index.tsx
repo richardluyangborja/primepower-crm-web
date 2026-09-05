@@ -18,13 +18,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Spinner } from "@/components/ui/spinner"
@@ -47,7 +40,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import useTeamsQuery from "@/lib/queries/useTeams"
 import useAuthUser from "@/lib/queries/useAuthUser"
 
 export const Route = createFileRoute("/admin/users/$userId/")({
@@ -58,7 +50,6 @@ const editSchema = z.object({
   name: z.string().min(1).max(255),
   email: z.string().email().max(255),
   role: z.enum(["admin", "manager", "sales_rep"]),
-  team_id: z.string(),
   manager_id: z.string(),
   password: z.string(),
 })
@@ -77,7 +68,6 @@ function RouteComponent() {
     },
   })
 
-  const teamsQuery = useTeamsQuery()
   const [confirmAction, setConfirmAction] = useState<
     null | "deactivate" | "activate" | "delete" | "reset"
   >(null)
@@ -92,7 +82,6 @@ function RouteComponent() {
         email: values.email,
         role: values.role,
       }
-      payload.team_id = values.team_id ? Number(values.team_id) : null
       payload.manager_id = values.manager_id ? Number(values.manager_id) : null
       if (values.password && values.password.length > 0) {
         payload.password = values.password
@@ -146,9 +135,6 @@ function RouteComponent() {
         | "admin"
         | "manager"
         | "sales_rep",
-      team_id: userQuery.data?.team_id
-        ? String(userQuery.data.team_id)
-        : "",
       manager_id: userQuery.data?.manager_id
         ? String(userQuery.data.manager_id)
         : "",
@@ -205,11 +191,6 @@ function RouteComponent() {
               >
                 {(userQuery.data.is_active as boolean) ? "Active" : "Inactive"}
               </Badge>
-              {(userQuery.data.team as { name: string } | null)?.name && (
-                <Badge variant="outline">
-                  Team: {(userQuery.data.team as { name: string }).name}
-                </Badge>
-              )}
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -344,51 +325,20 @@ function RouteComponent() {
                     </Field>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  <form.Field
-                    name="team_id"
-                    children={(field) => (
-                      <Field>
-                        <FieldLabel>Team</FieldLabel>
-                        <Select
-                          value={field.state.value || "none"}
-                          onValueChange={(value) =>
-                            field.handleChange(value === "none" ? "" : value)
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="No team" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">No team</SelectItem>
-                            {teamsQuery.data?.map((team) => (
-                              <SelectItem
-                                key={team.id}
-                                value={String(team.id)}
-                              >
-                                {team.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                    )}
-                  />
-                  <form.Field
-                    name="manager_id"
-                    children={(field) => (
-                      <Field>
-                        <FieldLabel>Manager user ID</FieldLabel>
-                        <Input
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="Leave empty for no manager"
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                      </Field>
-                    )}
-                  />
-                </div>
+                <form.Field
+                  name="manager_id"
+                  children={(field) => (
+                    <Field>
+                      <FieldLabel>Manager user ID</FieldLabel>
+                      <Input
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder="Leave empty for no manager"
+                      />
+                      <FieldError errors={field.state.meta.errors} />
+                    </Field>
+                  )}
+                />
                 <form.Field
                   name="password"
                   children={(field) => (

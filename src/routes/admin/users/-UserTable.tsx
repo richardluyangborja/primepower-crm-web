@@ -7,13 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
   Table,
   TableBody,
   TableCell,
@@ -37,7 +30,6 @@ import {
 import { useNavigate } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 import useUsersQuery, { type UserRow } from "@/lib/queries/useUsers"
-import useTeamsQuery from "@/lib/queries/useTeams"
 import { Spinner } from "@/components/ui/spinner"
 
 const roleLabels: Record<UserRow["role"], string> = {
@@ -56,22 +48,19 @@ export default function UserTable() {
   const navigate = useNavigate()
   const [search, setSearch] = useState("")
   const [role, setRole] = useState<string>("all")
-  const [teamId, setTeamId] = useState<string>("all")
   const [isActive, setIsActive] = useState<string>("all")
 
   const params = useMemo(
     () => ({
       search: search || undefined,
       role: role === "all" ? undefined : role,
-      team_id: teamId === "all" ? undefined : Number(teamId),
       is_active:
         isActive === "all" ? undefined : isActive === "active",
     }),
-    [search, role, teamId, isActive],
+    [search, role, isActive],
   )
 
   const query = useUsersQuery(params)
-  const teamsQuery = useTeamsQuery()
 
   return (
     <Card>
@@ -97,19 +86,6 @@ export default function UserTable() {
               <SelectItem value="sales_rep">Sales Representative</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={teamId} onValueChange={setTeamId}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder="Team" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All teams</SelectItem>
-              {teamsQuery.data?.map((team) => (
-                <SelectItem key={team.id} value={String(team.id)}>
-                  {team.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Select value={isActive} onValueChange={setIsActive}>
             <SelectTrigger className="w-36">
               <SelectValue placeholder="Status" />
@@ -125,7 +101,6 @@ export default function UserTable() {
             onClick={() => {
               setSearch("")
               setRole("all")
-              setTeamId("all")
               setIsActive("all")
             }}
           >
@@ -138,7 +113,6 @@ export default function UserTable() {
               const params = new URLSearchParams()
               if (search) params.set("search", search)
               if (role !== "all") params.set("role", role)
-              if (teamId !== "all") params.set("team_id", teamId)
               if (isActive !== "all")
                 params.set("is_active", isActive === "active" ? "1" : "0")
               window.location.href = `/api/users-export?${params.toString()}`
@@ -168,7 +142,6 @@ export default function UserTable() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Team</TableHead>
                 <TableHead>Manager</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-12" />
@@ -210,7 +183,6 @@ export default function UserTable() {
                         {roleLabels[user.role]}
                       </Badge>
                     </TableCell>
-                    <TableCell>{user.team?.name ?? "—"}</TableCell>
                     <TableCell>{user.manager?.name ?? "—"}</TableCell>
                     <TableCell>
                       <Badge
@@ -250,7 +222,7 @@ export default function UserTable() {
               })}
               {query.data?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
+                  <TableCell colSpan={5} className="text-center">
                     No users found.
                   </TableCell>
                 </TableRow>

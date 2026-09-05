@@ -28,12 +28,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Ellipsis, Loader2, Plus, Search, Trash2, Zap } from "lucide-react"
-import useEscalationRulesQuery, {
-  type EscalationRuleRow,
-} from "@/lib/queries/useEscalationRules"
-import { useDeleteEscalationRule } from "./-useEscalationRuleMutation"
-import { EscalationRuleFormDialog } from "./-EscalationRuleFormDialog"
+import { Ellipsis, Loader2, Plus, Search, Trash2 } from "lucide-react"
+import useSurveyTemplatesQuery, {
+  type SurveyTemplateRow,
+} from "@/lib/queries/useSurveyTemplates"
+import { useDeleteSurveyTemplate } from "./-useSurveyTemplateMutation"
+import { SurveyTemplateFormDialog } from "./-SurveyTemplateFormDialog"
 import { useIsAdmin } from "@/lib/queries/useIsAdmin"
 import { Spinner } from "@/components/ui/spinner"
 
@@ -46,20 +46,18 @@ function formatDate(dateString: string): string {
   })
 }
 
-export default function EscalationRuleTable() {
+export default function SurveyTemplateTable() {
   const isAdmin = useIsAdmin()
-  const query = useEscalationRulesQuery()
+  const query = useSurveyTemplatesQuery()
   const data = query.data ?? []
   const [search, setSearch] = useState("")
   const [formOpen, setFormOpen] = useState(false)
-  const [editingRule, setEditingRule] = useState<EscalationRuleRow | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<EscalationRuleRow | null>(
-    null
-  )
-  const del = useDeleteEscalationRule()
+  const [editingTemplate, setEditingTemplate] = useState<SurveyTemplateRow | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<SurveyTemplateRow | null>(null)
+  const del = useDeleteSurveyTemplate()
 
-  const filtered = data.filter((rule) =>
-    rule.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = data.filter((template) =>
+    template.name.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -71,7 +69,7 @@ export default function EscalationRuleTable() {
               <Search />
             </Button>
             <Input
-              placeholder="Search rules..."
+              placeholder="Search templates..."
               className="w-xs"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -80,12 +78,12 @@ export default function EscalationRuleTable() {
           {isAdmin && (
             <Button
               onClick={() => {
-                setEditingRule(null)
+                setEditingTemplate(null)
                 setFormOpen(true)
               }}
             >
               <Plus />
-              <span>Create Rule</span>
+              <span>Create Template</span>
             </Button>
           )}
         </div>
@@ -99,57 +97,43 @@ export default function EscalationRuleTable() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Rule</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Threshold</TableHead>
-                <TableHead>Action</TableHead>
+                <TableHead>Template</TableHead>
+                <TableHead>Questions</TableHead>
+                <TableHead>Version</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
                 {isAdmin && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((rule) => (
-                <TableRow key={rule.id}>
+              {filtered.map((template) => (
+                <TableRow key={template.id}>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="shrink-0">
-                        <Zap className="size-3" />
-                      </Badge>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{rule.name}</span>
-                        {rule.reminder_title && (
-                          <span className="max-w-60 truncate text-xs text-muted-foreground">
-                            Reminder: {rule.reminder_title}
-                          </span>
-                        )}
-                      </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{template.name}</span>
+                      {template.description && (
+                        <span className="max-w-60 truncate text-xs text-muted-foreground">
+                          {template.description}
+                        </span>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">{rule.condition_label}</span>
+                    <span className="text-sm">{template.question_count} question{template.question_count === 1 ? "" : "s"}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">
-                      {rule.threshold_days} day
-                      {rule.threshold_days === 1 ? "" : "s"}
-                    </span>
+                    <span className="text-sm text-muted-foreground">v{template.version}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">{rule.action_label}</span>
-                  </TableCell>
-                  <TableCell>
-                    {rule.is_active ? (
-                      <Badge className="bg-emerald-600 text-white">
-                        Active
-                      </Badge>
+                    {template.is_active ? (
+                      <Badge className="bg-emerald-600 text-white">Active</Badge>
                     ) : (
                       <Badge variant="secondary">Inactive</Badge>
                     )}
                   </TableCell>
                   <TableCell>
                     <span className="text-sm text-muted-foreground">
-                      {formatDate(rule.created_at)}
+                      {formatDate(template.created_at)}
                     </span>
                   </TableCell>
                   {isAdmin && (
@@ -165,7 +149,7 @@ export default function EscalationRuleTable() {
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem
                               onSelect={() => {
-                                setEditingRule(rule)
+                                setEditingTemplate(template)
                                 setFormOpen(true)
                               }}
                             >
@@ -176,7 +160,7 @@ export default function EscalationRuleTable() {
                           <DropdownMenuGroup>
                             <DropdownMenuItem
                               variant="destructive"
-                              onSelect={() => setDeleteTarget(rule)}
+                              onSelect={() => setDeleteTarget(template)}
                             >
                               Delete
                             </DropdownMenuItem>
@@ -192,7 +176,7 @@ export default function EscalationRuleTable() {
         )}
         {!isAdmin && (
           <p className="mt-4 text-xs text-muted-foreground">
-            Escalation rules are managed by administrators. This page is
+            Survey templates are managed by administrators. This page is
             read-only for managers and sales representatives.
           </p>
         )}
@@ -200,10 +184,10 @@ export default function EscalationRuleTable() {
 
       {isAdmin && (
         <>
-          <EscalationRuleFormDialog
+          <SurveyTemplateFormDialog
             open={formOpen}
             onOpenChange={setFormOpen}
-            rule={editingRule ?? undefined}
+            template={editingTemplate ?? undefined}
           />
 
           <Dialog
@@ -214,13 +198,12 @@ export default function EscalationRuleTable() {
           >
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Delete escalation rule?</DialogTitle>
+                <DialogTitle>Delete survey template?</DialogTitle>
                 <DialogDescription>
-                  This will permanently delete the rule{" "}
-                  <strong>{deleteTarget?.name}</strong>. Matching entities that
-                  have already fired will keep their reminders and
-                  notifications, but the rule will no longer fire. This action
-                  cannot be undone.
+                  This will permanently delete the template{" "}
+                  <strong>{deleteTarget?.name}</strong> and all its versions.
+                  Surveys that were sent using this template will keep their
+                  snapshot of the questions. This action cannot be undone.
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>

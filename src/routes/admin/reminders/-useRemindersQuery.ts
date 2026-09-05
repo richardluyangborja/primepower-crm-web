@@ -2,7 +2,7 @@ import api from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 import type { ReminderTableRow } from "./-RemindersTable"
 
-export type ReminderScope = "all" | "mine" | "team"
+export type ReminderScope = "all" | "mine"
 
 export default function useRemindersQuery(scope: ReminderScope = "all") {
   return useQuery({
@@ -11,9 +11,7 @@ export default function useRemindersQuery(scope: ReminderScope = "all") {
       const url =
         scope === "mine"
           ? "/api/reminders/mine"
-          : scope === "team"
-            ? "/api/reminders/team"
-            : "/api/reminders"
+          : "/api/reminders"
       const response = await api.get(url)
       return response.data.data as ReminderTableRow[]
     },

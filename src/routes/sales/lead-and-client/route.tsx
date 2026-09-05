@@ -1,37 +1,10 @@
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  useLocation,
-} from "@tanstack/react-router"
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
+import { createFileRoute, Outlet } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/sales/lead-and-client")({
   component: RouteComponent,
 })
 
-const navigations = [
-  {
-    label: "Leads",
-    path: "/sales/lead-and-client/leads",
-  },
-  {
-    label: "Clients",
-    path: "/sales/lead-and-client/clients",
-  },
-]
-
 function RouteComponent() {
-  const path = useLocation({
-    select: (location) => location.pathname,
-  })
-
   return (
     <div className="w-full px-4">
       <header className="py-4">
@@ -39,25 +12,6 @@ function RouteComponent() {
         <p className="mb-6 text-sm text-muted-foreground">
           View potential and existing client companies and their relationships.
         </p>
-        <NavigationMenu>
-          <NavigationMenuList>
-            {navigations.map((nav, i) => (
-              <NavigationMenuItem key={i}>
-                <NavigationMenuLink
-                  asChild
-                  className={navigationMenuTriggerStyle()}
-                >
-                  <Link
-                    to={nav.path}
-                    className={path !== nav.path ? "text-muted-foreground" : ""}
-                  >
-                    {nav.label}
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
-        </NavigationMenu>
       </header>
       <main>
         <Outlet />

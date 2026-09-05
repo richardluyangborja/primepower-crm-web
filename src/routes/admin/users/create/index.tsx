@@ -18,16 +18,8 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { ChevronLeft, Info, Loader2 } from "lucide-react"
-import useTeamsQuery from "@/lib/queries/useTeams"
 import { createFileRoute } from "@tanstack/react-router"
 import { useIsAdmin } from "@/lib/queries/useIsAdmin"
 import { AdminOnlyEmptyState } from "@/components/admin-only-empty-state"
@@ -41,7 +33,6 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
   password: z.string().min(8, "Password must be at least 8 characters"),
   role: z.enum(["admin", "manager", "sales_rep"]),
-  team_id: z.string(),
   manager_id: z.string(),
 })
 
@@ -51,7 +42,6 @@ function RouteComponent() {
   const isAdmin = useIsAdmin()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const teamsQuery = useTeamsQuery()
 
   if (!isAdmin) {
     return (
@@ -80,7 +70,6 @@ function RouteComponent() {
         password: values.password,
         role: values.role,
       }
-      if (values.team_id) payload.team_id = Number(values.team_id)
       if (values.manager_id) payload.manager_id = Number(values.manager_id)
       const response = await api.post("/api/users", payload)
       return response.data as {
@@ -100,7 +89,6 @@ function RouteComponent() {
       email: "",
       password: "",
       role: "sales_rep" as CreateUserForm["role"],
-      team_id: "",
       manager_id: "",
     },
     validators: { onSubmit: formSchema },
@@ -239,42 +227,16 @@ function RouteComponent() {
                     </Field>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  <form.Field
-                    name="team_id"
-                    children={(field) => (
-                      <Field>
-                        <FieldLabel>Team (optional)</FieldLabel>
-                        <Select
-                          value={field.state.value || "none"}
-                          onValueChange={(value) =>
-                            field.handleChange(value === "none" ? "" : value)
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select team" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">No team</SelectItem>
-                            {teamsQuery.data?.map((team) => (
-                              <SelectItem key={team.id} value={String(team.id)}>
-                                {team.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                    )}
-                  />
+                <div className="grid grid-cols-1 gap-4">
                   <form.Field
                     name="manager_id"
                     children={(field) => (
                       <Field>
-                        <FieldLabel>Manager (optional)</FieldLabel>
+                        <FieldLabel>Manager user ID (optional)</FieldLabel>
                         <Input
                           value={field.state.value}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="User ID"
+                          placeholder="Leave empty for no manager"
                         />
                         <FieldError errors={field.state.meta.errors} />
                       </Field>

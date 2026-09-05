@@ -41,7 +41,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import useAuthUser from "@/lib/queries/useAuthUser"
 
 export type ReminderTableRow = {
   id: number
@@ -77,8 +76,6 @@ export default function RemindersTable({
   basePath?: string
 }) {
   const navigate = useNavigate()
-  const userQuery = useAuthUser()
-  const canSeeTeam = userQuery.data?.role === "admin" || userQuery.data?.role === "manager"
   const [scope, setScope] = useState<ReminderScope>(defaultScope)
   const query = useRemindersQuery(scope)
   const data = query.data
@@ -99,9 +96,6 @@ export default function RemindersTable({
               <SelectContent>
                 <SelectItem value="all">All Reminders</SelectItem>
                 <SelectItem value="mine">My Reminders</SelectItem>
-                {canSeeTeam && (
-                  <SelectItem value="team">Team Reminders</SelectItem>
-                )}
               </SelectContent>
             </Select>
           </div>

@@ -9,17 +9,20 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 import {
   Bell,
   ChartSpline,
+  ChevronRight,
   ClipboardCheck,
   LayoutGrid,
   LogOut,
   MessageCircleMore,
   Network,
   UserRound,
-  Zap,
 } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip"
 import { Link, useNavigate } from "@tanstack/react-router"
@@ -52,12 +55,21 @@ const sidebarConfig = [
     ],
   },
   {
-    group: "CRM",
+    group: "Sales Pipeline",
     items: [
       {
-        path: "/manager/lead-and-client/leads",
         label: "Lead and Client Tracking",
         icon: Network,
+        children: [
+          {
+            path: "/manager/lead-and-client/leads",
+            label: "Leads",
+          },
+          {
+            path: "/manager/lead-and-client/clients",
+            label: "Clients",
+          },
+        ],
       },
       {
         path: "/manager/opportunities",
@@ -65,16 +77,31 @@ const sidebarConfig = [
         icon: ChartSpline,
         tooltip: true,
       },
+    ],
+  },
+  {
+    group: "Engagement",
+    items: [
       {
         path: "/manager/communications",
         label: "Communications History",
         icon: MessageCircleMore,
       },
+    ],
+  },
+  {
+    group: "Feedback",
+    items: [
       {
         path: "/manager/satisfaction",
         label: "Client Satisfaction and Surveys",
         icon: ClipboardCheck,
       },
+    ],
+  },
+  {
+    group: "Follow-ups",
+    items: [
       {
         path: "/manager/reminders",
         label: "Follow-up Reminders",
@@ -83,13 +110,8 @@ const sidebarConfig = [
     ],
   },
   {
-    group: "Administration",
+    group: "Account",
     items: [
-      {
-        path: "/manager/escalation",
-        label: "Escalation Rules",
-        icon: Zap,
-      },
       {
         path: "/manager/account",
         label: "Account",
@@ -98,6 +120,37 @@ const sidebarConfig = [
     ],
   },
 ]
+
+function CollapsibleMenuItem({
+  item,
+  navigate,
+}: {
+  item: { label: string; icon: React.ComponentType<{ className?: string }>; children: { path: string; label: string }[] }
+  navigate: (opts: { to: string }) => void
+}) {
+  const [isExpanded, setIsExpanded] = React.useState(true)
+
+  return (
+    <>
+      <SidebarMenuButton onClick={() => setIsExpanded(!isExpanded)}>
+        <item.icon />
+        <span>{item.label}</span>
+        <ChevronRight className={`ml-auto transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+      </SidebarMenuButton>
+      {isExpanded && (
+        <SidebarMenuSub>
+          {item.children.map((child) => (
+            <SidebarMenuSubItem key={child.path}>
+              <SidebarMenuSubButton onClick={() => navigate({ to: child.path })}>
+                <span>{child.label}</span>
+              </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+          ))}
+        </SidebarMenuSub>
+      )}
+    </>
+  )
+}
 
 export function ManagerSidebar({
   ...props
@@ -133,32 +186,30 @@ export function ManagerSidebar({
           <SidebarGroup key={group.group}>
             <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
             <SidebarMenu>
-              {group.items.map((item) =>
-                item.tooltip ? (
-                  <Tooltip key={item.path}>
-                    <TooltipTrigger asChild>
-                      <SidebarMenuItem>
+              {group.items.map((item) => (
+                <SidebarMenuItem key={item.path ?? item.label}>
+                  {item.children ? (
+                    <CollapsibleMenuItem item={item} navigate={navigate} />
+                  ) : item.tooltip ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
                         <SidebarMenuButton
                           onClick={() => navigate({ to: item.path })}
                         >
                           <item.icon />
                           <span>{item.label}</span>
                         </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">{item.label}</TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      onClick={() => navigate({ to: item.path })}
-                    >
+                      </TooltipTrigger>
+                      <TooltipContent side="right">{item.label}</TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <SidebarMenuButton onClick={() => navigate({ to: item.path })}>
                       <item.icon />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              )}
+                  )}
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroup>
         ))}

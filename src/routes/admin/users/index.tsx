@@ -31,7 +31,7 @@ function RouteComponent() {
       <header className="py-4">
         <h1 className="font-heading text-lg">User Management</h1>
         <p className="mb-6 text-sm text-muted-foreground">
-          Manage user accounts, roles, team assignments, and access.
+          Manage user accounts, roles, and access.
         </p>
       </header>
       <main>
