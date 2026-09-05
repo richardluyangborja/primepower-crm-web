@@ -1,7 +1,10 @@
 import axios, { isAxiosError } from "axios"
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL:
+    window.location.hostname === "localhost"
+      ? "http://localhost:8000"
+      : "https://primepower-crm-api-primepower.hostforgeplatforms.com",
   withCredentials: true,
   withXSRFToken: true,
   headers: {
