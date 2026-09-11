@@ -33,7 +33,6 @@ import {
 import useReminderDetailsQuery from "./-useReminderDetailsQuery"
 import { useMarkReminderComplete } from "../-useMarkReminderComplete"
 import { useMarkReminderIncomplete } from "../-useMarkReminderIncomplete"
-import { SnoozeReminderDialog } from "../-SnoozeReminderDialog"
 import { DeleteReminderButton } from "../-DeleteReminderButton"
 import { Badge } from "@/components/ui/badge"
 import { useCanManage } from "@/lib/queries/useCanManage"
@@ -181,13 +180,10 @@ function ReminderDetailCard({
               )}
               {isMarkingComplete ? "Marking..." : "Mark as Incomplete"}
             </Button>
-            <SnoozeReminderDialog
-              reminderId={reminder.id}
-              disabled={reminder.is_completed}
-            />
             {canManage && <DeleteReminderButton reminderId={reminder.id} />}
             <Link
-              to="/sales/reminders/create"
+              to="/sales/reminders/$reminderId/edit"
+              params={{ reminderId: String(reminder.id) }}
               className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 text-sm font-medium shadow-xs hover:bg-accent"
             >
               <Pencil className="mr-2 h-4 w-4" />

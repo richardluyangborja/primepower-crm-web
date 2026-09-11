@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
+import SatisfactionKpis from "@/routes/admin/analytics/-SatisfactionKpis"
 import ClientSatisfactionList from "./-ClientSatisfactionList"
 
 export const Route = createFileRoute("/admin/satisfaction/")({
@@ -14,7 +15,8 @@ function RouteComponent() {
           Monitor client satisfaction scores and manage survey distribution.
         </p>
       </header>
-      <main>
+      <main className="space-y-4">
+        <SatisfactionKpis />
         <ClientSatisfactionList />
       </main>
     </div>

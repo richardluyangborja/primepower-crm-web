@@ -33,8 +33,8 @@ const demoAccounts = [
   },
   {
     role: "Sales Rep",
-    name: "Carlos Reyes",
-    email: "carlos@primepower.com",
+    name: "Maria Santos",
+    email: "maria@primepower.com",
     password: "password",
   },
 ]
@@ -61,7 +61,7 @@ export function LoginForm({
       queryClient.invalidateQueries({ queryKey: ["auth_user"] })
       const role = response.data?.two_factor
         ? null
-        : response.data?.user?.role ?? response.data?.role
+        : (response.data?.user?.role ?? response.data?.role)
       return navigate({ to: getDefaultRouteForRole(role) })
     },
   })

@@ -34,6 +34,8 @@ export type DashboardData = {
     by_stage: { stage: string; count: number }[]
     value_by_stage: { stage: string; value: number }[]
     monthly_won: { month: string; count: number; total_value: number }[]
+    trend: { month: string; count: number; value: number }[]
+    win_loss: { stage: string; count: number; value: number }[]
     avg_deal_size: number
     total_opportunities: number
     avg_time_in_stage_days: { stage: string; avg_days: number }[]
@@ -59,6 +61,8 @@ export type DashboardData = {
     response_rate: number
     average_score: number | null
     score_distribution: { label: string; count: number }[]
+    trend: { month: string; average_score: number }[]
+    by_question: { question: string; label: string; average_score: number }[]
     per_rep: {
       rep_id: number | null
       rep_name: string
@@ -66,6 +70,16 @@ export type DashboardData = {
       average_score: number | null
     }[]
   }
+  performance: {
+    rep_id: number
+    rep_name: string
+    open_opportunities: number
+    pipeline_value: number
+    won_count: number
+    win_rate: number
+    average_score: number | null
+    response_rate: number
+  }[]
 }
 
 export type DashboardQueryParams = {

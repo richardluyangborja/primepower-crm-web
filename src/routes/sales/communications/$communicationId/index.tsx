@@ -151,8 +151,8 @@ function RouteComponent() {
                 <DialogHeader>
                   <DialogTitle>Delete communication</DialogTitle>
                   <DialogDescription>
-                    This will soft-delete the communication record. The action
-                    cannot be undone.
+                    This will delete the communication record. The action cannot
+                    be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

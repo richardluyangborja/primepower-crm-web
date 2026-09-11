@@ -13,14 +13,19 @@ import {
 } from "@/components/ui/table"
 import { Spinner } from "@/components/ui/spinner"
 import {
-  FunnelPlus,
-  Search,
-  TrendingUp,
-  TrendingDown,
-  Minus,
-} from "lucide-react"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Search, TrendingUp, TrendingDown, Minus, X } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
-import { useSatisfactionQuery } from "./-useSatisfactionQuery"
+import { useState, useMemo } from "react"
+import {
+  useSatisfactionQuery,
+  type SatisfactionFilters,
+} from "./-useSatisfactionQuery"
 import {
   trendLabels,
   type ClientSatisfactionSummary,
@@ -47,20 +52,101 @@ function ScoreBadge({ score }: { score: number | null | undefined }) {
 
 export default function ClientSatisfactionList() {
   const navigate = useNavigate()
-  const query = useSatisfactionQuery()
+  const [search, setSearch] = useState("")
+  const [trendFilter, setTrendFilter] = useState("all")
+  const [scoreFilter, setScoreFilter] = useState("all")
+  const [dateFrom, setDateFrom] = useState("")
+  const [dateTo, setDateTo] = useState("")
+
+  const filters: SatisfactionFilters = useMemo(
+    () => ({
+      q: search || undefined,
+      trend: trendFilter !== "all" ? trendFilter : undefined,
+      score: scoreFilter !== "all" ? scoreFilter : undefined,
+      from: dateFrom || undefined,
+      to: dateTo || undefined,
+    }),
+    [search, trendFilter, scoreFilter, dateFrom, dateTo]
+  )
+
+  const hasActiveFilters =
+    search !== "" || trendFilter !== "all" || scoreFilter !== "all" || dateFrom !== "" || dateTo !== ""
+
+  function clearFilters() {
+    setSearch("")
+    setTrendFilter("all")
+    setScoreFilter("all")
+    setDateFrom("")
+    setDateTo("")
+  }
+
+  const query = useSatisfactionQuery(filters)
   const data = query.data
 
   return (
     <Card>
       <CardHeader>
+        {/* Row 1: Search + Selects + Clear */}
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon">
-            <Search />
-          </Button>
-          <Input placeholder="Search client..." className="w-xs" />
-          <Button variant="outline" size="icon">
-            <FunnelPlus />
-          </Button>
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search companies..."
+              className="pl-8 w-60"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <Select value={trendFilter} onValueChange={setTrendFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="All trends" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All trends</SelectItem>
+              <SelectItem value="up">Improving</SelectItem>
+              <SelectItem value="down">Declining</SelectItem>
+              <SelectItem value="stable">Stable</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={scoreFilter} onValueChange={setScoreFilter}>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="All scores" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All scores</SelectItem>
+              <SelectItem value="ge4">4.0+ (Strong)</SelectItem>
+              <SelectItem value="ge3">3.0–3.9 (Neutral)</SelectItem>
+              <SelectItem value="lt3">Below 3.0 (At risk)</SelectItem>
+            </SelectContent>
+          </Select>
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              <X className="mr-1 size-4" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Row 2: Date Range */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">From</span>
+            <Input
+              type="date"
+              className="w-40"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">To</span>
+            <Input
+              type="date"
+              className="w-40"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+            />
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -150,6 +236,13 @@ export default function ClientSatisfactionList() {
                   </TableCell>
                 </TableRow>
               ))}
+              {data?.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center">
+                    No clients found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         )}

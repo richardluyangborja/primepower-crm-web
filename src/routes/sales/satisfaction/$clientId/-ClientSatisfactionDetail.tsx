@@ -46,6 +46,7 @@ import {
   useDeleteSurvey,
   useSatisfactionDetailQuery,
 } from "../-useSatisfactionQuery"
+import { SatisfactionTrendChart } from "@/components/satisfaction-trend-chart"
 
 const surveyQuestions = [
   {
@@ -435,6 +436,8 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
           </div>
         </CardContent>
       </Card>
+
+      <SatisfactionTrendChart surveys={detail.surveys} />
 
       {detail.primary_contact?.name && (
         <Card>

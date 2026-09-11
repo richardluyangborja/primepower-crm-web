@@ -23,6 +23,7 @@ import {
   type ReminderEntry,
 } from "@/components/reminders-history"
 import { useState } from "react"
+import { ActionSuggestionAlert } from "@/components/action-suggestion-alert"
 
 export type OpportunityInfoPage = {
   id: number
@@ -132,6 +133,10 @@ export function OpportunityDetailContent({
           </div>
         ) : (
           <div className="mt-6 flex flex-col gap-6">
+            <ActionSuggestionAlert
+              entityType="opportunity"
+              entityId={Number(opportunityId)}
+            />
             <OpportunityInfoCard
               opportunity={opportunity}
               opportunityId={Number(opportunityId)}
@@ -158,6 +163,7 @@ function OpportunityInfoCard({
   opportunityId: number
   basePath?: string
 }) {
+  const readOnly = basePath === "/manager"
   const winMutation = useWinOpportunity(opportunityId)
   const stageMutation = useUpdateOpportunityStage(opportunityId)
   const transitions = stageTransitions[opportunity.stage] ?? []
@@ -221,21 +227,25 @@ function OpportunityInfoCard({
             <CardDescription>{opportunity.company.name}</CardDescription>
           </div>
           <CardAction className="flex flex-wrap gap-2">
-            {transitions.map((t) => (
-              <Button
-                key={t.value}
-                size="sm"
-                variant={t.value === "lost" ? "destructive" : "default"}
-                onClick={() => handleTransitionClick(t)}
-                disabled={isPending}
-              >
-                {t.value === "won" && <CheckCircle2 className="mr-2 size-4" />}
-                {t.label}
-              </Button>
-            ))}
-            <Button variant="outline" size="icon">
-              <Pencil />
-            </Button>
+            {!readOnly && (
+              <>
+                {transitions.map((t) => (
+                  <Button
+                    key={t.value}
+                    size="sm"
+                    variant={t.value === "lost" ? "destructive" : "default"}
+                    onClick={() => handleTransitionClick(t)}
+                    disabled={isPending}
+                  >
+                    {t.value === "won" && <CheckCircle2 className="mr-2 size-4" />}
+                    {t.label}
+                  </Button>
+                ))}
+                <Button variant="outline" size="icon">
+                  <Pencil />
+                </Button>
+              </>
+            )}
           </CardAction>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">

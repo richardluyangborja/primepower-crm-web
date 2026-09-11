@@ -27,14 +27,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
-  ChevronDown,
-  Ellipsis,
-  Plus,
-  Search,
-  X,
-} from "lucide-react"
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Ellipsis, Loader2, Plus, Search, X } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { Spinner } from "@/components/ui/spinner"
 import {
@@ -49,6 +51,7 @@ import {
 } from "@/components/communication-history"
 import useCommunicationsQuery from "./-useCommunicationsQuery"
 import { useDeleteCommunication } from "./-useCreateCommunication"
+import { useCanWrite } from "@/lib/queries/useCanWrite"
 
 export type CommunicationTableRow = CommunicationEntry
 
@@ -108,7 +111,11 @@ function trimSubject(subject: string, max = 30): string {
   return `${subject.slice(0, max).trimEnd()}...`
 }
 
-export default function CommunicationsTable({ basePath = "/admin" }: { basePath?: string }) {
+export default function CommunicationsTable({
+  basePath = "/admin",
+}: {
+  basePath?: string
+}) {
   const navigate = useNavigate()
   const [search, setSearch] = useState("")
   const [type, setType] = useState<string>("all")
@@ -122,17 +129,25 @@ export default function CommunicationsTable({ basePath = "/admin" }: { basePath?
       q: search || undefined,
       type: type === "all" ? undefined : type,
       direction:
-        direction === "all" ? undefined : (direction as "incoming" | "outgoing"),
+        direction === "all"
+          ? undefined
+          : (direction as "incoming" | "outgoing"),
       outcome: outcome === "all" ? undefined : outcome,
       from: from || undefined,
       to: to || undefined,
     }),
-    [search, type, direction, outcome, from, to],
+    [search, type, direction, outcome, from, to]
   )
 
   const query = useCommunicationsQuery(params)
   const deleteMutation = useDeleteCommunication()
   const data = query.data
+  const canWrite = useCanWrite()
+
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: number
+    name: string
+  } | null>(null)
 
   const hasActiveFilters =
     Boolean(search) ||
@@ -146,8 +161,8 @@ export default function CommunicationsTable({ basePath = "/admin" }: { basePath?
     <Card>
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[12rem]">
-            <Search className="text-muted-foreground absolute top-1/2 left-2 size-4 -translate-y-1/2" />
+          <div className="relative min-w-[12rem] flex-1">
+            <Search className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search subject or notes..."
               value={search}
@@ -187,7 +202,9 @@ export default function CommunicationsTable({ basePath = "/admin" }: { basePath?
             <SelectContent>
               <SelectItem value="all">All outcomes</SelectItem>
               {(
-                Object.keys(communicationOutcomeLabels) as CommunicationOutcome[]
+                Object.keys(
+                  communicationOutcomeLabels
+                ) as CommunicationOutcome[]
               ).map((o) => (
                 <SelectItem key={o} value={o}>
                   {communicationOutcomeLabels[o]}
@@ -195,20 +212,24 @@ export default function CommunicationsTable({ basePath = "/admin" }: { basePath?
               ))}
             </SelectContent>
           </Select>
-          <Input
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            className="w-40"
-            placeholder="From"
-          />
-          <Input
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            className="w-40"
-            placeholder="To"
-          />
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>From</span>
+            <Input
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              className="w-36"
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>To</span>
+            <Input
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              className="w-36"
+            />
+          </label>
           {hasActiveFilters && (
             <Button
               variant="ghost"
@@ -226,18 +247,18 @@ export default function CommunicationsTable({ basePath = "/admin" }: { basePath?
               Clear
             </Button>
           )}
-          <Button variant="outline" size="sm" disabled>
-            <ChevronDown />
-            Saved views
-          </Button>
         </div>
         <CardAction>
-          <Button
-            onClick={() => navigate({ to: `${basePath}/communications/create` })}
-          >
-            <Plus />
-            <span>Log Communication</span>
-          </Button>
+          {canWrite && (
+            <Button
+              onClick={() =>
+                navigate({ to: `${basePath}/communications/create` })
+              }
+            >
+              <Plus />
+              <span>Log Communication</span>
+            </Button>
+          )}
         </CardAction>
       </CardHeader>
       <CardContent>
@@ -255,7 +276,7 @@ export default function CommunicationsTable({ basePath = "/admin" }: { basePath?
                 <TableHead>Outcome</TableHead>
                 <TableHead>Subject</TableHead>
                 <TableHead>{"Logged By & Date"}</TableHead>
-                <TableHead />
+                {canWrite && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -344,56 +365,55 @@ export default function CommunicationsTable({ basePath = "/admin" }: { basePath?
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Ellipsis />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuGroup>
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              navigate({
-                                to: `${basePath}/communications/$communicationId`,
-                                params: {
-                                  communicationId: comm.id.toString(),
-                                },
-                              })
-                            }}
+                  {canWrite && (
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            View / Edit
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            disabled={deleteMutation.isPending}
-                            onClick={async (e) => {
-                              e.stopPropagation()
-                              if (
-                                window.confirm(
-                                  "Delete this communication? This cannot be undone.",
-                                )
-                              ) {
-                                await deleteMutation.mutateAsync(comm.id)
-                              }
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                            <Ellipsis />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuGroup>
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                navigate({
+                                  to: `${basePath}/communications/$communicationId`,
+                                  params: {
+                                    communicationId: comm.id.toString(),
+                                  },
+                                })
+                              }}
+                            >
+                              View / Edit
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              disabled={deleteMutation.isPending}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setDeleteTarget({
+                                  id: comm.id,
+                                  name: comm.company.name,
+                                })
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
               {data?.length === 0 && (
@@ -407,6 +427,49 @@ export default function CommunicationsTable({ basePath = "/admin" }: { basePath?
           </Table>
         )}
       </CardContent>
+
+      <Dialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null)
+            deleteMutation.reset()
+          }
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Delete communication</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this communication for{" "}
+              {deleteTarget?.name}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteTarget(null)}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={async () => {
+                if (!deleteTarget) return
+                await deleteMutation.mutateAsync(deleteTarget.id)
+                setDeleteTarget(null)
+              }}
+            >
+              {deleteMutation.isPending && (
+                <Loader2 className="size-4 animate-spin" />
+              )}
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

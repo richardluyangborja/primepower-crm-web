@@ -18,6 +18,7 @@ import { useState } from "react"
 import api from "@/lib/api"
 import { StageTransitionModal } from "@/components/stage-transition-modal"
 import useOpportunitiesQuery from "./-useOpportunitiesQuery"
+import { useCanWrite } from "@/lib/queries/useCanWrite"
 
 const stages = [
   {
@@ -80,11 +81,16 @@ export type OpportunityPipelineCard = {
   expected_close_date: string | null
 }
 
-export default function OpportunityPipeline({ basePath = "/admin" }: { basePath?: string }) {
+export default function OpportunityPipeline({
+  basePath = "/admin",
+}: {
+  basePath?: string
+}) {
   const navigate = useNavigate()
   const query = useOpportunitiesQuery()
   const data = query.data
   const queryClient = useQueryClient()
+  const canWrite = useCanWrite()
 
   const [modalOpen, setModalOpen] = useState(false)
   const [activeTransition, setActiveTransition] = useState<{
@@ -198,7 +204,7 @@ export default function OpportunityPipeline({ basePath = "/admin" }: { basePath?
                   {grouped[stage.key]?.length ?? 0}
                 </Badge>
               </div>
-              {stage.key === "initial_contact" && (
+              {stage.key === "initial_contact" && canWrite && (
                 <Button
                   className="w-full"
                   onClick={() =>
@@ -293,7 +299,7 @@ export default function OpportunityPipeline({ basePath = "/admin" }: { basePath?
                             </div>
                           )}
 
-                          {stage.key === "contract_processing" && (
+                          {canWrite && stage.key === "contract_processing" && (
                             <Button
                               variant="default"
                               size="sm"
@@ -313,7 +319,8 @@ export default function OpportunityPipeline({ basePath = "/admin" }: { basePath?
                             </Button>
                           )}
 
-                          {stage.next &&
+                          {canWrite &&
+                            stage.next &&
                             stage.key !== "contract_processing" && (
                               <Button
                                 variant="outline"

@@ -9,7 +9,7 @@ export function getDefaultRouteForRole(role: string | undefined | null): string 
     case "manager":
       return "/manager/dashboard"
     case "sales_rep":
-      return "/sales/lead-and-client/leads"
+      return "/sales/dashboard"
     default:
       return "/login"
   }

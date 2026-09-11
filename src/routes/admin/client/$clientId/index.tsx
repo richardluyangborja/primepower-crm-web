@@ -58,7 +58,6 @@ import OpportunitiesSummary, {
 } from "@/components/opportunities-summary"
 import {
   Alert,
-  AlertAction,
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert"
@@ -74,15 +73,20 @@ import { useNavigate } from "@tanstack/react-router"
 import { StageTransitionModal } from "@/components/stage-transition-modal"
 import type { StatusHistoryEntry } from "@/components/stage-transition-modal"
 import { ReassignDialog } from "@/components/reassign-dialog"
+import { ClientEditDialog } from "@/components/client-edit-dialog"
+import { CompanyEditDialog } from "@/components/company-edit-dialog"
+import { ContactEditDialog } from "@/components/contact-edit-dialog"
+import { ClientDangerZone } from "@/components/client-danger-zone"
 import { useCanManage } from "@/lib/queries/useCanManage"
+import { useCanWrite } from "@/lib/queries/useCanWrite"
 import { useState } from "react"
+import { ActionSuggestionAlert } from "@/components/action-suggestion-alert"
 
 export type ClientInfoPage = {
   id: number
   status: "active" | "inactive"
   client_since: string
   notes?: string
-  created_at: string
   recent_activity?: Date
   company: {
     id: number
@@ -99,6 +103,8 @@ export type ClientInfoPage = {
     id: number
     profileHref?: string
     profileFallback?: string
+    first_name: string
+    last_name: string
     name: string
     title: string
     email: string
@@ -140,11 +146,12 @@ const clientStatusLabels: Record<"active" | "inactive", string> = {
   inactive: "Inactive",
 }
 
-const surveyStatusLabels: Record<"pending" | "completed" | "expired", string> = {
-  pending: "Pending",
-  completed: "Completed",
-  expired: "Expired",
-}
+const surveyStatusLabels: Record<"pending" | "completed" | "expired", string> =
+  {
+    pending: "Pending",
+    completed: "Completed",
+    expired: "Expired",
+  }
 
 const surveyStatusVariant: Record<
   "pending" | "completed" | "expired",
@@ -177,6 +184,7 @@ export function ClientDetailContent({
   const router = useRouter()
   const query = useClientDetailsQuery(clientId)
   const client = query.data!
+  const canWrite = useCanWrite()
 
   return (
     <div className="px-4 pb-8">
@@ -218,14 +226,22 @@ export function ClientDetailContent({
               </div>
             </header>
             <div className="mt-6 flex flex-col gap-6">
-              <CompanyInfoCard client={client} />
+              <ActionSuggestionAlert
+                entityType="client"
+                entityId={Number(clientId)}
+              />
+              <CompanyInfoCard
+                client={client}
+                canWrite={canWrite}
+                detailQueryKey={["client_details", clientId]}
+              />
               <ClientInfoCard client={client} basePath={basePath} />
               {client.status_histories &&
                 client.status_histories.length > 0 && (
                   <StatusHistorySection histories={client.status_histories} />
                 )}
               <Separator />
-              <ContactInfoSection client={client} basePath={basePath} />
+              <ContactInfoSection client={client} />
               <Separator />
               {client.opportunities && client.opportunities.length > 0 && (
                 <OpportunitiesSummary
@@ -245,6 +261,13 @@ export function ClientDetailContent({
                 reminders={client.reminders ?? []}
                 basePath={basePath}
               />
+              {canWrite && (
+                <ClientDangerZone
+                  client={client}
+                  detailQueryKey={["client_details", clientId]}
+                  listPath={`${basePath}/lead-and-client/clients`}
+                />
+              )}
             </div>
           </>
         )}
@@ -258,17 +281,33 @@ function RouteComponent() {
   return <ClientDetailContent clientId={clientId} />
 }
 
-function CompanyInfoCard({ client }: { client: ClientInfoPage }) {
+function CompanyInfoCard({
+  client,
+  canWrite,
+  detailQueryKey,
+}: {
+  client: ClientInfoPage
+  canWrite: boolean
+  detailQueryKey: string[]
+}) {
+  const [editOpen, setEditOpen] = useState(false)
+
   return (
     <section>
       <Card>
         <CardHeader>
           <CardTitle>Company Information</CardTitle>
-          <CardAction>
-            <Button variant="outline" size="icon">
-              <Pencil />
-            </Button>
-          </CardAction>
+          {canWrite && (
+            <CardAction>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setEditOpen(true)}
+              >
+                <Pencil />
+              </Button>
+            </CardAction>
+          )}
         </CardHeader>
         <CardContent>
           <div className="mb-4 grid grid-cols-2 gap-4">
@@ -298,15 +337,26 @@ function CompanyInfoCard({ client }: { client: ClientInfoPage }) {
               <Info />
               <AlertTitle>Note</AlertTitle>
               <AlertDescription>{client.notes}</AlertDescription>
-              <AlertAction>
-                <Button variant="outline" size="icon">
-                  <Pencil />
-                </Button>
-              </AlertAction>
             </Alert>
           )}
         </CardContent>
       </Card>
+
+      <CompanyEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        company={{
+          id: client.company.id,
+          industry: client.company.industry,
+          address: client.company.address,
+          phone: client.company.phone,
+          email: client.company.email,
+          website: client.company.website,
+        }}
+        notes={client.notes ?? ""}
+        notesEndpoint={`/api/clients/${client.id}`}
+        detailQueryKey={detailQueryKey}
+      />
     </section>
   )
 }
@@ -320,7 +370,9 @@ function ClientInfoCard({
 }) {
   const updateStatusMutation = useUpdateClientStatus(client.id)
   const canManage = useCanManage()
+  const canWrite = useCanWrite()
   const [reassignOpen, setReassignOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [targetStatus, setTargetStatus] = useState<"active" | "inactive">(
     "inactive"
@@ -328,7 +380,10 @@ function ClientInfoCard({
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const pendingReminders = (client.reminders ?? []).filter(
-    (r) => !r.is_completed && r.related_to_type === "client" && r.related_to_id === client.id
+    (r) =>
+      !r.is_completed &&
+      r.related_to_type === "client" &&
+      r.related_to_id === client.id
   )
 
   const handleToggleClick = () => {
@@ -391,18 +446,30 @@ function ClientInfoCard({
                 </a>
               </Button>
             )}
-            <Button
-              variant={client.status === "active" ? "destructive" : "default"}
-              size="sm"
-              onClick={handleToggleClick}
-              disabled={updateStatusMutation.isPending}
-            >
-              {updateStatusMutation.isPending
-                ? "Updating..."
-                : client.status === "active"
-                  ? "Mark as Inactive"
-                  : "Mark as Active"}
-            </Button>
+            {canWrite && (
+              <Button
+                variant={client.status === "active" ? "destructive" : "default"}
+                size="sm"
+                onClick={handleToggleClick}
+                disabled={updateStatusMutation.isPending}
+              >
+                {updateStatusMutation.isPending
+                  ? "Updating..."
+                  : client.status === "active"
+                    ? "Mark as Inactive"
+                    : "Mark as Active"}
+              </Button>
+            )}
+            {canWrite && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setEditOpen(true)}
+              >
+                <Pencil />
+                Edit
+              </Button>
+            )}
           </CardAction>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
@@ -424,12 +491,6 @@ function ClientInfoCard({
               <span>{client.sales_representative.name}</span>
             </div>
           </div>
-          <div>
-            <span className="block text-sm text-muted-foreground">
-              Created At
-            </span>
-            <span>{new Date(client.created_at).toDateString()}</span>
-          </div>
         </CardContent>
       </Card>
 
@@ -438,8 +499,9 @@ function ClientInfoCard({
           <DialogHeader>
             <DialogTitle>Mark Client as Inactive?</DialogTitle>
             <DialogDescription>
-              This client has {pendingReminders.length} pending reminder{pendingReminders.length === 1 ? '' : 's'}. 
-              The client will be marked as inactive, but existing reminders will remain.
+              This client has {pendingReminders.length} pending reminder
+              {pendingReminders.length === 1 ? "" : "s"}. The client will be
+              marked as inactive, but existing reminders will remain.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -469,6 +531,23 @@ function ClientInfoCard({
         currentOwnerId={client.sales_representative.id}
         currentOwnerName={client.sales_representative.name}
         subjectName={`client ${client.company.name}`}
+        detailQueryKey={["client_details", String(client.id)]}
+      />
+
+      <ClientEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        client={{
+          id: client.id,
+          client_since: client.client_since,
+          status: client.status,
+          notes: client.notes,
+          sales_representative: {
+            id: client.sales_representative.id,
+            name: client.sales_representative.name,
+          },
+        }}
+        detailQueryKey={["client_details", String(client.id)]}
       />
     </section>
   )
@@ -510,17 +589,15 @@ function StatusHistorySection({
   )
 }
 
-function ContactInfoSection({
-  client,
-  basePath = "/admin",
-}: {
-  client: ClientInfoPage
-  basePath?: string
-}) {
+function ContactInfoSection({ client }: { client: ClientInfoPage }) {
+  const canWrite = useCanWrite()
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const createContactMutation = useCreateContact(String(client.id))
   const deleteContactMutation = useDeleteContact(String(client.id))
   const markAsPrimaryMutation = useMarkAsPrimaryContact(String(client.id))
+  const [editDialogContact, setEditDialogContact] = useState<
+    ClientInfoPage["contacts"][number] | null
+  >(null)
 
   const hasPrimaryContact = client.contacts.some((c) => c.is_primary)
 
@@ -569,10 +646,12 @@ function ContactInfoSection({
     <section>
       <header className="flex items-center justify-between">
         <h2 className="font-heading text-lg">Contacts</h2>
-        <Button variant="outline" onClick={() => setAddDialogOpen(true)}>
-          <Plus />
-          <span>Add a contact</span>
-        </Button>
+        {canWrite && (
+          <Button variant="outline" onClick={() => setAddDialogOpen(true)}>
+            <Plus />
+            <span>Add a contact</span>
+          </Button>
+        )}
       </header>
       <div className="mt-4 grid grid-cols-2 gap-4">
         {client.contacts.map((contact, i) => (
@@ -581,16 +660,15 @@ function ContactInfoSection({
               <CardTitle>{contact.name}</CardTitle>
               <CardDescription>{contact.title}</CardDescription>
               <CardAction className="flex flex-wrap gap-2">
-                {client.lead && (
-                  <Button variant="link" size="sm" asChild>
-                    <a href={`${basePath}/lead/${client.lead.id}`}>
-                      View Lead Profile
-                    </a>
+                {canWrite && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setEditDialogContact(contact)}
+                  >
+                    <Pencil />
                   </Button>
                 )}
-                <Button variant="outline" size="icon">
-                  <Pencil />
-                </Button>
               </CardAction>
             </CardHeader>
             <CardContent className="flex items-center gap-4">
@@ -606,7 +684,7 @@ function ContactInfoSection({
 
             <Separator />
             <CardFooter className="flex flex-wrap gap-2">
-              {!hasPrimaryContact && (
+              {!hasPrimaryContact && canWrite && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -617,15 +695,17 @@ function ContactInfoSection({
                   <span>Mark as Primary</span>
                 </Button>
               )}
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => requestDeleteContact(contact)}
-                disabled={deleteContactMutation.isPending}
-              >
-                <Trash />
-                <span>Delete this contact</span>
-              </Button>
+              {canWrite && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => requestDeleteContact(contact)}
+                  disabled={deleteContactMutation.isPending}
+                >
+                  <Trash />
+                  <span>Delete this contact</span>
+                </Button>
+              )}
             </CardFooter>
           </Card>
         ))}
@@ -735,9 +815,7 @@ function ContactInfoSection({
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && (
-                  <Loader2 className="size-4 animate-spin" />
-                )}
+                {isSubmitting && <Loader2 className="size-4 animate-spin" />}
                 {isSubmitting ? "Adding..." : "Add Contact"}
               </Button>
             </DialogFooter>
@@ -775,6 +853,24 @@ function ContactInfoSection({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {editDialogContact && (
+        <ContactEditDialog
+          open={editDialogContact !== null}
+          onOpenChange={(open) => {
+            if (!open) setEditDialogContact(null)
+          }}
+          contact={{
+            id: editDialogContact.id,
+            first_name: editDialogContact.first_name,
+            last_name: editDialogContact.last_name,
+            title: editDialogContact.title,
+            email: editDialogContact.email,
+            phone: editDialogContact.phone,
+          }}
+          detailQueryKey={["client_details", String(client.id)]}
+        />
+      )}
     </section>
   )
 }
@@ -787,9 +883,8 @@ function ClientSurveySummary({
   basePath?: string
 }) {
   const navigate = useNavigate()
-  const score = client.average_score !== null
-    ? Number(client.average_score)
-    : null
+  const score =
+    client.average_score !== null ? Number(client.average_score) : null
 
   return (
     <section>
@@ -834,11 +929,7 @@ function ClientSurveySummary({
                             : "destructive"
                       }
                     >
-                      {score >= 4
-                        ? "Good"
-                        : score >= 3
-                          ? "Fair"
-                          : "Poor"}
+                      {score >= 4 ? "Good" : score >= 3 ? "Fair" : "Poor"}
                     </Badge>
                   </>
                 ) : (
@@ -847,9 +938,7 @@ function ClientSurveySummary({
               </div>
             </div>
             <div>
-              <span className="block text-sm text-muted-foreground">
-                Trend
-              </span>
+              <span className="block text-sm text-muted-foreground">Trend</span>
               <div className="mt-1 flex items-center gap-2">
                 {client.trend ? (
                   <>
@@ -859,9 +948,7 @@ function ClientSurveySummary({
                     </span>
                   </>
                 ) : (
-                  <span className="text-muted-foreground">
-                    Not enough data
-                  </span>
+                  <span className="text-muted-foreground">Not enough data</span>
                 )}
               </div>
             </div>
@@ -873,9 +960,7 @@ function ClientSurveySummary({
                 {client.latest_survey ? (
                   <>
                     <Badge
-                      variant={
-                        surveyStatusVariant[client.latest_survey.status]
-                      }
+                      variant={surveyStatusVariant[client.latest_survey.status]}
                     >
                       {surveyStatusLabels[client.latest_survey.status]}
                     </Badge>
@@ -892,9 +977,7 @@ function ClientSurveySummary({
                     </span>
                   </>
                 ) : (
-                  <span className="text-muted-foreground">
-                    No surveys
-                  </span>
+                  <span className="text-muted-foreground">No surveys</span>
                 )}
               </div>
             </div>

@@ -26,10 +26,11 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { createFileRoute, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { useForm } from "@tanstack/react-form"
 import {
   AlertTriangle,
+  Archive,
   ChevronLeft,
   Info,
   Loader2,
@@ -56,7 +57,6 @@ import OpportunitiesSummary, {
 } from "@/components/opportunities-summary"
 import {
   Alert,
-  AlertAction,
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert"
@@ -69,13 +69,20 @@ import {
 } from "@/components/communication-history"
 import { ReminderHistorySection } from "@/components/reminders-history"
 import { useState } from "react"
+import { LeadEditDialog } from "@/components/lead-edit-dialog"
+import { CompanyEditDialog } from "@/components/company-edit-dialog"
+import { ContactEditDialog } from "@/components/contact-edit-dialog"
+import { LeadDangerZone } from "@/components/lead-danger-zone"
+import { useCanWrite } from "@/lib/queries/useCanWrite"
 
 export type LeadInfoPage = {
   id: number
   status: "new" | "qualified" | "converted" | "disqualified"
+  client_id?: number | null
   source: string
   notes?: string
   sales_representative: {
+    id: number
     name: string
     profileHref?: string
     profileFallback?: string
@@ -97,6 +104,8 @@ export type LeadInfoPage = {
     id: number
     profileHref?: string
     profileFallback?: string
+    first_name: string
+    last_name: string
     name: string
     title: string
     email: string
@@ -145,9 +154,7 @@ export const leadStatusTransitions: Record<
     { label: "Convert to Client", value: "converted" },
     { label: "Disqualify Lead", value: "disqualified" },
   ],
-  disqualified: [
-    { label: "Re-qualify Lead", value: "qualified" },
-  ],
+  disqualified: [{ label: "Re-qualify Lead", value: "qualified" }],
   converted: [],
 }
 
@@ -170,6 +177,7 @@ function RouteComponent() {
   const { leadId } = Route.useParams()
   const query = useLeadDetailsQuery(leadId)
   const lead = query.data!
+  const canWrite = useCanWrite()
 
   return (
     <div className="px-4 pb-8">
@@ -213,7 +221,30 @@ function RouteComponent() {
               </div>
             </header>
             <div className="mt-6 flex flex-col gap-6">
-              <CompanyInfoCard lead={lead} />
+              {lead.status === "converted" && (
+                <Alert>
+                  <Archive />
+                  <AlertTitle>Converted Lead</AlertTitle>
+                  <AlertDescription>
+                    This lead was converted to a client and is kept for history
+                    only.{" "}
+                    {lead.client_id ? (
+                      <Link
+                        to={`/sales/client/$clientId`}
+                        params={{ clientId: String(lead.client_id) }}
+                        className="font-medium underline underline-offset-4"
+                      >
+                        View the client
+                      </Link>
+                    ) : null}
+                  </AlertDescription>
+                </Alert>
+              )}
+              <CompanyInfoCard
+                lead={lead}
+                canWrite={canWrite}
+                detailQueryKey={["sales_lead_details", leadId]}
+              />
               <LeadInfoCard lead={lead} />
               {lead.status_histories && lead.status_histories.length > 0 && (
                 <StatusHistorySection histories={lead.status_histories} />
@@ -222,7 +253,10 @@ function RouteComponent() {
               <ContactInfoSection lead={lead} />
               <Separator />
               {lead.opportunities && lead.opportunities.length > 0 && (
-                <OpportunitiesSummary opportunities={lead.opportunities} basePath="/sales" />
+                <OpportunitiesSummary
+                  opportunities={lead.opportunities}
+                  basePath="/sales"
+                />
               )}
               <Separator />
               <CommunicationHistorySection
@@ -242,7 +276,17 @@ function RouteComponent() {
                     </AlertDescription>
                   </Alert>
                 )}
-              <ReminderHistorySection reminders={lead.reminders ?? []} basePath="/sales" />
+              <ReminderHistorySection
+                reminders={lead.reminders ?? []}
+                basePath="/sales"
+              />
+              {canWrite && (
+                <LeadDangerZone
+                  lead={lead}
+                  detailQueryKey={["sales_lead_details", leadId]}
+                  listPath="/sales/lead-and-client/leads"
+                />
+              )}
             </div>{" "}
           </>
         )}
@@ -251,17 +295,33 @@ function RouteComponent() {
   )
 }
 
-function CompanyInfoCard({ lead }: { lead: LeadInfoPage }) {
+function CompanyInfoCard({
+  lead,
+  canWrite,
+  detailQueryKey,
+}: {
+  lead: LeadInfoPage
+  canWrite: boolean
+  detailQueryKey: string[]
+}) {
+  const [editOpen, setEditOpen] = useState(false)
+
   return (
     <section>
       <Card>
         <CardHeader>
           <CardTitle>Company Information</CardTitle>
-          <CardAction>
-            <Button variant="outline" size="icon">
-              <Pencil />
-            </Button>
-          </CardAction>
+          {canWrite && (
+            <CardAction>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setEditOpen(true)}
+              >
+                <Pencil />
+              </Button>
+            </CardAction>
+          )}
         </CardHeader>
         <CardContent>
           <div className="mb-4 grid grid-cols-2 gap-4">
@@ -291,15 +351,26 @@ function CompanyInfoCard({ lead }: { lead: LeadInfoPage }) {
               <Info />
               <AlertTitle>Note</AlertTitle>
               <AlertDescription>{lead.notes}</AlertDescription>
-              <AlertAction>
-                <Button variant="outline" size="icon">
-                  <Pencil />
-                </Button>
-              </AlertAction>
             </Alert>
           )}
         </CardContent>
       </Card>
+
+      <CompanyEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        company={{
+          id: lead.company.id,
+          industry: lead.company.industry,
+          address: lead.company.address,
+          phone: lead.company.phone,
+          email: lead.company.email,
+          website: lead.company.website,
+        }}
+        notes={lead.notes ?? ""}
+        notesEndpoint={`/api/leads/${lead.id}`}
+        detailQueryKey={detailQueryKey}
+      />
     </section>
   )
 }
@@ -309,8 +380,10 @@ function LeadInfoCard({ lead }: { lead: LeadInfoPage }) {
   const statusMutation = useUpdateLeadStatus(lead.id)
   const transitions = leadStatusTransitions[status] ?? []
   const showQualificationAlert = shouldShowQualificationAlert(lead)
+  const canWrite = useCanWrite()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [activeTransition, setActiveTransition] = useState<{
     label: string
     value: string
@@ -359,17 +432,30 @@ function LeadInfoCard({ lead }: { lead: LeadInfoPage }) {
             Created at {new Date(lead.created_at).toDateString()}
           </CardDescription>
           <CardAction className="flex flex-wrap gap-2">
-            {transitions.map((t) => (
+            {canWrite &&
+              transitions.map((t) => (
+                <Button
+                  key={t.value}
+                  size="sm"
+                  variant={
+                    t.value === "disqualified" ? "destructive" : "default"
+                  }
+                  onClick={() => handleTransitionClick(t)}
+                  disabled={statusMutation.isPending}
+                >
+                  {t.label}
+                </Button>
+              ))}
+            {canWrite && (
               <Button
-                key={t.value}
                 size="sm"
-                variant={t.value === "disqualified" ? "destructive" : "default"}
-                onClick={() => handleTransitionClick(t)}
-                disabled={statusMutation.isPending}
+                variant="outline"
+                onClick={() => setEditOpen(true)}
               >
-                {t.label}
+                <Pencil />
+                Edit
               </Button>
-            ))}
+            )}
           </CardAction>
         </CardHeader>
         <CardContent>
@@ -425,6 +511,21 @@ function LeadInfoCard({ lead }: { lead: LeadInfoPage }) {
         isPending={statusMutation.isPending}
         onSubmit={handleModalSubmit}
       />
+
+      <LeadEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        lead={{
+          id: lead.id,
+          source: lead.source,
+          notes: lead.notes,
+          sales_representative: {
+            id: lead.sales_representative.id,
+            name: lead.sales_representative.name,
+          },
+        }}
+        detailQueryKey={["sales_lead_details", String(lead.id)]}
+      />
     </section>
   )
 }
@@ -470,6 +571,9 @@ function ContactInfoSection({ lead }: { lead: LeadInfoPage }) {
   const createContactMutation = useCreateContact(String(lead.id))
   const deleteContactMutation = useDeleteContact(String(lead.id))
   const markAsPrimaryMutation = useMarkAsPrimaryContact(String(lead.id))
+  const [editDialogContact, setEditDialogContact] = useState<
+    LeadInfoPage["contacts"][number] | null
+  >(null)
 
   const hasPrimaryContact = lead.contacts.some((c) => c.is_primary)
 
@@ -530,7 +634,11 @@ function ContactInfoSection({ lead }: { lead: LeadInfoPage }) {
               <CardTitle>{contact.name}</CardTitle>
               <CardDescription>{contact.title}</CardDescription>
               <CardAction>
-                <Button variant="outline" size="icon">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setEditDialogContact(contact)}
+                >
                   <Pencil />
                 </Button>
               </CardAction>
@@ -677,9 +785,7 @@ function ContactInfoSection({ lead }: { lead: LeadInfoPage }) {
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && (
-                  <Loader2 className="size-4 animate-spin" />
-                )}
+                {isSubmitting && <Loader2 className="size-4 animate-spin" />}
                 {isSubmitting ? "Adding..." : "Add Contact"}
               </Button>
             </DialogFooter>
@@ -717,6 +823,24 @@ function ContactInfoSection({ lead }: { lead: LeadInfoPage }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {editDialogContact && (
+        <ContactEditDialog
+          open={editDialogContact !== null}
+          onOpenChange={(open) => {
+            if (!open) setEditDialogContact(null)
+          }}
+          contact={{
+            id: editDialogContact.id,
+            first_name: editDialogContact.first_name,
+            last_name: editDialogContact.last_name,
+            title: editDialogContact.title,
+            email: editDialogContact.email,
+            phone: editDialogContact.phone,
+          }}
+          detailQueryKey={["sales_lead_details", String(lead.id)]}
+        />
+      )}
     </section>
   )
 }

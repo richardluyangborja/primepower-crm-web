@@ -69,6 +69,7 @@ import {
   useUpdateCommunication,
 } from "../-useCreateCommunication"
 import { isAxiosError } from "@/lib/api"
+import { useCanWrite } from "@/lib/queries/useCanWrite"
 
 export const Route = createFileRoute("/admin/communications/$communicationId/")(
   {
@@ -89,6 +90,7 @@ export function CommunicationDetailContent({
   const deleteMutation = useDeleteCommunication()
   const comm = query.data
   const TypeIcon = comm ? communicationTypeIcons[comm.type] : null
+  const canWrite = useCanWrite()
 
   const [editOpen, setEditOpen] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
@@ -139,6 +141,7 @@ export function CommunicationDetailContent({
                 date={new Date(comm.created_at)}
                 onEdit={() => setEditOpen(true)}
                 onDelete={() => setConfirmDeleteOpen(true)}
+                canWrite={canWrite}
               />
             </div>
 
@@ -156,8 +159,8 @@ export function CommunicationDetailContent({
                 <DialogHeader>
                   <DialogTitle>Delete communication</DialogTitle>
                   <DialogDescription>
-                    This will soft-delete the communication record. The action
-                    cannot be undone.
+                    This will delete the communication record. The action cannot
+                    be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -202,11 +205,13 @@ function CommunicationDetailCard({
   date,
   onEdit,
   onDelete,
+  canWrite,
 }: {
   comm: CommunicationEntry
   date: Date
   onEdit: () => void
   onDelete: () => void
+  canWrite: boolean
 }) {
   return (
     <section>
@@ -215,19 +220,23 @@ function CommunicationDetailCard({
           <CardTitle>Communication Details</CardTitle>
           <CardDescription>Recorded on {date.toLocaleString()}</CardDescription>
           <CardAction className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" onClick={onEdit}>
-              <Pencil />
-              Edit
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onDelete}
-              className="text-destructive"
-            >
-              <Trash />
-              Delete
-            </Button>
+            {canWrite && (
+              <>
+                <Button variant="outline" size="sm" onClick={onEdit}>
+                  <Pencil />
+                  Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onDelete}
+                  className="text-destructive"
+                >
+                  <Trash />
+                  Delete
+                </Button>
+              </>
+            )}
           </CardAction>
         </CardHeader>
         <CardContent>

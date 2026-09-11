@@ -1,42 +1,50 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { useState } from "react"
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { Area, AreaChart } from "recharts"
-import { Pie, PieChart, Cell } from "recharts"
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts"
+import { useState, type ComponentType } from "react"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Area,
+  AreaChart,
+  XAxis,
+  YAxis,
+} from "recharts"
+import {
+  Target,
+  Banknote,
+  Trophy,
+  TrendingUp,
+  Star,
+  Send,
+  ChartSpline,
+  BarChart3,
+  Briefcase,
+} from "lucide-react"
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import {
   ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
-import { Badge } from "@/components/ui/badge"
 import {
-  Users,
-  UserCheck,
-  Target,
-  DollarSign,
-  Bell,
-  BarChart3,
-  MessageSquare,
-  ClipboardCheck,
-  UserX,
-  Clock,
-  AlertTriangle,
-  CheckCircle2,
-} from "lucide-react"
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Separator } from "@/components/ui/separator"
 import {
   Select,
@@ -46,6 +54,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import useDashboardQuery, { type DashboardData } from "./-useDashboardQuery"
+import { KpiCards } from "@/components/kpi-cards"
 import useSalesRepresentatives from "@/lib/queries/useSalesRepresentatives"
 import { Spinner } from "@/components/ui/spinner"
 import { formatCurrency } from "@/lib/utils"
@@ -66,6 +75,13 @@ const CHART_COLORS = [
   "var(--chart-5)",
 ]
 
+/** "contract_processing" -> "Contract processing" */
+function titleCase(value: string): string {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
 export function DashboardContent({
   showRepFilter = false,
 }: {
@@ -75,21 +91,7 @@ export function DashboardContent({
   const repsQuery = useSalesRepresentatives()
   const { data, isLoading } = useDashboardQuery(repId ? { repId } : {})
 
-  const handleRepChange = (value: string) => {
-    setRepId(value === "all" ? null : Number(value))
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Spinner className="size-10" />
-      </div>
-    )
-  }
-
-  if (!data) {
-    return <div>No data available</div>
-  }
+  const isOverseer = data?.scope.role === "admin" || data?.scope.role === "manager"
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -99,14 +101,16 @@ export function DashboardContent({
             Dashboard and Analytics
           </h1>
           <p className="text-sm text-muted-foreground">
-            Overview of your CRM performance metrics
+            Opportunity pipeline and customer satisfaction at a glance
           </p>
         </div>
         {showRepFilter && (
           <div className="w-56">
             <Select
               value={repId ? String(repId) : "all"}
-              onValueChange={handleRepChange}
+              onValueChange={(value) =>
+                setRepId(value === "all" ? null : Number(value))
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -124,410 +128,166 @@ export function DashboardContent({
         )}
       </div>
 
-      <SummaryCards summary={data.summary} />
+      {isLoading && (
+        <div className="flex h-full items-center justify-center py-24">
+          <Spinner className="size-10" />
+        </div>
+      )}
+      {!isLoading && !data && <div>No data available</div>}
+      {!isLoading && data && (
+        <>
+          <KpiGrid data={data} />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <LeadsByStatusChart leads={data.leads} />
-        <OpportunitiesByStageChart opportunities={data.opportunities} />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <LeadTrendsChart leads={data.leads} />
-        <MonthlyRevenueChart opportunities={data.opportunities} />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <ClientGrowthChart clients={data.clients} />
-        <CommunicationsChart communications={data.communications} />
-        <RemindersChart reminders={data.reminders} />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <SatisfactionChart satisfaction={data.satisfaction} />
-        <LeadSourceChart leads={data.leads} />
-      </div>
-    </div>
-  )
-}
-
-function SummaryCards({ summary }: { summary: DashboardData["summary"] }) {
-  return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      <Card>
-        <CardContent className="flex items-center gap-4 p-4">
-          <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10">
-            <Users className="size-6 text-primary" />
+          <SectionHeading icon={Briefcase} title="Opportunity Pipeline Analytics" />
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+            <OpportunityDistributionChart opportunities={data.opportunities} />
+            <OpportunityTrendChart opportunities={data.opportunities} />
+            <WinLossChart opportunities={data.opportunities} />
           </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Total Leads</p>
-            <p className="text-2xl font-semibold">{summary.total_leads}</p>
-          </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardContent className="flex items-center gap-4 p-4">
-          <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10">
-            <UserCheck className="size-6 text-primary" />
+          <SectionHeading
+            icon={Star}
+            title="Client Satisfaction Analytics"
+          />
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <OverallSatisfactionCard satisfaction={data.satisfaction} />
+            <SatisfactionTrendChart satisfaction={data.satisfaction} />
+            <SatisfactionByCategoryChart satisfaction={data.satisfaction} />
+            <SatisfactionDistributionChart satisfaction={data.satisfaction} />
           </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Total Clients</p>
-            <p className="text-2xl font-semibold">{summary.total_clients}</p>
-          </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardContent className="flex items-center gap-4 p-4">
-          <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10">
-            <DollarSign className="size-6 text-primary" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Contract Value</p>
-            <p className="text-2xl font-semibold">
-              {formatCurrency(summary.total_contract_value)}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="flex items-center gap-4 p-4">
-          <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10">
-            <Target className="size-6 text-primary" />
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Conversion Rate</p>
-            <p className="text-2xl font-semibold">{summary.conversion_rate}%</p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-function LeadsByStatusChart({ leads }: { leads: DashboardData["leads"] }) {
-  const chartConfig = {
-    count: {
-      label: "Leads",
-      color: "var(--chart-1)",
-    },
-  } satisfies ChartConfig
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="size-4" />
-          Leads by Status
-        </CardTitle>
-        <CardDescription>Distribution of leads across statuses</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
-          <BarChart accessibilityLayer data={leads.by_status}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="status"
-              tickLine={false}
-              tickMargin={8}
-              axisLine={false}
-              tickFormatter={(value) =>
-                value.charAt(0).toUpperCase() + value.slice(1)
-              }
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar dataKey="count" fill="var(--color-count)" radius={8} />
-          </BarChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
-  )
-}
-
-function OpportunitiesByStageChart({
-  opportunities,
-}: {
-  opportunities: DashboardData["opportunities"]
-}) {
-  const chartConfig = Object.fromEntries(
-    opportunities.by_stage.map((s, i) => [
-      s.stage,
-      {
-        label:
-          s.stage.replace(/_/g, " ").charAt(0).toUpperCase() +
-          s.stage.replace(/_/g, " ").slice(1),
-        color: CHART_COLORS[i % CHART_COLORS.length],
-      },
-    ])
-  ) satisfies ChartConfig
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Target className="size-4" />
-          Opportunities by Stage
-        </CardTitle>
-        <CardDescription>Pipeline distribution across stages</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={opportunities.by_stage.filter((s) => s.count > 0)}
-              dataKey="count"
-              nameKey="stage"
-              innerRadius={60}
-              outerRadius={80}
-            >
-              {opportunities.by_stage.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={CHART_COLORS[index % CHART_COLORS.length]}
+          {(isOverseer || data.performance.length > 0) && (
+            <>
+              <SectionHeading
+                icon={BarChart3}
+                title={isOverseer ? "Sales Rep Performance" : "My Performance"}
+              />
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                <PerformanceTable
+                  performance={data.performance}
+                  fullWidth={!isOverseer}
                 />
-              ))}
-            </Pie>
-          </PieChart>
-        </ChartContainer>
-      </CardContent>
-      <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 leading-none font-medium">
-          Total: {opportunities.total_opportunities} opportunities
-        </div>
-      </CardFooter>
-    </Card>
+                {isOverseer && <PipelineByRepChart performance={data.performance} />}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
   )
 }
 
-function LeadTrendsChart({ leads }: { leads: DashboardData["leads"] }) {
-  const chartConfig = {
-    count: {
-      label: "Leads",
-      color: "var(--chart-1)",
-    },
-  } satisfies ChartConfig
-
+function SectionHeading({
+  icon: Icon,
+  title,
+}: {
+  icon: ComponentType<{ className?: string }>
+  title: string
+}) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="size-4" />
-          Lead Trends
-        </CardTitle>
-        <CardDescription>Monthly lead acquisition</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
-          <AreaChart
-            accessibilityLayer
-            data={leads.by_month}
-            margin={{ left: 12, right: 12 }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Area
-              dataKey="count"
-              type="natural"
-              fill="var(--color-count)"
-              fillOpacity={0.4}
-              stroke="var(--color-count)"
-            />
-          </AreaChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+    <h2 className="flex items-center gap-2 font-heading text-lg font-semibold">
+      <Icon className="size-5 text-primary" />
+      {title}
+    </h2>
   )
 }
 
-function MonthlyRevenueChart({
+function KpiGrid({ data }: { data: DashboardData }) {
+  const { summary, opportunities, satisfaction } = data
+  const activeOpportunities = Math.max(
+    0,
+    summary.total_opportunities -
+      summary.won_opportunities -
+      summary.lost_opportunities,
+  )
+  const pipelineValue = opportunities.value_by_stage
+    .filter((row) => row.stage !== "won" && row.stage !== "lost")
+    .reduce((sum, row) => sum + row.value, 0)
+
+  const cards = [
+    {
+      label: "Active Opportunities",
+      value: activeOpportunities.toLocaleString(),
+      hint: "Open in the pipeline",
+      icon: Target,
+    },
+    {
+      label: "Pipeline Value",
+      value: formatCurrency(pipelineValue),
+      hint: "Open opportunity value",
+      icon: Banknote,
+    },
+    {
+      label: "Won Opportunities",
+      value: summary.won_opportunities.toLocaleString(),
+      hint: `${formatCurrency(summary.total_contract_value)} won`,
+      icon: Trophy,
+    },
+    {
+      label: "Win Rate",
+      value: `${summary.win_rate}%`,
+      hint: "Closed deals won",
+      icon: TrendingUp,
+    },
+    {
+      label: "Avg Satisfaction",
+      value:
+        satisfaction.average_score !== null
+          ? `${satisfaction.average_score}/5`
+          : "—",
+      hint: "Completed surveys",
+      icon: Star,
+    },
+    {
+      label: "Survey Response Rate",
+      value: `${satisfaction.response_rate}%`,
+      hint: `${satisfaction.completed_surveys}/${satisfaction.total_surveys} completed`,
+      icon: Send,
+    },
+  ]
+
+  return <KpiCards kpis={cards} />
+}
+
+// ---------------------------------------------------------------------------
+// Opportunity Pipeline Analytics
+// ---------------------------------------------------------------------------
+
+function OpportunityDistributionChart({
   opportunities,
 }: {
   opportunities: DashboardData["opportunities"]
 }) {
-  const chartConfig = {
-    total_value: {
-      label: "Revenue",
-      color: "var(--chart-2)",
-    },
-  } satisfies ChartConfig
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <DollarSign className="size-4" />
-          Monthly Won Revenue
-        </CardTitle>
-        <CardDescription>Revenue from won opportunities</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
-          <BarChart accessibilityLayer data={opportunities.monthly_won}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={8}
-              axisLine={false}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar
-              dataKey="total_value"
-              fill="var(--color-total_value)"
-              radius={8}
-            />
-          </BarChart>
-        </ChartContainer>
-        <div className="mt-4 flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">Avg Deal:</span>
-            <Badge variant="secondary">
-              {formatCurrency(opportunities.avg_deal_size)}
-            </Badge>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function ClientGrowthChart({ clients }: { clients: DashboardData["clients"] }) {
-  const chartConfig = {
-    count: {
-      label: "Clients",
-      color: "var(--chart-3)",
-    },
-  } satisfies ChartConfig
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <UserCheck className="size-4" />
-          Client Growth
-        </CardTitle>
-        <CardDescription>Monthly client acquisition</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4 flex gap-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="size-4 text-green-500" />
-            <span className="text-sm text-muted-foreground">Active:</span>
-            <Badge variant="outline">{clients.active}</Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <UserX className="size-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Inactive:</span>
-            <Badge variant="outline">{clients.inactive}</Badge>
-          </div>
-        </div>
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
-          <AreaChart
-            accessibilityLayer
-            data={clients.by_month}
-            margin={{ left: 12, right: 12 }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Area
-              dataKey="count"
-              type="natural"
-              fill="var(--color-count)"
-              fillOpacity={0.4}
-              stroke="var(--color-count)"
-            />
-          </AreaChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
-  )
-}
-
-function CommunicationsChart({
-  communications,
-}: {
-  communications: DashboardData["communications"]
-}) {
   const chartConfig = Object.fromEntries(
-    communications.by_type.map((t, i) => [
-      t.type,
-      {
-        label: t.type.charAt(0).toUpperCase() + t.type.slice(1),
-        color: CHART_COLORS[i % CHART_COLORS.length],
-      },
-    ])
+    opportunities.by_stage.map((row, index) => [
+      row.stage,
+      { label: titleCase(row.stage), color: CHART_COLORS[index % CHART_COLORS.length] },
+    ]),
   ) satisfies ChartConfig
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="size-4" />
-          Communications
-        </CardTitle>
-        <CardDescription>By type</CardDescription>
+        <CardTitle className="text-base">Distribution by Stage</CardTitle>
+        <CardDescription>Opportunities across pipeline stages</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
-          <span className="text-sm text-muted-foreground">Total:</span>
-          <Badge variant="secondary" className="ml-2">
-            {communications.total}
-          </Badge>
-        </div>
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
-          <BarChart
-            accessibilityLayer
-            data={communications.by_type}
-            layout="vertical"
-          >
-            <CartesianGrid horizontal={false} />
-            <XAxis type="number" hide />
-            <YAxis
-              dataKey="type"
-              type="category"
+        <ChartContainer config={chartConfig} className="h-[260px] w-full">
+          <BarChart accessibilityLayer data={opportunities.by_stage}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="stage"
               tickLine={false}
-              tickMargin={8}
               axisLine={false}
-              width={80}
-              tickFormatter={(value) =>
-                value.charAt(0).toUpperCase() + value.slice(1)
-              }
+              tickMargin={8}
+              tickFormatter={titleCase}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="count" radius={4}>
-              {communications.by_type.map((_, index) => (
+            <Bar dataKey="count" radius={8}>
+              {opportunities.by_stage.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={CHART_COLORS[index % CHART_COLORS.length]}
@@ -541,90 +301,305 @@ function CommunicationsChart({
   )
 }
 
-function RemindersChart({
-  reminders,
+function OpportunityTrendChart({
+  opportunities,
 }: {
-  reminders: DashboardData["reminders"]
+  opportunities: DashboardData["opportunities"]
 }) {
   const chartConfig = {
-    pending: {
-      label: "Pending",
+    count: {
+      label: "Opportunities",
       color: "var(--chart-1)",
     },
-    completed: {
-      label: "Completed",
-      color: "var(--chart-2)",
-    },
   } satisfies ChartConfig
-
-  const chartData = [
-    {
-      status: "pending",
-      count: reminders.pending,
-      fill: "var(--color-pending)",
-    },
-    {
-      status: "completed",
-      count: reminders.completed,
-      fill: "var(--color-completed)",
-    },
-  ]
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="size-4" />
-          Reminders
-        </CardTitle>
-        <CardDescription>Follow-up reminders overview</CardDescription>
+        <CardTitle className="text-base">Opportunity Trend</CardTitle>
+        <CardDescription>Opportunities created per month</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-4 flex flex-wrap gap-3">
-          <div className="flex items-center gap-2">
-            <Clock className="size-4 text-blue-500" />
-            <span className="text-sm text-muted-foreground">Pending:</span>
-            <Badge variant="outline">{reminders.pending}</Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="size-4 text-green-500" />
-            <span className="text-sm text-muted-foreground">Completed:</span>
-            <Badge variant="outline">{reminders.completed}</Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="size-4 text-destructive" />
-            <span className="text-sm text-muted-foreground">Overdue:</span>
-            <Badge variant="destructive">{reminders.overdue}</Badge>
-          </div>
-        </div>
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
-          <PieChart>
+        <ChartContainer config={chartConfig} className="h-[260px] w-full">
+          <AreaChart
+            accessibilityLayer
+            data={opportunities.trend}
+            margin={{ left: 12, right: 12 }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+            />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={<ChartTooltipContent indicator="line" />}
             />
-            <Pie
-              data={chartData}
+            <Area
               dataKey="count"
-              nameKey="status"
-              innerRadius={50}
-              outerRadius={70}
+              type="natural"
+              fill="var(--color-count)"
+              fillOpacity={0.4}
+              stroke="var(--color-count)"
             />
-            <ChartLegend content={<ChartLegendContent />} />
-          </PieChart>
+          </AreaChart>
         </ChartContainer>
-        {reminders.due_soon > 0 && (
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            <Bell className="mr-1 inline size-4" />
-            {reminders.due_soon} due within 7 days
-          </div>
-        )}
       </CardContent>
     </Card>
   )
 }
 
-function SatisfactionChart({
+function WinLossChart({
+  opportunities,
+}: {
+  opportunities: DashboardData["opportunities"]
+}) {
+  const chartConfig = {
+    count: { label: "Deals" },
+  } satisfies ChartConfig
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Win/Loss Analysis</CardTitle>
+        <CardDescription>Won vs lost opportunities</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-[260px] w-full">
+          <BarChart accessibilityLayer data={opportunities.win_loss}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="stage"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) =>
+                value === "won" ? "Won" : "Lost"
+              }
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Bar dataKey="count" radius={8}>
+              {opportunities.win_loss.map((row) => (
+                <Cell
+                  key={row.stage}
+                  fill={
+                    row.stage === "won" ? "var(--chart-2)" : "var(--destructive)"
+                  }
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+        <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
+          {opportunities.win_loss.map((row) => (
+            <span key={row.stage} className="flex items-center gap-1.5">
+              <span
+                className="size-2.5 rounded-full"
+                style={{
+                  backgroundColor:
+                    row.stage === "won" ? "var(--chart-2)" : "var(--destructive)",
+                }}
+              />
+              {titleCase(row.stage)}: {row.count} · {formatCurrency(row.value)}
+            </span>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Client Satisfaction Analytics
+// ---------------------------------------------------------------------------
+
+function OverallSatisfactionCard({
+  satisfaction,
+}: {
+  satisfaction: DashboardData["satisfaction"]
+}) {
+  const score = satisfaction.average_score
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Star className="size-4 text-primary" />
+          Overall Satisfaction Score
+        </CardTitle>
+        <CardDescription>Average across completed surveys</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-4">
+          <div className="flex size-20 items-center justify-center rounded-2xl bg-primary/10">
+            <span className="text-3xl font-semibold">
+              {score !== null ? score : "—"}
+            </span>
+          </div>
+          <div className="text-sm">
+            {score !== null ? (
+              <>
+                <span className="font-medium">out of 5</span>
+                <p className="text-muted-foreground">
+                  {score >= 4
+                    ? "Strong satisfaction"
+                    : score >= 3
+                      ? "Acceptable satisfaction"
+                      : "Needs attention"}
+                </p>
+              </>
+            ) : (
+              <p className="text-muted-foreground">No completed surveys yet</p>
+            )}
+          </div>
+        </div>
+        <Separator className="my-4" />
+        <div className="flex justify-between text-sm">
+          <div>
+            <p className="text-muted-foreground">Response Rate</p>
+            <p className="text-lg font-semibold">
+              {satisfaction.response_rate}%
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Completed Surveys</p>
+            <p className="text-lg font-semibold">
+              {satisfaction.completed_surveys}
+              <span className="text-muted-foreground">
+                /{satisfaction.total_surveys}
+              </span>
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function SatisfactionTrendChart({
+  satisfaction,
+}: {
+  satisfaction: DashboardData["satisfaction"]
+}) {
+  const chartConfig = {
+    average_score: {
+      label: "Avg Score",
+      color: "var(--chart-1)",
+    },
+  } satisfies ChartConfig
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <TrendingUp className="size-4 text-primary" />
+          Satisfaction Trend
+        </CardTitle>
+        <CardDescription>Average survey score (1–5) per month</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-[260px] w-full">
+          <LineChart
+            accessibilityLayer
+            data={satisfaction.trend}
+            margin={{ left: 12, right: 12 }}
+          >
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+            />
+            <YAxis
+              domain={[0, 5]}
+              ticks={[1, 2, 3, 4, 5]}
+              tickLine={false}
+              axisLine={false}
+              width={30}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="dot" />}
+            />
+            <Line
+              dataKey="average_score"
+              type="monotone"
+              stroke="var(--color-average_score)"
+              strokeWidth={2}
+              dot={{ r: 3 }}
+              activeDot={{ r: 5 }}
+            />
+          </LineChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
+function SatisfactionByCategoryChart({
+  satisfaction,
+}: {
+  satisfaction: DashboardData["satisfaction"]
+}) {
+  const chartConfig = Object.fromEntries(
+    satisfaction.by_question.map((row, index) => [
+      row.question,
+      { label: row.label, color: CHART_COLORS[index % CHART_COLORS.length] },
+    ]),
+  ) satisfies ChartConfig
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ChartSpline className="size-4 text-primary" />
+          Satisfaction by Category
+        </CardTitle>
+        <CardDescription>Average score per survey question</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig} className="h-[260px] w-full">
+          <BarChart accessibilityLayer data={satisfaction.by_question}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="label"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+            />
+            <YAxis
+              domain={[0, 5]}
+              ticks={[1, 2, 3, 4, 5]}
+              tickLine={false}
+              axisLine={false}
+              width={30}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Bar dataKey="average_score" radius={8}>
+              {satisfaction.by_question.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={CHART_COLORS[index % CHART_COLORS.length]}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
+function SatisfactionDistributionChart({
   satisfaction,
 }: {
   satisfaction: DashboardData["satisfaction"]
@@ -632,7 +607,7 @@ function SatisfactionChart({
   const chartConfig = {
     count: {
       label: "Clients",
-      color: "var(--chart-1)",
+      color: "var(--chart-3)",
     },
   } satisfies ChartConfig
 
@@ -640,40 +615,20 @@ function SatisfactionChart({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <ClipboardCheck className="size-4" />
-          Client Satisfaction
+          <BarChart3 className="size-4 text-primary" />
+          Satisfaction Distribution
         </CardTitle>
-        <CardDescription>Survey score distribution</CardDescription>
+        <CardDescription>Clients by latest survey score band</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-4 flex items-center gap-4">
-          <div>
-            <p className="text-sm text-muted-foreground">Average Score</p>
-            <div className="flex items-center gap-2">
-              <span className="text-3xl font-semibold">
-                {satisfaction.average_score ?? "N/A"}
-              </span>
-            </div>
-          </div>
-          <Separator orientation="vertical" className="h-12" />
-          <div>
-            <p className="text-sm text-muted-foreground">Surveys</p>
-            <p className="text-lg font-semibold">
-              {satisfaction.completed_surveys}
-              <span className="text-sm text-muted-foreground">
-                /{satisfaction.total_surveys}
-              </span>
-            </p>
-          </div>
-        </div>
-        <ChartContainer config={chartConfig} className="h-[180px] w-full">
+        <ChartContainer config={chartConfig} className="h-[260px] w-full">
           <BarChart accessibilityLayer data={satisfaction.score_distribution}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="label"
               tickLine={false}
-              tickMargin={8}
               axisLine={false}
+              tickMargin={8}
             />
             <ChartTooltip
               cursor={false}
@@ -687,35 +642,126 @@ function SatisfactionChart({
   )
 }
 
-function LeadSourceChart({ leads }: { leads: DashboardData["leads"] }) {
-  const chartConfig = Object.fromEntries(
-    leads.by_source.map((s, i) => [
-      s.source,
-      {
-        label: s.source,
-        color: CHART_COLORS[i % CHART_COLORS.length],
-      },
-    ])
-  ) satisfies ChartConfig
+// ---------------------------------------------------------------------------
+// Sales Rep Performance (admin / manager)
+// ---------------------------------------------------------------------------
+
+function PerformanceTable({
+  performance,
+  fullWidth = false,
+}: {
+  performance: DashboardData["performance"]
+  fullWidth?: boolean
+}) {
+  const spanClass = fullWidth ? "xl:col-span-3" : "xl:col-span-2"
+
+  if (performance.length === 0) {
+    return (
+      <Card className={spanClass}>
+        <CardHeader>
+          <CardTitle className="text-base">Performance Comparison</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            No active sales representatives.
+          </p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <Card className={spanClass}>
+      <CardHeader>
+        <CardTitle className="text-base">Performance Comparison</CardTitle>
+        <CardDescription>Per-rep pipeline and satisfaction KPIs</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Rep</TableHead>
+              <TableHead className="text-right">Active</TableHead>
+              <TableHead className="text-right">Pipeline Value</TableHead>
+              <TableHead className="text-right">Won</TableHead>
+              <TableHead className="text-right">Win Rate</TableHead>
+              <TableHead className="text-right">Avg Score</TableHead>
+              <TableHead className="text-right">Response</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {performance.map((rep) => (
+              <TableRow key={rep.rep_id}>
+                <TableCell className="font-medium">{rep.rep_name}</TableCell>
+                <TableCell className="text-right">
+                  {rep.open_opportunities}
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatCurrency(rep.pipeline_value)}
+                </TableCell>
+                <TableCell className="text-right">{rep.won_count}</TableCell>
+                <TableCell className="text-right">{rep.win_rate}%</TableCell>
+                <TableCell className="text-right">
+                  {rep.average_score !== null ? `${rep.average_score}/5` : "—"}
+                </TableCell>
+                <TableCell className="text-right">
+                  {rep.response_rate}%
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  )
+}
+
+function PipelineByRepChart({
+  performance,
+}: {
+  performance: DashboardData["performance"]
+}) {
+  const chartConfig = {
+    pipeline_value: {
+      label: "Pipeline Value",
+      color: "var(--chart-1)",
+    },
+  } satisfies ChartConfig
+
+  if (performance.length === 0) {
+    return null
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="size-4" />
-          Lead Sources
-        </CardTitle>
-        <CardDescription>Where leads come from</CardDescription>
+        <CardTitle className="text-base">Pipeline Value by Rep</CardTitle>
+        <CardDescription>Open opportunity value per rep</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
-          <RadarChart data={leads.by_source}>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <PolarAngleAxis dataKey="source" />
-            <PolarGrid />
-            <Radar dataKey="count" fill="var(--chart-1)" fillOpacity={0.6} />
-            <ChartLegend content={<ChartLegendContent />} />
-          </RadarChart>
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <BarChart
+            accessibilityLayer
+            data={performance}
+            layout="vertical"
+            margin={{ left: 8, right: 12 }}
+          >
+            <CartesianGrid horizontal={false} />
+            <XAxis type="number" hide />
+            <YAxis
+              dataKey="rep_name"
+              type="category"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              width={110}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Bar dataKey="pipeline_value" fill="var(--color-pipeline_value)" radius={4} />
+          </BarChart>
         </ChartContainer>
       </CardContent>
     </Card>

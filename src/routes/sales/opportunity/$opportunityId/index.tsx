@@ -23,6 +23,7 @@ import {
   type ReminderEntry,
 } from "@/components/reminders-history"
 import { useState } from "react"
+import { ActionSuggestionAlert } from "@/components/action-suggestion-alert"
 
 export type OpportunityInfoPage = {
   id: number
@@ -127,6 +128,10 @@ function RouteComponent() {
           </div>
         ) : (
           <div className="mt-6 flex flex-col gap-6">
+            <ActionSuggestionAlert
+              entityType="opportunity"
+              entityId={Number(opportunityId)}
+            />
             <OpportunityInfoCard
               opportunity={opportunity}
               opportunityId={Number(opportunityId)}

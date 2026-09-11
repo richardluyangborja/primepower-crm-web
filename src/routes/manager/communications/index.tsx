@@ -14,7 +14,7 @@ function RouteComponent() {
           All logged communications across leads and clients.
         </p>
       </header>
-      <main>
+      <main className="space-y-4">
         <CommunicationsTable basePath="/manager" />
       </main>
     </div>

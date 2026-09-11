@@ -20,10 +20,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Ellipsis, FunnelPlus, Plus, Search } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Ellipsis, Loader2, Plus, Search, X } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { Spinner } from "@/components/ui/spinner"
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { useDeleteReminder } from "./-useDeleteReminder"
 import {
   ReminderPriorityBadge,
   ReminderStatusBadge,
@@ -31,9 +40,7 @@ import {
   recurrenceLabels,
   type ReminderPriority,
 } from "@/components/reminders-history"
-import useRemindersQuery, {
-  type ReminderScope,
-} from "./-useRemindersQuery"
+import useRemindersQuery, { type ReminderScope, type ReminderFilters } from "./-useRemindersQuery"
 import {
   Select,
   SelectContent,
@@ -41,6 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useCanWrite } from "@/lib/queries/useCanWrite"
 
 export type ReminderTableRow = {
   id: number
@@ -52,7 +60,7 @@ export type ReminderTableRow = {
   due_date: string
   priority: ReminderPriority
   is_completed: boolean
-  status: "pending" | "completed" | "incomplete" | "snoozed"
+  status: "pending" | "completed" | "incomplete"
   related_to_status: string | null
   assigned_to: { id: number; name: string } | null
   recurrence_rule: "daily" | "weekly" | "monthly" | null
@@ -76,41 +84,114 @@ export default function RemindersTable({
   basePath?: string
 }) {
   const navigate = useNavigate()
-  const [scope, setScope] = useState<ReminderScope>(defaultScope)
-  const query = useRemindersQuery(scope)
+  const [search, setSearch] = useState("")
+  const [status, setStatus] = useState<string>("all")
+  const [priority, setPriority] = useState<string>("all")
+  const [from, setFrom] = useState<string>("")
+  const [to, setTo] = useState<string>("")
+
+  const filters = useMemo<ReminderFilters>(
+    () => ({
+      q: search || undefined,
+      status: status === "all" ? undefined : status,
+      priority: priority === "all" ? undefined : priority,
+      from: from || undefined,
+      to: to || undefined,
+    }),
+    [search, status, priority, from, to],
+  )
+
+  const query = useRemindersQuery(defaultScope, filters)
   const data = query.data
+  const canWrite = useCanWrite()
+  const deleteMutation = useDeleteReminder()
+  const [reminderToDelete, setReminderToDelete] = useState<number | null>(null)
+
+  const hasActiveFilters =
+    Boolean(search) ||
+    status !== "all" ||
+    priority !== "all" ||
+    Boolean(from) ||
+    Boolean(to)
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">View</span>
-            <Select
-              value={scope}
-              onValueChange={(v) => setScope(v as ReminderScope)}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Reminders</SelectItem>
-                <SelectItem value="mine">My Reminders</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[12rem]">
+            <Search className="text-muted-foreground absolute top-1/2 left-2 size-4 -translate-y-1/2" />
+            <Input
+              placeholder="Search title or company..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8"
+            />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon">
-              <Search />
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="incomplete">Incomplete</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={priority} onValueChange={setPriority}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Priority" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All priorities</SelectItem>
+              <SelectItem value="low">Low</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="high">High</SelectItem>
+            </SelectContent>
+          </Select>
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSearch("")
+                setStatus("all")
+                setPriority("all")
+                setFrom("")
+                setTo("")
+              }}
+            >
+              <X />
+              Clear
             </Button>
-            <Input placeholder="Search reminders..." className="w-xs" />
-            <Button variant="outline" size="icon">
-              <FunnelPlus />
-            </Button>
-            <Button onClick={() => navigate({ to: `${basePath}/reminders/create` })}>
+          )}
+          {canWrite && (
+            <Button
+              onClick={() => navigate({ to: `${basePath}/reminders/create` })}
+            >
               <Plus />
               <span>Create Reminder</span>
             </Button>
+          )}
+        </div>
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-muted-foreground">From</span>
+            <Input
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              className="w-40"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="text-xs text-muted-foreground">To</span>
+            <Input
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              className="w-40"
+            />
           </div>
         </div>
       </CardHeader>
@@ -131,7 +212,7 @@ export default function RemindersTable({
                 <TableHead>Recurrence</TableHead>
                 <TableHead>Assigned To</TableHead>
                 <TableHead>Created</TableHead>
-                <TableHead />
+                {canWrite && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -222,57 +303,113 @@ export default function RemindersTable({
                       {formatDate(reminder.created_at)}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Ellipsis />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuGroup>
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              navigate({
-                                to: `${basePath}/reminders/$reminderId`,
-                                params: {
-                                  reminderId: reminder.id.toString(),
-                                },
-                              })
-                            }}
-                          >
-                            View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
+                  {canWrite && (
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            Edit
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                            <Ellipsis />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuGroup>
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                navigate({
+                                  to: `${basePath}/reminders/$reminderId`,
+                                  params: {
+                                    reminderId: reminder.id.toString(),
+                                  },
+                                })
+                              }}
+                            >
+                              View
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                navigate({
+                                  to: `${basePath}/reminders/$reminderId/edit`,
+                                  params: {
+                                    reminderId: reminder.id.toString(),
+                                  },
+                                })
+                              }}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setReminderToDelete(reminder.id)
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
+              {data?.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center">
+                    No reminders found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         )}
       </CardContent>
+
+      <Dialog
+        open={reminderToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setReminderToDelete(null)
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete reminder?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete the reminder. This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setReminderToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (reminderToDelete === null) return
+                await deleteMutation.mutateAsync(reminderToDelete)
+                setReminderToDelete(null)
+              }}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending && (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              )}
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

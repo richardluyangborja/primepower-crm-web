@@ -40,6 +40,7 @@ export type ReassignDialogProps = {
   currentOwnerId: number
   currentOwnerName: string
   subjectName: string
+  detailQueryKey?: string[]
   onSuccess?: () => void
 }
 
@@ -50,6 +51,7 @@ export function ReassignDialog({
   currentOwnerId,
   currentOwnerName,
   subjectName,
+  detailQueryKey,
   onSuccess,
 }: ReassignDialogProps) {
   const queryClient = useQueryClient()
@@ -75,6 +77,9 @@ export function ReassignDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leads"] })
       queryClient.invalidateQueries({ queryKey: ["clients"] })
+      if (detailQueryKey) {
+        queryClient.invalidateQueries({ queryKey: detailQueryKey })
+      }
       onSuccess?.()
       onOpenChange(false)
     },

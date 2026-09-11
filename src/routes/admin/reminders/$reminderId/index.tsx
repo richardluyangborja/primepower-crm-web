@@ -33,10 +33,10 @@ import {
 import useReminderDetailsQuery from "../-useReminderDetailsQuery"
 import { useMarkReminderComplete } from "../-useMarkReminderComplete"
 import { useMarkReminderIncomplete } from "../-useMarkReminderIncomplete"
-import { SnoozeReminderDialog } from "../-SnoozeReminderDialog"
 import { DeleteReminderButton } from "../-DeleteReminderButton"
 import { Badge } from "@/components/ui/badge"
-import { useCanManage } from "@/lib/queries/useCanManage"
+import { useIsAdmin } from "@/lib/queries/useIsAdmin"
+import { useCanWrite } from "@/lib/queries/useCanWrite"
 
 export const Route = createFileRoute("/admin/reminders/$reminderId/")({
   component: RouteComponent,
@@ -54,7 +54,8 @@ export function ReminderDetailContent({
   const reminder = query.data
   const updateMutation = useMarkReminderComplete()
   const markIncompleteMutation = useMarkReminderIncomplete()
-  const canManage = useCanManage()
+  const isAdmin = useIsAdmin()
+  const canWrite = useCanWrite()
 
   const dueDate = reminder ? new Date(reminder.due_date) : null
   const dueFormatted = dueDate
@@ -109,13 +110,10 @@ export function ReminderDetailContent({
                 reminder.related_to_status === "converted" && (
                   <Alert variant="destructive">
                     <AlertTriangle />
-                    <AlertTitle>
-                      Pending Reminder on Converted Lead
-                    </AlertTitle>
+                    <AlertTitle>Pending Reminder on Converted Lead</AlertTitle>
                     <AlertDescription>
-                      This reminder is still pending, but the related lead
-                      has been converted to a client. Please mark it as
-                      incomplete.
+                      This reminder is still pending, but the related lead has
+                      been converted to a client. Please mark it as incomplete.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -124,9 +122,14 @@ export function ReminderDetailContent({
                 dueFormatted={dueFormatted}
                 createdAtFormatted={createdAtFormatted}
                 onMarkComplete={() => updateMutation.mutate(Number(reminderId))}
-                onMarkIncomplete={() => markIncompleteMutation.mutate(Number(reminderId))}
-                isMarkingComplete={updateMutation.isPending || markIncompleteMutation.isPending}
-                canManage={canManage}
+                onMarkIncomplete={() =>
+                  markIncompleteMutation.mutate(Number(reminderId))
+                }
+                isMarkingComplete={
+                  updateMutation.isPending || markIncompleteMutation.isPending
+                }
+                isAdmin={isAdmin}
+                canWrite={canWrite}
                 basePath={basePath}
               />
             </div>
@@ -149,7 +152,8 @@ function ReminderDetailCard({
   onMarkComplete,
   onMarkIncomplete,
   isMarkingComplete,
-  canManage,
+  isAdmin,
+  canWrite,
   basePath = "/admin",
 }: {
   reminder: ReminderEntry
@@ -158,7 +162,8 @@ function ReminderDetailCard({
   onMarkComplete: () => void
   onMarkIncomplete: () => void
   isMarkingComplete: boolean
-  canManage: boolean
+  isAdmin: boolean
+  canWrite: boolean
   basePath?: string
 }) {
   const navigate = useNavigate()
@@ -169,44 +174,55 @@ function ReminderDetailCard({
           <CardTitle>Reminder Details</CardTitle>
           <CardDescription>Created on {createdAtFormatted}</CardDescription>
           <CardAction className="flex flex-wrap items-center gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onMarkComplete}
-              disabled={isMarkingComplete || reminder.status === "completed"}
-            >
-              {isMarkingComplete ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <CheckCircle className="mr-2 size-4" />
-              )}
-              {isMarkingComplete ? "Marking..." : "Mark as Complete"}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onMarkIncomplete}
-              disabled={isMarkingComplete || reminder.status === "incomplete"}
-            >
-              {isMarkingComplete ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <XCircle className="mr-2 size-4" />
-              )}
-              {isMarkingComplete ? "Marking..." : "Mark as Incomplete"}
-            </Button>
-            <SnoozeReminderDialog
-              reminderId={reminder.id}
-              disabled={reminder.is_completed}
-            />
-            {canManage && <DeleteReminderButton reminderId={reminder.id} />}
-            <Button
-              variant="outline"
-              onClick={() => navigate({ to: `${basePath}/reminders/create` })}
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
+            {canWrite && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={onMarkComplete}
+                  disabled={
+                    isMarkingComplete || reminder.status === "completed"
+                  }
+                >
+                  {isMarkingComplete ? (
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                  ) : (
+                    <CheckCircle className="mr-2 size-4" />
+                  )}
+                  {isMarkingComplete ? "Marking..." : "Mark as Complete"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={onMarkIncomplete}
+                  disabled={
+                    isMarkingComplete || reminder.status === "incomplete"
+                  }
+                >
+                  {isMarkingComplete ? (
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                  ) : (
+                    <XCircle className="mr-2 size-4" />
+                  )}
+                  {isMarkingComplete ? "Marking..." : "Mark as Incomplete"}
+                </Button>
+                </>
+            )}
+            {isAdmin && <DeleteReminderButton reminderId={reminder.id} />}
+            {canWrite && (
+              <Button
+                variant="outline"
+                onClick={() =>
+                  navigate({
+                    to: `${basePath}/reminders/$reminderId/edit`,
+                    params: { reminderId: String(reminder.id) },
+                  })
+                }
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+            )}
           </CardAction>
         </CardHeader>
         <CardContent>

@@ -6,11 +6,25 @@ import type {
   Survey,
 } from "./-types"
 
-export function useSatisfactionQuery() {
+export type SatisfactionFilters = {
+  q?: string
+  trend?: string
+  score?: string
+  from?: string
+  to?: string
+}
+
+export function useSatisfactionQuery(filters: SatisfactionFilters = {}) {
   return useQuery({
-    queryKey: ["satisfaction"],
+    queryKey: ["satisfaction", filters],
     queryFn: async () => {
-      const response = await api.get("/api/satisfaction")
+      const params: Record<string, string> = {}
+      if (filters.q) params.q = filters.q
+      if (filters.trend && filters.trend !== "all") params.trend = filters.trend
+      if (filters.score && filters.score !== "all") params.score = filters.score
+      if (filters.from) params.from = filters.from
+      if (filters.to) params.to = filters.to
+      const response = await api.get("/api/satisfaction", { params })
       return response.data.data as ClientSatisfactionSummary[]
     },
   })

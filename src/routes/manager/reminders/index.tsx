@@ -11,10 +11,10 @@ function RouteComponent() {
       <header className="py-4">
         <h1 className="font-heading text-lg">Follow-up Reminders</h1>
         <p className="mb-6 text-sm text-muted-foreground">
-          Actions and follow-ups tied to leads, clients, and opportunities.
+          Follow-up tasks for sales representatives
         </p>
       </header>
-      <main>
+      <main className="space-y-4">
         <RemindersTable basePath="/manager" />
       </main>
     </div>

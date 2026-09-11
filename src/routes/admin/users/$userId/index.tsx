@@ -56,7 +56,6 @@ const editSchema = z.object({
   name: z.string().min(1).max(255),
   email: z.string().email().max(255),
   role: z.enum(["admin", "manager", "sales_rep"]),
-  manager_id: z.string(),
   password: z.string(),
 })
 
@@ -90,7 +89,6 @@ function RouteComponent() {
         email: values.email,
         role: values.role,
       }
-      payload.manager_id = values.manager_id ? Number(values.manager_id) : null
       if (values.password && values.password.length > 0) {
         payload.password = values.password
       }
@@ -141,9 +139,6 @@ function RouteComponent() {
       email: (userQuery.data?.email as string) ?? "",
       role: ((userQuery.data?.role as string) ?? "sales_rep") as
         "admin" | "manager" | "sales_rep",
-      manager_id: userQuery.data?.manager_id
-        ? String(userQuery.data.manager_id)
-        : "",
       password: "",
     },
     validators: { onSubmit: editSchema },
@@ -329,20 +324,6 @@ function RouteComponent() {
                           </SelectItem>
                         </SelectContent>
                       </Select>
-                    </Field>
-                  )}
-                />
-                <form.Field
-                  name="manager_id"
-                  children={(field) => (
-                    <Field>
-                      <FieldLabel>Manager user ID</FieldLabel>
-                      <Input
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        placeholder="Leave empty for no manager"
-                      />
-                      <FieldError errors={field.state.meta.errors} />
                     </Field>
                   )}
                 />

@@ -148,7 +148,6 @@ export default function UserTable() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Manager</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-12" />
               </TableRow>
@@ -189,7 +188,6 @@ export default function UserTable() {
                         {roleLabels[user.role]}
                       </Badge>
                     </TableCell>
-                    <TableCell>{user.manager?.name ?? "—"}</TableCell>
                     <TableCell>
                       <Badge
                         variant={user.is_active ? "default" : "destructive"}
@@ -228,7 +226,7 @@ export default function UserTable() {
               })}
               {query.data?.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={4} className="text-center">
                     No users found.
                   </TableCell>
                 </TableRow>

@@ -40,7 +40,6 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address").max(255),
   password: z.string().min(8, "Password must be at least 8 characters"),
   role: z.enum(["admin", "manager", "sales_rep"]),
-  manager_id: z.string(),
 })
 
 type CreateUserForm = z.infer<typeof formSchema>
@@ -49,6 +48,39 @@ function RouteComponent() {
   const isAdmin = useIsAdmin()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: async (values: CreateUserForm) => {
+      const payload: Record<string, unknown> = {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        role: values.role,
+      }
+      const response = await api.post("/api/users", payload)
+      return response.data as {
+        data: Record<string, unknown>
+        initial_password: string
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] })
+      navigate({ to: "/admin/users" })
+    },
+  })
+
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: "sales_rep" as CreateUserForm["role"],
+    },
+    validators: { onSubmit: formSchema },
+    onSubmit: async ({ value }) => {
+      await mutation.mutateAsync(value)
+    },
+  })
 
   if (!isAdmin) {
     return (
@@ -68,41 +100,6 @@ function RouteComponent() {
       </div>
     )
   }
-
-  const mutation = useMutation({
-    mutationFn: async (values: CreateUserForm) => {
-      const payload: Record<string, unknown> = {
-        name: values.name,
-        email: values.email,
-        password: values.password,
-        role: values.role,
-      }
-      if (values.manager_id) payload.manager_id = Number(values.manager_id)
-      const response = await api.post("/api/users", payload)
-      return response.data as {
-        data: Record<string, unknown>
-        initial_password: string
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] })
-      navigate({ to: "/admin/users" })
-    },
-  })
-
-  const form = useForm({
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      role: "sales_rep" as CreateUserForm["role"],
-      manager_id: "",
-    },
-    validators: { onSubmit: formSchema },
-    onSubmit: async ({ value }) => {
-      await mutation.mutateAsync(value)
-    },
-  })
 
   return (
     <div className="px-4 pb-8">
@@ -234,22 +231,6 @@ function RouteComponent() {
                     </Field>
                   )}
                 />
-                <div className="grid grid-cols-1 gap-4">
-                  <form.Field
-                    name="manager_id"
-                    children={(field) => (
-                      <Field>
-                        <FieldLabel>Manager user ID (optional)</FieldLabel>
-                        <Input
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="Leave empty for no manager"
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                      </Field>
-                    )}
-                  />
-                </div>
                 <div className="flex items-center gap-2 pt-2">
                   <Button
                     type="button"

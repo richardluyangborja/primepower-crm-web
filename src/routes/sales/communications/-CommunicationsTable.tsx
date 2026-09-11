@@ -29,8 +29,16 @@ import {
 } from "@/components/ui/select"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
-  ChevronDown,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   Ellipsis,
+  Loader2,
   Plus,
   Search,
   X,
@@ -134,6 +142,11 @@ export default function CommunicationsTable() {
   const deleteMutation = useDeleteCommunication()
   const data = query.data
 
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: number
+    name: string
+  } | null>(null)
+
   const hasActiveFilters =
     Boolean(search) ||
     type !== "all" ||
@@ -226,10 +239,6 @@ export default function CommunicationsTable() {
               Clear
             </Button>
           )}
-          <Button variant="outline" size="sm" disabled>
-            <ChevronDown />
-            Saved views
-          </Button>
         </div>
         <CardAction>
           <Button
@@ -377,15 +386,12 @@ export default function CommunicationsTable() {
                           <DropdownMenuItem
                             variant="destructive"
                             disabled={deleteMutation.isPending}
-                            onClick={async (e) => {
+                            onClick={(e) => {
                               e.stopPropagation()
-                              if (
-                                window.confirm(
-                                  "Delete this communication? This cannot be undone.",
-                                )
-                              ) {
-                                await deleteMutation.mutateAsync(comm.id)
-                              }
+                              setDeleteTarget({
+                                id: comm.id,
+                                name: comm.company.name,
+                              })
                             }}
                           >
                             Delete
@@ -407,6 +413,49 @@ export default function CommunicationsTable() {
           </Table>
         )}
       </CardContent>
+
+      <Dialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTarget(null)
+            deleteMutation.reset()
+          }
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Delete communication</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this communication for{" "}
+              {deleteTarget?.name}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteTarget(null)}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={async () => {
+                if (!deleteTarget) return
+                await deleteMutation.mutateAsync(deleteTarget.id)
+                setDeleteTarget(null)
+              }}
+            >
+              {deleteMutation.isPending && (
+                <Loader2 className="size-4 animate-spin" />
+              )}
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

@@ -6,8 +6,6 @@ export type UserRow = {
   name: string
   email: string
   role: "admin" | "manager" | "sales_rep"
-  manager_id: number | null
-  manager: { id: number; name: string } | null
   is_active: boolean
   deactivated_at: string | null
   created_at: string

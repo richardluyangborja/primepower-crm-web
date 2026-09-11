@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Loader2, Trash2 } from "lucide-react"
+import { useNavigate } from "@tanstack/react-router"
 import { useDeleteReminder } from "./-useDeleteReminder"
 
 export function DeleteReminderButton({
@@ -19,12 +20,14 @@ export function DeleteReminderButton({
   reminderId: number
   disabled?: boolean
 }) {
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const del = useDeleteReminder()
 
   const onConfirm = async () => {
     await del.mutateAsync(reminderId)
     setOpen(false)
+    navigate({ to: "/sales/reminders" })
   }
 
   return (

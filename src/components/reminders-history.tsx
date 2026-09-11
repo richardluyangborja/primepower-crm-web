@@ -26,7 +26,7 @@ export type ReminderEntry = {
   description: string | null
   due_date: string
   priority: ReminderPriority
-  status: "pending" | "completed" | "incomplete" | "snoozed"
+  status: "pending" | "completed" | "incomplete"
   is_completed: boolean
   completed_at: string | null
   assigned_to: { id: number; name: string } | null
@@ -103,16 +103,9 @@ export function ReminderPriorityBadge({
 export function ReminderStatusBadge({ status }: { status: string }) {
   const isCompleted = status === "completed"
   const isIncomplete = status === "incomplete"
-  const isSnoozed = status === "snoozed"
   return (
     <Badge
-      variant={
-        isCompleted || isIncomplete
-          ? "secondary"
-          : isSnoozed
-            ? "outline"
-            : "outline"
-      }
+      variant={isCompleted || isIncomplete ? "secondary" : "outline"}
       className="flex items-center gap-1 text-xs"
     >
       {isCompleted ? (
@@ -124,11 +117,6 @@ export function ReminderStatusBadge({ status }: { status: string }) {
         <>
           <XCircle size={10} />
           <span>Incomplete</span>
-        </>
-      ) : isSnoozed ? (
-        <>
-          <Clock size={10} />
-          <span>Snoozed</span>
         </>
       ) : (
         <>

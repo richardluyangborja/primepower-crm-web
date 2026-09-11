@@ -56,6 +56,14 @@ type SelectedRecord = {
   id: number
 } | null
 
+function isPastDueDate(dateString: string): boolean {
+  if (!dateString) return false
+  const date = new Date(`${dateString}T00:00:00`)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return date.getTime() < today.getTime()
+}
+
 export function CreateReminderForm() {
   const companiesQuery = useSalesCompanies()
   const createMutation = useCreateReminder()
@@ -317,7 +325,19 @@ export function CreateReminderForm() {
               </form.Field>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <form.Field name="due_date">
+                <form.Field
+                  name="due_date"
+                  validators={{
+                    onChange: ({ value }) =>
+                      isPastDueDate(value)
+                        ? "Due date cannot be in the past."
+                        : undefined,
+                    onSubmit: ({ value }) =>
+                      isPastDueDate(value)
+                        ? "Due date cannot be in the past."
+                        : undefined,
+                  }}
+                >
                   {(field) => {
                     return (
                       <Field>
@@ -335,6 +355,14 @@ export function CreateReminderForm() {
                               e.target.value === "" ? "" : e.target.value
                             )
                           }
+                        />
+
+                        <FieldError
+                          errors={field.state.meta.errors.map((error) =>
+                            typeof error === "string"
+                              ? { message: error }
+                              : error
+                          )}
                         />
                       </Field>
                     )

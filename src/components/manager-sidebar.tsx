@@ -22,6 +22,7 @@ import {
   LogOut,
   MessageCircleMore,
   Network,
+  Sparkles,
   UserRound,
 } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip"
@@ -64,6 +65,16 @@ const sidebarConfig: SidebarGroup[] = [
         path: "/manager/dashboard",
         label: "Dashboard and Analytics",
         icon: LayoutGrid,
+      },
+    ],
+  },
+  {
+    group: "Insights",
+    items: [
+      {
+        path: "/manager/action-suggestions",
+        label: "Action Suggestions",
+        icon: Sparkles,
       },
     ],
   },
@@ -138,7 +149,11 @@ function CollapsibleMenuItem({
   item,
   navigate,
 }: {
-  item: { label: string; icon: React.ComponentType<{ className?: string }>; children: { path: string; label: string }[] }
+  item: {
+    label: string
+    icon: React.ComponentType<{ className?: string }>
+    children: { path: string; label: string }[]
+  }
   navigate: (opts: { to: string }) => void
 }) {
   const [isExpanded, setIsExpanded] = React.useState(true)
@@ -148,13 +163,17 @@ function CollapsibleMenuItem({
       <SidebarMenuButton onClick={() => setIsExpanded(!isExpanded)}>
         <item.icon />
         <span>{item.label}</span>
-        <ChevronRight className={`ml-auto transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+        <ChevronRight
+          className={`ml-auto transition-transform ${isExpanded ? "rotate-90" : ""}`}
+        />
       </SidebarMenuButton>
       {isExpanded && (
         <SidebarMenuSub>
           {item.children.map((child) => (
             <SidebarMenuSubItem key={child.path}>
-              <SidebarMenuSubButton onClick={() => navigate({ to: child.path })}>
+              <SidebarMenuSubButton
+                onClick={() => navigate({ to: child.path })}
+              >
                 <span>{child.label}</span>
               </SidebarMenuSubButton>
             </SidebarMenuSubItem>
@@ -200,10 +219,19 @@ export function ManagerSidebar({
             <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
             <SidebarMenu>
               {group.items.map((item) => (
-                  <SidebarMenuItem key={item.path ?? item.label}>
-                    {item.children ? (
-                      <CollapsibleMenuItem item={item as { label: string; icon: React.ComponentType<{ className?: string }>; children: { path: string; label: string }[] }} navigate={navigate} />
-                    ) : item.tooltip ? (
+                <SidebarMenuItem key={item.path ?? item.label}>
+                  {item.children ? (
+                    <CollapsibleMenuItem
+                      item={
+                        item as {
+                          label: string
+                          icon: React.ComponentType<{ className?: string }>
+                          children: { path: string; label: string }[]
+                        }
+                      }
+                      navigate={navigate}
+                    />
+                  ) : item.tooltip ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <SidebarMenuButton
@@ -216,7 +244,9 @@ export function ManagerSidebar({
                       <TooltipContent side="right">{item.label}</TooltipContent>
                     </Tooltip>
                   ) : (
-                    <SidebarMenuButton onClick={() => navigate({ to: item.path })}>
+                    <SidebarMenuButton
+                      onClick={() => navigate({ to: item.path })}
+                    >
                       <item.icon />
                       <span>{item.label}</span>
                     </SidebarMenuButton>

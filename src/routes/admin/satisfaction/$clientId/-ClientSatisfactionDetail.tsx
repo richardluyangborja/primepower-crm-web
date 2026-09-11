@@ -46,6 +46,7 @@ import {
   useDeleteSurvey,
   useSatisfactionDetailQuery,
 } from "../-useSatisfactionQuery"
+import { SatisfactionTrendChart } from "@/components/satisfaction-trend-chart"
 
 const surveyQuestions = [
   {
@@ -107,11 +108,18 @@ function ScoreBar({ score }: { score: number | null | undefined }) {
 function SurveyDetailCard({
   survey,
   onDelete,
+  readOnly = false,
+  isAdmin = false,
 }: {
   survey: Survey
   onDelete: (survey: Survey) => void
+  readOnly?: boolean
+  isAdmin?: boolean
 }) {
-  const isDeletable = survey.status === "pending" || survey.status === "expired"
+  const isDeletable =
+    survey.status === "pending" ||
+    survey.status === "expired" ||
+    (isAdmin && survey.status === "completed")
   const [copied, setCopied] = useState(false)
 
   const statusConfig = {
@@ -298,7 +306,7 @@ function SurveyDetailCard({
         )}
       </CardContent>
 
-      {isDeletable && (
+      {isDeletable && !readOnly && (
         <CardFooter className="border-t bg-muted/30 px-6 py-3">
           <Button
             variant="destructive"
@@ -314,7 +322,8 @@ function SurveyDetailCard({
   )
 }
 
-function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
+function ClientSatisfactionDetail({ clientId, basePath = "/admin", isAdmin = false }: { clientId: number; basePath?: string; isAdmin?: boolean }) {
+  const readOnly = basePath === "/manager"
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -384,19 +393,21 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
               </div>
             </div>
           </div>
-          <CardAction>
-            <Button
-              onClick={() => setConfirmDialogOpen(true)}
-              disabled={createSurvey.isPending || hasPendingSurvey}
-            >
-              <Send className="mr-2 size-4" />
-              {createSurvey.isPending
-                ? "Generating..."
-                : hasPendingSurvey
-                  ? "Pending Survey Exists"
-                  : "Send Survey to Client"}
-            </Button>
-          </CardAction>
+          {!readOnly && (
+            <CardAction>
+              <Button
+                onClick={() => setConfirmDialogOpen(true)}
+                disabled={createSurvey.isPending || hasPendingSurvey}
+              >
+                <Send className="mr-2 size-4" />
+                {createSurvey.isPending
+                  ? "Generating..."
+                  : hasPendingSurvey
+                    ? "Pending Survey Exists"
+                    : "Send Survey to Client"}
+              </Button>
+            </CardAction>
+          )}
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-4 gap-4">
@@ -435,6 +446,8 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
           </div>
         </CardContent>
       </Card>
+
+      <SatisfactionTrendChart surveys={detail.surveys} />
 
       {detail.primary_contact?.name && (
         <Card>
@@ -522,6 +535,8 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
                 key={survey.id}
                 survey={survey}
                 onDelete={handleDeleteClick}
+                readOnly={readOnly}
+                isAdmin={isAdmin}
               />
             ))}
           </div>

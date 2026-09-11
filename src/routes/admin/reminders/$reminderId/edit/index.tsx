@@ -1,14 +1,15 @@
 import { Button } from "@/components/ui/button"
 import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
-import { CreateOpportunityForm } from "@/routes/admin/opportunity/create/-CreateOpportunityForm"
+import { EditReminderForm } from "./-EditReminderForm"
 
-export const Route = createFileRoute("/manager/opportunity/create/")({
+export const Route = createFileRoute("/admin/reminders/$reminderId/edit/")({
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const router = useRouter()
+  const { reminderId } = Route.useParams()
 
   return (
     <div className="px-4 pb-8">
@@ -19,7 +20,7 @@ function RouteComponent() {
         </Button>
       </header>
       <main>
-        <CreateOpportunityForm basePath="/manager" />
+        <EditReminderForm reminderId={reminderId} />
       </main>
     </div>
   )

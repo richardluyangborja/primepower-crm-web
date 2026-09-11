@@ -7,7 +7,7 @@ export const Route = createFileRoute("/admin/satisfaction/$clientId/")({
   component: RouteComponent,
 })
 
-export function SatisfactionDetailPage({ clientId }: { clientId: number }) {
+export function SatisfactionDetailPage({ clientId, basePath = "/admin", isAdmin = false }: { clientId: number; basePath?: string; isAdmin?: boolean }) {
   const router = useRouter()
 
   return (
@@ -19,7 +19,7 @@ export function SatisfactionDetailPage({ clientId }: { clientId: number }) {
         </Button>
       </header>
       <main>
-        <ClientSatisfactionDetail clientId={clientId} />
+        <ClientSatisfactionDetail clientId={clientId} basePath={basePath} isAdmin={isAdmin} />
       </main>
     </div>
   )
@@ -27,5 +27,5 @@ export function SatisfactionDetailPage({ clientId }: { clientId: number }) {
 
 function RouteComponent() {
   const { clientId } = Route.useParams()
-  return <SatisfactionDetailPage clientId={Number(clientId)} />
+  return <SatisfactionDetailPage clientId={Number(clientId)} isAdmin />
 }
