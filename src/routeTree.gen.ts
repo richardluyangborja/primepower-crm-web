@@ -20,6 +20,7 @@ import { Route as SalesLeadAndClientRouteRouteImport } from './routes/sales/lead
 import { Route as SurveyTokenRouteImport } from './routes/survey/$token'
 import { Route as AdminAccountIndexRouteImport } from './routes/admin/account/index'
 import { Route as AdminActionSuggestionsIndexRouteImport } from './routes/admin/action-suggestions/index'
+import { Route as AdminAiReportIndexRouteImport } from './routes/admin/ai-report/index'
 import { Route as AdminAuditLogIndexRouteImport } from './routes/admin/audit-log/index'
 import { Route as AdminCommunicationsIndexRouteImport } from './routes/admin/communications/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
@@ -29,6 +30,7 @@ import { Route as AdminSatisfactionIndexRouteImport } from './routes/admin/satis
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
 import { Route as ManagerAccountIndexRouteImport } from './routes/manager/account/index'
 import { Route as ManagerActionSuggestionsIndexRouteImport } from './routes/manager/action-suggestions/index'
+import { Route as ManagerAiReportIndexRouteImport } from './routes/manager/ai-report/index'
 import { Route as ManagerCommunicationsIndexRouteImport } from './routes/manager/communications/index'
 import { Route as ManagerDashboardIndexRouteImport } from './routes/manager/dashboard/index'
 import { Route as ManagerOpportunitiesIndexRouteImport } from './routes/manager/opportunities/index'
@@ -138,6 +140,11 @@ const AdminActionSuggestionsIndexRoute =
     path: '/action-suggestions/',
     getParentRoute: () => AdminRouteRoute,
   } as any)
+const AdminAiReportIndexRoute = AdminAiReportIndexRouteImport.update({
+  id: '/ai-report/',
+  path: '/ai-report/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminAuditLogIndexRoute = AdminAuditLogIndexRouteImport.update({
   id: '/audit-log/',
   path: '/audit-log/',
@@ -185,6 +192,11 @@ const ManagerActionSuggestionsIndexRoute =
     path: '/action-suggestions/',
     getParentRoute: () => ManagerRouteRoute,
   } as any)
+const ManagerAiReportIndexRoute = ManagerAiReportIndexRouteImport.update({
+  id: '/ai-report/',
+  path: '/ai-report/',
+  getParentRoute: () => ManagerRouteRoute,
+} as any)
 const ManagerCommunicationsIndexRoute =
   ManagerCommunicationsIndexRouteImport.update({
     id: '/communications/',
@@ -490,6 +502,7 @@ export interface FileRoutesByFullPath {
   '/login/': typeof LoginIndexRoute
   '/admin/account/': typeof AdminAccountIndexRoute
   '/admin/action-suggestions/': typeof AdminActionSuggestionsIndexRoute
+  '/admin/ai-report/': typeof AdminAiReportIndexRoute
   '/admin/audit-log/': typeof AdminAuditLogIndexRoute
   '/admin/communications/': typeof AdminCommunicationsIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
@@ -499,6 +512,7 @@ export interface FileRoutesByFullPath {
   '/admin/users/': typeof AdminUsersIndexRoute
   '/manager/account/': typeof ManagerAccountIndexRoute
   '/manager/action-suggestions/': typeof ManagerActionSuggestionsIndexRoute
+  '/manager/ai-report/': typeof ManagerAiReportIndexRoute
   '/manager/communications/': typeof ManagerCommunicationsIndexRoute
   '/manager/dashboard/': typeof ManagerDashboardIndexRoute
   '/manager/opportunities/': typeof ManagerOpportunitiesIndexRoute
@@ -563,6 +577,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/admin/account': typeof AdminAccountIndexRoute
   '/admin/action-suggestions': typeof AdminActionSuggestionsIndexRoute
+  '/admin/ai-report': typeof AdminAiReportIndexRoute
   '/admin/audit-log': typeof AdminAuditLogIndexRoute
   '/admin/communications': typeof AdminCommunicationsIndexRoute
   '/admin/dashboard': typeof AdminDashboardIndexRoute
@@ -572,6 +587,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersIndexRoute
   '/manager/account': typeof ManagerAccountIndexRoute
   '/manager/action-suggestions': typeof ManagerActionSuggestionsIndexRoute
+  '/manager/ai-report': typeof ManagerAiReportIndexRoute
   '/manager/communications': typeof ManagerCommunicationsIndexRoute
   '/manager/dashboard': typeof ManagerDashboardIndexRoute
   '/manager/opportunities': typeof ManagerOpportunitiesIndexRoute
@@ -637,6 +653,7 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexRoute
   '/admin/account/': typeof AdminAccountIndexRoute
   '/admin/action-suggestions/': typeof AdminActionSuggestionsIndexRoute
+  '/admin/ai-report/': typeof AdminAiReportIndexRoute
   '/admin/audit-log/': typeof AdminAuditLogIndexRoute
   '/admin/communications/': typeof AdminCommunicationsIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
@@ -646,6 +663,7 @@ export interface FileRoutesById {
   '/admin/users/': typeof AdminUsersIndexRoute
   '/manager/account/': typeof ManagerAccountIndexRoute
   '/manager/action-suggestions/': typeof ManagerActionSuggestionsIndexRoute
+  '/manager/ai-report/': typeof ManagerAiReportIndexRoute
   '/manager/communications/': typeof ManagerCommunicationsIndexRoute
   '/manager/dashboard/': typeof ManagerDashboardIndexRoute
   '/manager/opportunities/': typeof ManagerOpportunitiesIndexRoute
@@ -712,6 +730,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/admin/account/'
     | '/admin/action-suggestions/'
+    | '/admin/ai-report/'
     | '/admin/audit-log/'
     | '/admin/communications/'
     | '/admin/dashboard/'
@@ -721,6 +740,7 @@ export interface FileRouteTypes {
     | '/admin/users/'
     | '/manager/account/'
     | '/manager/action-suggestions/'
+    | '/manager/ai-report/'
     | '/manager/communications/'
     | '/manager/dashboard/'
     | '/manager/opportunities/'
@@ -785,6 +805,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/account'
     | '/admin/action-suggestions'
+    | '/admin/ai-report'
     | '/admin/audit-log'
     | '/admin/communications'
     | '/admin/dashboard'
@@ -794,6 +815,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/manager/account'
     | '/manager/action-suggestions'
+    | '/manager/ai-report'
     | '/manager/communications'
     | '/manager/dashboard'
     | '/manager/opportunities'
@@ -858,6 +880,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/admin/account/'
     | '/admin/action-suggestions/'
+    | '/admin/ai-report/'
     | '/admin/audit-log/'
     | '/admin/communications/'
     | '/admin/dashboard/'
@@ -867,6 +890,7 @@ export interface FileRouteTypes {
     | '/admin/users/'
     | '/manager/account/'
     | '/manager/action-suggestions/'
+    | '/manager/ai-report/'
     | '/manager/communications/'
     | '/manager/dashboard/'
     | '/manager/opportunities/'
@@ -1008,6 +1032,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminActionSuggestionsIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/ai-report/': {
+      id: '/admin/ai-report/'
+      path: '/ai-report'
+      fullPath: '/admin/ai-report/'
+      preLoaderRoute: typeof AdminAiReportIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/audit-log/': {
       id: '/admin/audit-log/'
       path: '/audit-log'
@@ -1069,6 +1100,13 @@ declare module '@tanstack/react-router' {
       path: '/action-suggestions'
       fullPath: '/manager/action-suggestions/'
       preLoaderRoute: typeof ManagerActionSuggestionsIndexRouteImport
+      parentRoute: typeof ManagerRouteRoute
+    }
+    '/manager/ai-report/': {
+      id: '/manager/ai-report/'
+      path: '/ai-report'
+      fullPath: '/manager/ai-report/'
+      preLoaderRoute: typeof ManagerAiReportIndexRouteImport
       parentRoute: typeof ManagerRouteRoute
     }
     '/manager/communications/': {
@@ -1451,6 +1489,7 @@ interface AdminRouteRouteChildren {
   AdminLeadAndClientRouteRoute: typeof AdminLeadAndClientRouteRouteWithChildren
   AdminAccountIndexRoute: typeof AdminAccountIndexRoute
   AdminActionSuggestionsIndexRoute: typeof AdminActionSuggestionsIndexRoute
+  AdminAiReportIndexRoute: typeof AdminAiReportIndexRoute
   AdminAuditLogIndexRoute: typeof AdminAuditLogIndexRoute
   AdminCommunicationsIndexRoute: typeof AdminCommunicationsIndexRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
@@ -1479,6 +1518,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminLeadAndClientRouteRoute: AdminLeadAndClientRouteRouteWithChildren,
   AdminAccountIndexRoute: AdminAccountIndexRoute,
   AdminActionSuggestionsIndexRoute: AdminActionSuggestionsIndexRoute,
+  AdminAiReportIndexRoute: AdminAiReportIndexRoute,
   AdminAuditLogIndexRoute: AdminAuditLogIndexRoute,
   AdminCommunicationsIndexRoute: AdminCommunicationsIndexRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
@@ -1532,6 +1572,7 @@ interface ManagerRouteRouteChildren {
   ManagerLeadAndClientRouteRoute: typeof ManagerLeadAndClientRouteRouteWithChildren
   ManagerAccountIndexRoute: typeof ManagerAccountIndexRoute
   ManagerActionSuggestionsIndexRoute: typeof ManagerActionSuggestionsIndexRoute
+  ManagerAiReportIndexRoute: typeof ManagerAiReportIndexRoute
   ManagerCommunicationsIndexRoute: typeof ManagerCommunicationsIndexRoute
   ManagerDashboardIndexRoute: typeof ManagerDashboardIndexRoute
   ManagerOpportunitiesIndexRoute: typeof ManagerOpportunitiesIndexRoute
@@ -1549,6 +1590,7 @@ const ManagerRouteRouteChildren: ManagerRouteRouteChildren = {
   ManagerLeadAndClientRouteRoute: ManagerLeadAndClientRouteRouteWithChildren,
   ManagerAccountIndexRoute: ManagerAccountIndexRoute,
   ManagerActionSuggestionsIndexRoute: ManagerActionSuggestionsIndexRoute,
+  ManagerAiReportIndexRoute: ManagerAiReportIndexRoute,
   ManagerCommunicationsIndexRoute: ManagerCommunicationsIndexRoute,
   ManagerDashboardIndexRoute: ManagerDashboardIndexRoute,
   ManagerOpportunitiesIndexRoute: ManagerOpportunitiesIndexRoute,

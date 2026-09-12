@@ -132,3 +132,24 @@
     @apply font-sans;
     }
 }
+/* AI Reports: browser print-to-PDF. Only the .print-report pane prints;
+   all app chrome (sidebar, nav, buttons) is hidden. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-report,
+  .print-report * {
+    visibility: visible;
+  }
+  .print-report {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
