@@ -138,7 +138,8 @@ function SurveyDetailCard({
   }
 
   const config = statusConfig[survey.status]
-  const surveyUrl = `${window.location.origin}/survey/${survey.token}`
+  const surveyUrl =
+    survey.link || `${window.location.origin}/survey/${survey.token}`
 
   const handleCopyUrl = async () => {
     await navigator.clipboard.writeText(surveyUrl)

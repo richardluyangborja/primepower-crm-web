@@ -14,6 +14,7 @@ export type SurveyResponse = {
 export type Survey = {
   id: string
   token: string
+  link: string | null
   client_id: string
   status: SurveyStatus
   created_at: string

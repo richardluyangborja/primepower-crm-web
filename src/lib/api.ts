@@ -1,10 +1,22 @@
 import axios, { isAxiosError } from "axios"
 
+function resolveBaseUrl(): string {
+  // Explicit build-time override wins (set VITE_API_URL in prod builds).
+  const configured = import.meta.env.VITE_API_URL as string | undefined
+  if (configured && configured.length > 0) {
+    return configured
+  }
+
+  // Local dev default; the deployed frontend must set VITE_API_URL.
+  if (window.location.hostname === "localhost") {
+    return "http://localhost:8000"
+  }
+
+  return "https://primepower-crm-api-primepower.hostforgeplatforms.com"
+}
+
 const api = axios.create({
-  baseURL:
-    window.location.hostname === "localhost"
-      ? "http://localhost:8000"
-      : "https://primepower-crm-api-primepower.hostforgeplatforms.com",
+  baseURL: resolveBaseUrl(),
   withCredentials: true,
   withXSRFToken: true,
   headers: {
