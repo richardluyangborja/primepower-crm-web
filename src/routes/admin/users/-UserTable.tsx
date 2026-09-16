@@ -17,7 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Ellipsis, MoveUpRight, Search, UserRound } from "lucide-react"
+import { ChevronDown, Ellipsis, MoveUpRight, Search, UserRound } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 import useUsersQuery, { type UserRow } from "@/lib/queries/useUsers"

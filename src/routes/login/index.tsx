@@ -6,7 +6,7 @@ import { getDefaultRouteForRole } from "@/lib/role-redirect"
 import { Spinner } from "@/components/ui/spinner"
 
 export const Route = createFileRoute("/login/")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { expired?: "1" } => ({
     expired: search.expired === "1" ? "1" : undefined,
   }),
   component: RouteComponent,
