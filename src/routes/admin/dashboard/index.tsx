@@ -77,9 +77,7 @@ const CHART_COLORS = [
 
 /** "contract_processing" -> "Contract processing" */
 function titleCase(value: string): string {
-  return value
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase())
+  return value.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
 export function DashboardContent({
@@ -87,11 +85,12 @@ export function DashboardContent({
 }: {
   showRepFilter?: boolean
 }) {
-  const [repId, setRepId] = useState<number | null>(null)
+  const [repId, setRepId] = useState<string | null>(null)
   const repsQuery = useSalesRepresentatives()
   const { data, isLoading } = useDashboardQuery(repId ? { repId } : {})
 
-  const isOverseer = data?.scope.role === "admin" || data?.scope.role === "manager"
+  const isOverseer =
+    data?.scope.role === "admin" || data?.scope.role === "manager"
 
   return (
     <div className="flex flex-col gap-6 p-6">
@@ -109,7 +108,7 @@ export function DashboardContent({
             <Select
               value={repId ? String(repId) : "all"}
               onValueChange={(value) =>
-                setRepId(value === "all" ? null : Number(value))
+                setRepId(value === "all" ? null : value)
               }
             >
               <SelectTrigger>
@@ -138,17 +137,17 @@ export function DashboardContent({
         <>
           <KpiGrid data={data} />
 
-          <SectionHeading icon={Briefcase} title="Opportunity Pipeline Analytics" />
+          <SectionHeading
+            icon={Briefcase}
+            title="Opportunity Pipeline Analytics"
+          />
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             <OpportunityDistributionChart opportunities={data.opportunities} />
             <OpportunityTrendChart opportunities={data.opportunities} />
             <WinLossChart opportunities={data.opportunities} />
           </div>
 
-          <SectionHeading
-            icon={Star}
-            title="Client Satisfaction Analytics"
-          />
+          <SectionHeading icon={Star} title="Client Satisfaction Analytics" />
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <OverallSatisfactionCard satisfaction={data.satisfaction} />
             <SatisfactionTrendChart satisfaction={data.satisfaction} />
@@ -167,7 +166,9 @@ export function DashboardContent({
                   performance={data.performance}
                   fullWidth={!isOverseer}
                 />
-                {isOverseer && <PipelineByRepChart performance={data.performance} />}
+                {isOverseer && (
+                  <PipelineByRepChart performance={data.performance} />
+                )}
               </div>
             </>
           )}
@@ -198,7 +199,7 @@ function KpiGrid({ data }: { data: DashboardData }) {
     0,
     summary.total_opportunities -
       summary.won_opportunities -
-      summary.lost_opportunities,
+      summary.lost_opportunities
   )
   const pipelineValue = opportunities.value_by_stage
     .filter((row) => row.stage !== "won" && row.stage !== "lost")
@@ -261,8 +262,11 @@ function OpportunityDistributionChart({
   const chartConfig = Object.fromEntries(
     opportunities.by_stage.map((row, index) => [
       row.stage,
-      { label: titleCase(row.stage), color: CHART_COLORS[index % CHART_COLORS.length] },
-    ]),
+      {
+        label: titleCase(row.stage),
+        color: CHART_COLORS[index % CHART_COLORS.length],
+      },
+    ])
   ) satisfies ChartConfig
 
   return (
@@ -375,9 +379,7 @@ function WinLossChart({
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) =>
-                value === "won" ? "Won" : "Lost"
-              }
+              tickFormatter={(value) => (value === "won" ? "Won" : "Lost")}
             />
             <ChartTooltip
               cursor={false}
@@ -388,7 +390,9 @@ function WinLossChart({
                 <Cell
                   key={row.stage}
                   fill={
-                    row.stage === "won" ? "var(--chart-2)" : "var(--destructive)"
+                    row.stage === "won"
+                      ? "var(--chart-2)"
+                      : "var(--destructive)"
                   }
                 />
               ))}
@@ -402,7 +406,9 @@ function WinLossChart({
                 className="size-2.5 rounded-full"
                 style={{
                   backgroundColor:
-                    row.stage === "won" ? "var(--chart-2)" : "var(--destructive)",
+                    row.stage === "won"
+                      ? "var(--chart-2)"
+                      : "var(--destructive)",
                 }}
               />
               {titleCase(row.stage)}: {row.count} · {formatCurrency(row.value)}
@@ -551,7 +557,7 @@ function SatisfactionByCategoryChart({
     satisfaction.by_question.map((row, index) => [
       row.question,
       { label: row.label, color: CHART_COLORS[index % CHART_COLORS.length] },
-    ]),
+    ])
   ) satisfies ChartConfig
 
   return (
@@ -674,7 +680,9 @@ function PerformanceTable({
     <Card className={spanClass}>
       <CardHeader>
         <CardTitle className="text-base">Performance Comparison</CardTitle>
-        <CardDescription>Per-rep pipeline and satisfaction KPIs</CardDescription>
+        <CardDescription>
+          Per-rep pipeline and satisfaction KPIs
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
@@ -760,7 +768,11 @@ function PipelineByRepChart({
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="pipeline_value" fill="var(--color-pipeline_value)" radius={4} />
+            <Bar
+              dataKey="pipeline_value"
+              fill="var(--color-pipeline_value)"
+              radius={4}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>

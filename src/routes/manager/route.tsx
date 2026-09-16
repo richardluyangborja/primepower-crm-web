@@ -3,6 +3,7 @@ import { ManagerSidebar } from "@/components/manager-sidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import api from "@/lib/api"
 import { getDefaultRouteForRole } from "@/lib/role-redirect"
+import { useIdleLogout } from "@/hooks/use-idle-logout"
 
 export const Route = createFileRoute("/manager")({
   beforeLoad: async ({ location }) => {
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/manager")({
 })
 
 function RouteComponent() {
+  useIdleLogout()
   return (
     <SidebarProvider>
       <ManagerSidebar />

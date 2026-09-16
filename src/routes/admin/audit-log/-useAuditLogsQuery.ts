@@ -2,7 +2,7 @@ import api from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 
 export type AuditLogEntry = {
-  id: number
+  id: string
   actor_name: string | null
   actor_email: string | null
   actor_role: string | null

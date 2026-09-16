@@ -1,6 +1,5 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "@tanstack/react-router"
-import { createFileRoute } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 import { CreateLeadForm } from "@/components/create-lead-form"
 
@@ -9,18 +8,24 @@ export const Route = createFileRoute("/admin/lead/create/")({
 })
 
 function RouteComponent() {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() => navigate({ to: "/admin/lead-and-client/leads" })}
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>
       </header>
       <main>
-        <CreateLeadForm mode="select" successPath="/admin/lead-and-client/leads" />
+        <CreateLeadForm
+          mode="select"
+          successPath="/admin/lead-and-client/leads"
+        />
       </main>
     </div>
   )

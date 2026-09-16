@@ -40,6 +40,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { formatDateTime } from "@/lib/utils"
 import useAuthUser from "@/lib/queries/useAuthUser"
 import {
   Select,
@@ -80,7 +81,7 @@ function RouteComponent() {
     null
   )
 
-  const isSelf = Number(userId) === authUser.data?.id
+  const isSelf = userId === authUser.data?.id
 
   const updateMutation = useMutation({
     mutationFn: async (values: z.infer<typeof editSchema>) => {
@@ -191,6 +192,12 @@ function RouteComponent() {
               >
                 {(userQuery.data.is_active as boolean) ? "Active" : "Inactive"}
               </Badge>
+              <div className="text-xs text-muted-foreground">
+                Last password reset:{" "}
+                {formatDateTime(
+                  (userQuery.data.updated_at as string) ?? undefined
+                )}
+              </div>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">

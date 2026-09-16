@@ -51,7 +51,7 @@ export function NotificationsPanel({
             {unreadCount > 0 && (
               <Badge
                 variant="destructive"
-                className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px]"
+                className="absolute -top-1 -right-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px]"
               >
                 {unreadCount > 99 ? "99+" : unreadCount}
               </Badge>
@@ -81,7 +81,7 @@ export function NotificationsPanel({
           </div>
           <SheetDescription>
             {unreadCount > 0
-              ? `You have ${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}.`
+              ? `You have ${unreadCount} unviewed overdue reminder${unreadCount === 1 ? "" : "s"}.`
               : "You're all caught up."}
           </SheetDescription>
         </SheetHeader>
@@ -96,7 +96,7 @@ export function NotificationsPanel({
           ) : items.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-12 text-center text-sm text-muted-foreground">
               <CircleAlert className="size-6" />
-              No notifications yet.
+              No overdue reminders.
             </div>
           ) : (
             <ul className="flex flex-col">

@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input"
 import api from "@/lib/api"
 
 export type ContactEditValues = {
-  id: number
+  id: string
   first_name: string
   last_name: string
   title: string

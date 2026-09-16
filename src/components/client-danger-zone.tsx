@@ -22,7 +22,7 @@ import {
 import api from "@/lib/api"
 
 type ClientDangerData = {
-  id: number
+  id: string
   opportunities?: unknown[]
   reminders?: unknown[]
   communications?: unknown[]

@@ -29,9 +29,9 @@ export type CommunicationOutcome =
   | "other"
 
 export type CommunicationEntry = {
-  id: number
-  company: { id: number; name: string; industry: string }
-  contact: { id: number; name: string; title: string } | null
+  id: string
+  company: { id: string; name: string; industry: string }
+  contact: { id: string; name: string; title: string } | null
   type: CommunicationType
   direction: "incoming" | "outgoing"
   outcome: CommunicationOutcome | null
@@ -40,7 +40,7 @@ export type CommunicationEntry = {
   notes: string | null
   duration_minutes: number | null
   scheduled_at: string | null
-  user: { id: number; name: string } | null
+  user: { id: string; name: string } | null
   created_at: string
   updated_at?: string
 }
@@ -258,15 +258,16 @@ export const communicationDirectionLabels: Record<
   outgoing: "Outbound",
 }
 
-export const communicationOutcomeLabels: Record<CommunicationOutcome, string> = {
-  interested: "Interested",
-  not_now: "Not right now",
-  no_response: "No response",
-  voicemail: "Left voicemail",
-  meeting_booked: "Meeting booked",
-  unsubscribe: "Unsubscribed",
-  other: "Other",
-}
+export const communicationOutcomeLabels: Record<CommunicationOutcome, string> =
+  {
+    interested: "Interested",
+    not_now: "Not right now",
+    no_response: "No response",
+    voicemail: "Left voicemail",
+    meeting_booked: "Meeting booked",
+    unsubscribe: "Unsubscribed",
+    other: "Other",
+  }
 
 export const communicationOutcomeVariant: Record<
   CommunicationOutcome,
@@ -288,10 +289,7 @@ export function CommunicationOutcomeBadge({
 }) {
   if (!outcome) return null
   return (
-    <Badge
-      variant={communicationOutcomeVariant[outcome]}
-      className="text-xs"
-    >
+    <Badge variant={communicationOutcomeVariant[outcome]} className="text-xs">
       {communicationOutcomeLabels[outcome]}
     </Badge>
   )

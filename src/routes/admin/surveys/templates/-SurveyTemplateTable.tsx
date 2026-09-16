@@ -52,8 +52,11 @@ export default function SurveyTemplateTable() {
   const data = query.data ?? []
   const [search, setSearch] = useState("")
   const [formOpen, setFormOpen] = useState(false)
-  const [editingTemplate, setEditingTemplate] = useState<SurveyTemplateRow | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<SurveyTemplateRow | null>(null)
+  const [editingTemplate, setEditingTemplate] =
+    useState<SurveyTemplateRow | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<SurveyTemplateRow | null>(
+    null
+  )
   const del = useDeleteSurveyTemplate()
 
   const filtered = data.filter((template) =>
@@ -119,14 +122,21 @@ export default function SurveyTemplateTable() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">{template.question_count} question{template.question_count === 1 ? "" : "s"}</span>
+                    <span className="text-sm">
+                      {template.question_count} question
+                      {template.question_count === 1 ? "" : "s"}
+                    </span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm text-muted-foreground">v{template.version}</span>
+                    <span className="text-sm text-muted-foreground">
+                      v{template.version}
+                    </span>
                   </TableCell>
                   <TableCell>
                     {template.is_active ? (
-                      <Badge className="bg-emerald-600 text-white">Active</Badge>
+                      <Badge className="bg-emerald-600 text-white">
+                        Active
+                      </Badge>
                     ) : (
                       <Badge variant="secondary">Inactive</Badge>
                     )}

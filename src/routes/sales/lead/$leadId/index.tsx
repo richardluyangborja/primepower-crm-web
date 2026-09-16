@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { useForm } from "@tanstack/react-form"
 import {
   AlertTriangle,
@@ -55,11 +55,7 @@ import OpportunitiesSummary, {
   type OpportunityStage,
   type OpportunitySummary,
 } from "@/components/opportunities-summary"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { StageTransitionModal } from "@/components/stage-transition-modal"
 import type { StatusHistoryEntry } from "@/components/stage-transition-modal"
 import { type ReminderEntry } from "@/components/reminders-history"
@@ -76,13 +72,13 @@ import { LeadDangerZone } from "@/components/lead-danger-zone"
 import { useCanWrite } from "@/lib/queries/useCanWrite"
 
 export type LeadInfoPage = {
-  id: number
+  id: string
   status: "new" | "qualified" | "converted" | "disqualified"
-  client_id?: number | null
+  client_id?: string | null
   source: string
   notes?: string
   sales_representative: {
-    id: number
+    id: string
     name: string
     profileHref?: string
     profileFallback?: string
@@ -90,7 +86,7 @@ export type LeadInfoPage = {
   created_at: string
   recent_activity?: Date
   company: {
-    id: number
+    id: string
     logoHref?: string
     logoFallback?: string
     name: string
@@ -101,7 +97,7 @@ export type LeadInfoPage = {
     website: string
   }
   contacts: {
-    id: number
+    id: string
     profileHref?: string
     profileFallback?: string
     first_name: string
@@ -173,7 +169,7 @@ function shouldShowQualificationAlert(lead: LeadInfoPage): boolean {
 }
 
 function RouteComponent() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { leadId } = Route.useParams()
   const query = useLeadDetailsQuery(leadId)
   const lead = query.data!
@@ -182,7 +178,10 @@ function RouteComponent() {
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() => navigate({ to: "/sales/lead-and-client/leads" })}
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>
@@ -579,7 +578,7 @@ function ContactInfoSection({ lead }: { lead: LeadInfoPage }) {
 
   const form = useForm({
     defaultValues: {
-      company_id: lead.company.id ?? 0,
+      company_id: lead.company.id ?? "",
       first_name: "",
       last_name: "",
       title: "",
@@ -598,11 +597,11 @@ function ContactInfoSection({ lead }: { lead: LeadInfoPage }) {
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [contactToDelete, setContactToDelete] = useState<{
-    id: number
+    id: string
     name: string
   } | null>(null)
 
-  const requestDeleteContact = (contact: { id: number; name: string }) => {
+  const requestDeleteContact = (contact: { id: string; name: string }) => {
     setContactToDelete(contact)
     setDeleteConfirmOpen(true)
   }
@@ -614,7 +613,7 @@ function ContactInfoSection({ lead }: { lead: LeadInfoPage }) {
     setDeleteConfirmOpen(false)
   }
 
-  const handleMarkAsPrimary = async (contactId: number) => {
+  const handleMarkAsPrimary = async (contactId: string) => {
     await markAsPrimaryMutation.mutateAsync(contactId)
   }
 

@@ -21,7 +21,7 @@ export default function OpportunityKpis() {
     0,
     summary.total_opportunities -
       summary.won_opportunities -
-      summary.lost_opportunities,
+      summary.lost_opportunities
   )
   const pipelineValue = opportunities.value_by_stage
     .filter((row) => row.stage !== "won" && row.stage !== "lost")

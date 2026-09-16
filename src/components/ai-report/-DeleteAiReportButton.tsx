@@ -12,9 +12,9 @@ import {
 import { Loader2, Trash2 } from "lucide-react"
 
 interface DeleteAiReportButtonProps {
-  reportId: number
+  reportId: string
   reportLabel: string
-  onDelete: (id: number) => void
+  onDelete: (id: string) => void
   isPending: boolean
 }
 
@@ -51,7 +51,11 @@ export function DeleteAiReportButton({
           <Button variant="ghost" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm} disabled={isPending}>
+          <Button
+            variant="destructive"
+            onClick={onConfirm}
+            disabled={isPending}
+          >
             {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
             Delete
           </Button>

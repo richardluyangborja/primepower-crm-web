@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
-import { createFileRoute, useRouter, Link } from "@tanstack/react-router"
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router"
 import {
   AlertTriangle,
   Bell,
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/sales/reminders/$reminderId/")({
 })
 
 function RouteComponent() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { reminderId } = Route.useParams()
   const query = useReminderDetailsQuery(reminderId)
   const reminder = query.data
@@ -67,7 +67,10 @@ function RouteComponent() {
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() => navigate({ to: "/sales/reminders" })}
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>
@@ -103,13 +106,10 @@ function RouteComponent() {
                 reminder.related_to_status === "converted" && (
                   <Alert variant="destructive">
                     <AlertTriangle />
-                    <AlertTitle>
-                      Pending Reminder on Converted Lead
-                    </AlertTitle>
+                    <AlertTitle>Pending Reminder on Converted Lead</AlertTitle>
                     <AlertDescription>
-                      This reminder is still pending, but the related lead
-                      has been converted to a client. Please mark it as
-                      incomplete.
+                      This reminder is still pending, but the related lead has
+                      been converted to a client. Please mark it as incomplete.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -117,9 +117,13 @@ function RouteComponent() {
                 reminder={reminder}
                 dueFormatted={dueFormatted}
                 createdAtFormatted={createdAtFormatted}
-                onMarkComplete={() => updateMutation.mutate(Number(reminderId))}
-                onMarkIncomplete={() => markIncompleteMutation.mutate(Number(reminderId))}
-                isMarkingComplete={updateMutation.isPending || markIncompleteMutation.isPending}
+                onMarkComplete={() => updateMutation.mutate(reminderId)}
+                onMarkIncomplete={() =>
+                  markIncompleteMutation.mutate(reminderId)
+                }
+                isMarkingComplete={
+                  updateMutation.isPending || markIncompleteMutation.isPending
+                }
                 canManage={canManage}
               />
             </div>

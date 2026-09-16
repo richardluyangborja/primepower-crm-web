@@ -2,7 +2,7 @@ import api from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 
 export type UserRow = {
-  id: number
+  id: string
   name: string
   email: string
   role: "admin" | "manager" | "sales_rep"

@@ -12,9 +12,9 @@ export type SurveyResponse = {
 }
 
 export type Survey = {
-  id: number
+  id: string
   token: string
-  client_id: number
+  client_id: string
   status: SurveyStatus
   created_at: string
   completed_at: string | null
@@ -26,7 +26,7 @@ export type Survey = {
 }
 
 export type ClientSatisfactionSummary = {
-  id: number
+  id: string
   company: {
     name: string
     industry: string
@@ -48,7 +48,7 @@ export type ClientSatisfactionSummary = {
 }
 
 export type ClientSatisfactionDetail = {
-  id: number
+  id: string
   company: {
     name: string
     industry: string

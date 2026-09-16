@@ -2,7 +2,7 @@ import api from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 
 export type SurveyTemplateRow = {
-  id: number
+  id: string
   name: string
   description: string | null
   is_active: boolean

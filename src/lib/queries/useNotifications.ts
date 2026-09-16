@@ -6,9 +6,9 @@ export type NotificationItem = {
   type: string | null
   title: string | null
   message: string | null
-  reminder_id: number | null
+  reminder_id: string | null
   related_to_type: "lead" | "client" | "opportunity" | null
-  related_to_id: number | null
+  related_to_id: string | null
   due_date: string | null
   priority: string | null
   read_at: string | null
@@ -24,6 +24,9 @@ export function useNotificationsQuery(unreadOnly = false) {
       })
       return (response.data.data ?? []) as NotificationItem[]
     },
+    // Long polling: the feed is derived live from overdue reminders.
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: false,
   })
 }
 
@@ -34,7 +37,8 @@ export function useUnreadCountQuery() {
       const response = await api.get("/api/notifications/unread-count")
       return (response.data.count ?? 0) as number
     },
-    refetchInterval: 60_000,
+    refetchInterval: 15_000,
+    refetchIntervalInBackground: false,
   })
 }
 

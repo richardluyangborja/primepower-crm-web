@@ -46,6 +46,28 @@ api.interceptors.request.use(async (config) => {
   return config
 })
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status
+    const url: string = error?.config?.url ?? ""
+    const path = window.location.pathname
+
+    const isAuthRequest =
+      url.includes("/api/login") ||
+      url.includes("/api/logout") ||
+      url.includes("/sanctum/csrf-cookie")
+    const isPublicPage = path.startsWith("/login") || path.startsWith("/survey")
+
+    if ((status === 401 || status === 419) && !isAuthRequest && !isPublicPage) {
+      csrfInitialized = false
+      window.location.href = "/login?expired=1"
+    }
+
+    return Promise.reject(error)
+  }
+)
+
 export default api
 
 export { isAxiosError }

@@ -55,7 +55,7 @@ const stages = [
 ]
 
 export type OpportunityPipelineCard = {
-  id: number
+  id: string
   title: string
   stage:
     | "initial_contact"
@@ -68,12 +68,12 @@ export type OpportunityPipelineCard = {
   description: string | null
   manpower_requirement: number | null
   company: {
-    id: number
+    id: string
     name: string
     industry: string
   }
   assigned_to: {
-    id: number
+    id: string
     name: string
   }
   estimated_contract_value: number | null
@@ -88,7 +88,7 @@ export default function OpportunityPipeline() {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [activeTransition, setActiveTransition] = useState<{
-    opportunityId: number
+    opportunityId: string
     label: string
     stage: string
   } | null>(null)
@@ -99,7 +99,7 @@ export default function OpportunityPipeline() {
       stage,
       reason,
     }: {
-      opportunityId: number
+      opportunityId: string
       stage: string
       reason: string
     }) => {
@@ -120,7 +120,7 @@ export default function OpportunityPipeline() {
       opportunityId,
       reason,
     }: {
-      opportunityId: number
+      opportunityId: string
       reason: string
     }) => {
       const response = await api.post(
@@ -146,7 +146,7 @@ export default function OpportunityPipeline() {
   const isPending = stageMutation.isPending || winMutation.isPending
 
   const handleTransitionClick = (
-    opportunityId: number,
+    opportunityId: string,
     stage: string,
     label: string
   ) => {

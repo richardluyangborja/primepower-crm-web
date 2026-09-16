@@ -2,7 +2,7 @@ import api from "@/lib/api"
 import type { CreateOpportunityPayload } from "../../create/-types"
 
 export async function updateOpportunity(
-  opportunityId: number,
+  opportunityId: string,
   payload: CreateOpportunityPayload
 ) {
   const response = await api.patch(

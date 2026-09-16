@@ -5,7 +5,7 @@ export function useMarkReminderComplete() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (reminderId: number) => {
+    mutationFn: async (reminderId: string) => {
       const response = await api.patch(`/api/reminders/${reminderId}/complete`)
       return response.data.data
     },

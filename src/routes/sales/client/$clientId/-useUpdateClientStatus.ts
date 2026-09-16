@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 import type { ClientInfoPage } from "."
 
-export function useUpdateClientStatus(clientId: number) {
+export function useUpdateClientStatus(clientId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({

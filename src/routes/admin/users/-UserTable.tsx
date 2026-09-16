@@ -17,13 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  ChevronDown,
-  Ellipsis,
-  MoveUpRight,
-  Search,
-  UserRound,
-} from "lucide-react"
+import { Ellipsis, MoveUpRight, Search, UserRound } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 import useUsersQuery, { type UserRow } from "@/lib/queries/useUsers"
@@ -112,19 +106,6 @@ export default function UserTable() {
           >
             <ChevronDown />
             Reset
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              const params = new URLSearchParams()
-              if (search) params.set("search", search)
-              if (role !== "all") params.set("role", role)
-              if (isActive !== "all")
-                params.set("is_active", isActive === "active" ? "1" : "0")
-              window.location.href = `/api/users-export?${params.toString()}`
-            }}
-          >
-            Export CSV
           </Button>
         </div>
         <div className="flex items-center justify-end">

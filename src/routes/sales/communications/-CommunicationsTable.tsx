@@ -36,13 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  Ellipsis,
-  Loader2,
-  Plus,
-  Search,
-  X,
-} from "lucide-react"
+import { Ellipsis, Loader2, Plus, Search, X } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { Spinner } from "@/components/ui/spinner"
 import {
@@ -130,12 +124,14 @@ export default function CommunicationsTable() {
       q: search || undefined,
       type: type === "all" ? undefined : type,
       direction:
-        direction === "all" ? undefined : (direction as "incoming" | "outgoing"),
+        direction === "all"
+          ? undefined
+          : (direction as "incoming" | "outgoing"),
       outcome: outcome === "all" ? undefined : outcome,
       from: from || undefined,
       to: to || undefined,
     }),
-    [search, type, direction, outcome, from, to],
+    [search, type, direction, outcome, from, to]
   )
 
   const query = useCommunicationsQuery(params)
@@ -143,7 +139,7 @@ export default function CommunicationsTable() {
   const data = query.data
 
   const [deleteTarget, setDeleteTarget] = useState<{
-    id: number
+    id: string
     name: string
   } | null>(null)
 
@@ -159,8 +155,8 @@ export default function CommunicationsTable() {
     <Card>
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[12rem]">
-            <Search className="text-muted-foreground absolute top-1/2 left-2 size-4 -translate-y-1/2" />
+          <div className="relative min-w-[12rem] flex-1">
+            <Search className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search subject or notes..."
               value={search}
@@ -200,7 +196,9 @@ export default function CommunicationsTable() {
             <SelectContent>
               <SelectItem value="all">All outcomes</SelectItem>
               {(
-                Object.keys(communicationOutcomeLabels) as CommunicationOutcome[]
+                Object.keys(
+                  communicationOutcomeLabels
+                ) as CommunicationOutcome[]
               ).map((o) => (
                 <SelectItem key={o} value={o}>
                   {communicationOutcomeLabels[o]}

@@ -34,7 +34,8 @@ import useAuditLogsQuery, {
   type AuditLogEntry,
 } from "./-useAuditLogsQuery"
 
-type BadgeVariant = "default" | "secondary" | "destructive" | "outline" | "ghost"
+type BadgeVariant =
+  "default" | "secondary" | "destructive" | "outline" | "ghost"
 
 function moduleVariant(module: string): BadgeVariant {
   switch (module) {
@@ -103,7 +104,7 @@ function MetadataValue({ value }: { value: unknown }) {
   }
   if (typeof value === "object") {
     return (
-      <pre className="text-xs whitespace-pre-wrap rounded bg-muted p-2">
+      <pre className="rounded bg-muted p-2 text-xs whitespace-pre-wrap">
         {JSON.stringify(value, null, 2)}
       </pre>
     )
@@ -111,7 +112,11 @@ function MetadataValue({ value }: { value: unknown }) {
   return <span>{String(value)}</span>
 }
 
-function MetadataList({ metadata }: { metadata: Record<string, unknown> | null }) {
+function MetadataList({
+  metadata,
+}: {
+  metadata: Record<string, unknown> | null
+}) {
   if (!metadata || Object.keys(metadata).length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -151,13 +156,13 @@ function AuditLogDetails({ entry }: { entry: AuditLogEntry }) {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <p className="text-xs font-medium uppercase text-muted-foreground">
+          <p className="text-xs font-medium text-muted-foreground uppercase">
             Performed At
           </p>
           <p className="text-sm">{formatDateTime(entry.created_at)}</p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase text-muted-foreground">
+          <p className="text-xs font-medium text-muted-foreground uppercase">
             Actor
           </p>
           <p className="text-sm">
@@ -173,7 +178,7 @@ function AuditLogDetails({ entry }: { entry: AuditLogEntry }) {
           ) : null}
         </div>
         <div>
-          <p className="text-xs font-medium uppercase text-muted-foreground">
+          <p className="text-xs font-medium text-muted-foreground uppercase">
             Subject
           </p>
           <p className="text-sm">{entry.subject_name ?? "—"}</p>
@@ -189,7 +194,7 @@ function AuditLogDetails({ entry }: { entry: AuditLogEntry }) {
       <Separator />
 
       <div>
-        <p className="mb-2 text-xs font-medium uppercase text-muted-foreground">
+        <p className="mb-2 text-xs font-medium text-muted-foreground uppercase">
           Additional Details
         </p>
         <MetadataList metadata={entry.metadata} />
@@ -289,7 +294,7 @@ export default function AuditLogTable() {
                   className="cursor-pointer"
                   onClick={() => setSelected(entry)}
                 >
-                  <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                  <TableCell className="text-sm whitespace-nowrap text-muted-foreground">
                     {formatDateTime(entry.created_at)}
                   </TableCell>
                   <TableCell className="text-sm">
@@ -364,11 +369,14 @@ export default function AuditLogTable() {
         ) : null}
       </CardContent>
 
-      <Dialog open={selected !== null} onOpenChange={(open) => {
-        if (!open) {
-          setSelected(null)
-        }
-      }}>
+      <Dialog
+        open={selected !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelected(null)
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-xl">
           {selected ? (
             <>

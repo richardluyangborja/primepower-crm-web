@@ -12,7 +12,7 @@ export default function useOpportunitiesQuery() {
 }
 
 type Opportunity = {
-  id: number
+  id: string
   title: string
   stage:
     | "initial_contact"
@@ -25,12 +25,12 @@ type Opportunity = {
   description: string | null
   manpower_requirement: number | null
   company: {
-    id: number
+    id: string
     name: string
     industry: string
   }
   assigned_to: {
-    id: number
+    id: string
     name: string
   }
   estimated_contract_value: number | null

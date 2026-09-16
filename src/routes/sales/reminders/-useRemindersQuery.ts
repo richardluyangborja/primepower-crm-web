@@ -17,8 +17,10 @@ export default function useRemindersQuery(filters: ReminderFilters = {}) {
     queryFn: async () => {
       const params: Record<string, string | boolean> = {}
       if (filters.q) params.q = filters.q
-      if (filters.status && filters.status !== "all") params.status = filters.status
-      if (filters.priority && filters.priority !== "all") params.priority = filters.priority
+      if (filters.status && filters.status !== "all")
+        params.status = filters.status
+      if (filters.priority && filters.priority !== "all")
+        params.priority = filters.priority
       if (filters.from) params.from = filters.from
       if (filters.to) params.to = filters.to
       if (filters.overdue) params.overdue = true

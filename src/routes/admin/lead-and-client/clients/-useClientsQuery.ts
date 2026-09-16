@@ -12,8 +12,8 @@ export type ClientsQueryParams = {
 function cleanParams(params?: ClientsQueryParams) {
   return Object.fromEntries(
     Object.entries(params ?? {}).filter(
-      ([, v]) => v !== undefined && v !== null && v !== "",
-    ),
+      ([, v]) => v !== undefined && v !== null && v !== ""
+    )
   )
 }
 
@@ -33,7 +33,7 @@ export function useDeleteClient() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (clientId: number | string) => {
+    mutationFn: async (clientId: string | string) => {
       const response = await api.delete(`/api/clients/${clientId}`)
       return response.data
     },

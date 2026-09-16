@@ -70,7 +70,11 @@ export default function ClientSatisfactionList() {
   )
 
   const hasActiveFilters =
-    search !== "" || trendFilter !== "all" || scoreFilter !== "all" || dateFrom !== "" || dateTo !== ""
+    search !== "" ||
+    trendFilter !== "all" ||
+    scoreFilter !== "all" ||
+    dateFrom !== "" ||
+    dateTo !== ""
 
   function clearFilters() {
     setSearch("")
@@ -89,10 +93,10 @@ export default function ClientSatisfactionList() {
         {/* Row 1: Search + Selects + Clear */}
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search companies..."
-              className="pl-8 w-60"
+              className="w-60 pl-8"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

@@ -7,5 +7,5 @@ export const Route = createFileRoute("/manager/satisfaction/$clientId/")({
 
 function RouteComponent() {
   const { clientId } = Route.useParams()
-  return <SatisfactionDetailPage clientId={Number(clientId)} />
+  return <SatisfactionDetailPage clientId={clientId} />
 }

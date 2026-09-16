@@ -50,18 +50,18 @@ import {
 } from "@/components/ui/select"
 
 export type ReminderTableRow = {
-  id: number
+  id: string
   title: string
-  company: { id: number; name: string; industry: string }
+  company: { id: string; name: string; industry: string }
   related_to_type: "lead" | "client" | "opportunity"
-  related_to_id: number
+  related_to_id: string
   related_to_name: string
   related_to_status: string | null
   due_date: string
   priority: ReminderPriority
   status: "pending" | "completed" | "incomplete"
   is_completed: boolean
-  assigned_to: { id: number; name: string } | null
+  assigned_to: { id: string; name: string } | null
   recurrence_rule: "daily" | "weekly" | "monthly" | null
   created_at: string
 }
@@ -91,13 +91,13 @@ export default function RemindersTable() {
       from: from || undefined,
       to: to || undefined,
     }),
-    [search, status, priority, from, to],
+    [search, status, priority, from, to]
   )
 
   const query = useRemindersQuery(filters)
   const data = query.data
   const deleteMutation = useDeleteReminder()
-  const [reminderToDelete, setReminderToDelete] = useState<number | null>(null)
+  const [reminderToDelete, setReminderToDelete] = useState<string | null>(null)
 
   const hasActiveFilters =
     Boolean(search) ||
@@ -110,8 +110,8 @@ export default function RemindersTable() {
     <Card>
       <CardHeader>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[12rem]">
-            <Search className="text-muted-foreground absolute top-1/2 left-2 size-4 -translate-y-1/2" />
+          <div className="relative min-w-[12rem] flex-1">
+            <Search className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search title or company..."
               value={search}

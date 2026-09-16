@@ -10,7 +10,6 @@ import {
 import { Spinner } from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
 import { formatCurrency } from "@/lib/utils"
-import { useIsAdmin } from "@/lib/queries/useIsAdmin"
 import { useLocation, useNavigate } from "@tanstack/react-router"
 import {
   AlertTriangle,
@@ -29,7 +28,6 @@ import {
   type OpportunitySuggestedAction,
   type SatisfactionSuggestedAction,
 } from "@/lib/queries/useActionSuggestions"
-import { ActionSettingsPanel } from "./-ActionSettingsPanel"
 
 const opportunityActionIcon: Record<
   OpportunitySuggestedAction["type"],
@@ -52,7 +50,6 @@ const satisfactionActionIcon: Record<
 }
 
 export default function ActionSuggestionsPage() {
-  const isAdmin = useIsAdmin()
   const query = useActionSuggestionsQuery()
   const data = query.data
 
@@ -81,17 +78,17 @@ export default function ActionSuggestionsPage() {
       </div>
     )
   } else if (data) {
-    content = <SuggestionsContent data={data} basePath={basePath} navigate={navigate} />
+    content = (
+      <SuggestionsContent data={data} basePath={basePath} navigate={navigate} />
+    )
   }
 
   return (
     <div className="flex flex-col gap-6 p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-heading text-2xl font-medium">
-            Action Suggestions
-          </h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="font-heading text-lg">Action Suggestions</h1>
+          <p className="mb-6 text-sm text-muted-foreground">
             Rule-based suggested actions from opportunity pipeline and client
             satisfaction analytics
           </p>
@@ -109,8 +106,6 @@ export default function ActionSuggestionsPage() {
         </Button>
       </div>
 
-      {isAdmin && <ActionSettingsPanel />}
-
       {content}
     </div>
   )
@@ -122,8 +117,14 @@ function SuggestionsContent({
   navigate,
 }: {
   data: {
-    opportunity: { empty: boolean; suggested_actions: OpportunitySuggestedAction[] }
-    satisfaction: { empty: boolean; suggested_actions: SatisfactionSuggestedAction[] }
+    opportunity: {
+      empty: boolean
+      suggested_actions: OpportunitySuggestedAction[]
+    }
+    satisfaction: {
+      empty: boolean
+      suggested_actions: SatisfactionSuggestedAction[]
+    }
   }
   basePath: string
   navigate: (opts: { to: string }) => void
@@ -238,7 +239,8 @@ function SuggestedActions({
               variant === "opportunity"
                 ? opportunityActionIcon
                 : satisfactionActionIcon
-            const Icon = iconMap[action.type as keyof typeof iconMap] ?? Sparkles
+            const Icon =
+              iconMap[action.type as keyof typeof iconMap] ?? Sparkles
 
             return (
               <li

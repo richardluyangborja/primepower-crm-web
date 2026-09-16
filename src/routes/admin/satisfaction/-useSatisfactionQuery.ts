@@ -30,7 +30,7 @@ export function useSatisfactionQuery(filters: SatisfactionFilters = {}) {
   })
 }
 
-export function useSatisfactionDetailQuery(clientId: number) {
+export function useSatisfactionDetailQuery(clientId: string) {
   return useQuery({
     queryKey: ["satisfaction_detail", clientId],
     queryFn: async () => {
@@ -40,7 +40,7 @@ export function useSatisfactionDetailQuery(clientId: number) {
   })
 }
 
-export function useCreateSurvey(clientId: number) {
+export function useCreateSurvey(clientId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -57,11 +57,11 @@ export function useCreateSurvey(clientId: number) {
   })
 }
 
-export function useDeleteSurvey(clientId: number) {
+export function useDeleteSurvey(clientId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (surveyId: number) => {
+    mutationFn: async (surveyId: string) => {
       await api.delete(`/api/satisfaction/${clientId}/surveys/${surveyId}`)
     },
     onSuccess: () => {

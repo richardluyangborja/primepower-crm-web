@@ -26,7 +26,7 @@ export function useCreateCommunication() {
   })
 }
 
-export function useUpdateCommunication(id: number | string) {
+export function useUpdateCommunication(id: string | string) {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -57,7 +57,7 @@ export function useDeleteCommunication() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (id: number | string) => {
+    mutationFn: async (id: string | string) => {
       await api.delete(`/api/communications/${id}`)
     },
     onSuccess: () => {

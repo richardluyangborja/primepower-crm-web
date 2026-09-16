@@ -1,7 +1,15 @@
 import { Calendar, FileText, Printer } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import useAuthUser from "@/lib/queries/useAuthUser"
 import {
   aiReportRangeLabel,
@@ -12,51 +20,67 @@ import { DeleteAiReportButton } from "./-DeleteAiReportButton"
 
 export type AiReportView = AiReport
 
-export function AiReportRender({ report }: { report: AiReportView }) {
+/**
+ * Full report viewer in a modal dialog. The report body only renders here —
+ * the page itself keeps the report collapsed to a one-line summary.
+ */
+export function AiReportModal({
+  report,
+  open,
+  onOpenChange,
+}: {
+  report: AiReportView
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
   const userQuery = useAuthUser()
   const isAdmin = userQuery.data?.role === "admin"
   const deleteMutation = useDeleteAiReport()
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <FileText className="h-4 w-4 text-muted-foreground" />
-          {report.type_label}
-        </CardTitle>
-        <Badge variant="secondary" className="gap-1">
-          <Calendar className="h-3 w-3" />
-          {aiReportRangeLabel(report)}
-        </Badge>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="whitespace-pre-wrap text-sm leading-relaxed">{report.content}</p>
-
-        <div className="flex items-center justify-between border-t pt-4 text-xs text-muted-foreground no-print">
-          <time dateTime={report.created_at}>
-            Generated {new Date(report.created_at).toLocaleString([], {
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <FileText className="h-4 w-4 text-muted-foreground" />
+            {report.type_label}
+          </DialogTitle>
+          <DialogDescription>
+            <Badge variant="secondary" className="gap-1">
+              <Calendar className="h-3 w-3" />
+              {aiReportRangeLabel(report)}
+            </Badge>{" "}
+            — Generated{" "}
+            {new Date(report.created_at).toLocaleString([], {
               month: "short",
               day: "numeric",
               year: "numeric",
             })}
-          </time>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => window.print()}>
-              <Printer className="mr-2 h-4 w-4" />
-              Export PDF
-            </Button>
-            {isAdmin && (
-              <DeleteAiReportButton
-                reportId={report.id}
-                reportLabel={report.type_label}
-                onDelete={(id) => deleteMutation.mutate(id)}
-                isPending={deleteMutation.isPending}
-              />
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          </DialogDescription>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[70vh]">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap">
+            {report.content}
+          </p>
+        </ScrollArea>
+
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <Printer className="mr-2 h-4 w-4" />
+            Export PDF
+          </Button>
+          {isAdmin && (
+            <DeleteAiReportButton
+              reportId={report.id}
+              reportLabel={report.type_label}
+              onDelete={(id) => deleteMutation.mutate(id)}
+              isPending={deleteMutation.isPending}
+            />
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -74,7 +98,7 @@ export function AiReportPrintPane({ report }: { report: AiReportView }) {
           {new Date(report.created_at).toLocaleString()}
         </p>
       </div>
-      <div className="whitespace-pre-wrap text-sm leading-relaxed">
+      <div className="text-sm leading-relaxed whitespace-pre-wrap">
         {report.content}
       </div>
     </div>

@@ -40,7 +40,11 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { useState } from "react"
-import { surveyStatusLabels, surveyStatusVariant, type Survey } from "../../../../routes/admin/satisfaction/-types"
+import {
+  surveyStatusLabels,
+  surveyStatusVariant,
+  type Survey,
+} from "../../../../routes/admin/satisfaction/-types"
 import {
   useCreateSurvey,
   useDeleteSurvey,
@@ -187,9 +191,7 @@ function SurveyDetailCard({
             <div className="text-right">
               <div className="flex items-center gap-1">
                 <Star className="size-4 fill-primary text-primary" />
-                <span className="text-xl font-bold">
-                  {numScore.toFixed(1)}
-                </span>
+                <span className="text-xl font-bold">{numScore.toFixed(1)}</span>
               </div>
               <span className="text-xs text-muted-foreground">avg score</span>
             </div>
@@ -281,7 +283,9 @@ function SurveyDetailCard({
                 <div className="font-medium">{survey.respondent_name}</div>
               )}
               {survey.respondent_position && (
-                <div className="text-blue-500">{survey.respondent_position}</div>
+                <div className="text-blue-500">
+                  {survey.respondent_position}
+                </div>
               )}
             </div>
           </div>
@@ -315,7 +319,7 @@ function SurveyDetailCard({
   )
 }
 
-function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
+function ClientSatisfactionDetail({ clientId }: { clientId: string }) {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -422,7 +426,9 @@ function ClientSatisfactionDetail({ clientId }: { clientId: number }) {
                 Average Score
               </span>
               <div className="mt-1">
-                <ScoreBar score={detail.average_score as number | null | undefined} />
+                <ScoreBar
+                  score={detail.average_score as number | null | undefined}
+                />
               </div>
             </div>
             <div>

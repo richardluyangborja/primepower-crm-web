@@ -47,7 +47,11 @@ function ScoreBadge({ score }: { score: number | null | undefined }) {
   return <Badge variant={variant}>{numScore.toFixed(1)}</Badge>
 }
 
-export default function ClientSatisfactionList({ basePath = "/admin" }: { basePath?: string }) {
+export default function ClientSatisfactionList({
+  basePath = "/admin",
+}: {
+  basePath?: string
+}) {
   const navigate = useNavigate()
   const [search, setSearch] = useState("")
   const [trendFilter, setTrendFilter] = useState("all")
@@ -67,7 +71,11 @@ export default function ClientSatisfactionList({ basePath = "/admin" }: { basePa
   )
 
   const hasActiveFilters =
-    search !== "" || trendFilter !== "all" || scoreFilter !== "all" || dateFrom !== "" || dateTo !== ""
+    search !== "" ||
+    trendFilter !== "all" ||
+    scoreFilter !== "all" ||
+    dateFrom !== "" ||
+    dateTo !== ""
 
   function clearFilters() {
     setSearch("")
@@ -86,10 +94,10 @@ export default function ClientSatisfactionList({ basePath = "/admin" }: { basePa
         {/* Row 1: Search + Selects + Clear */}
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search companies..."
-              className="pl-8 w-60"
+              className="w-60 pl-8"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

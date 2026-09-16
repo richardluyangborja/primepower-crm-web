@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { createFileRoute, useRouter } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 import { CreateCommunicationForm } from "./-CreateCommunicationForm"
 
@@ -8,12 +8,15 @@ export const Route = createFileRoute("/admin/communications/create/")({
 })
 
 function RouteComponent() {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() => navigate({ to: "/admin/communications" })}
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>

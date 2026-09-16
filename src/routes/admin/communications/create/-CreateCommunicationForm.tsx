@@ -28,11 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   communicationTypeLabels,
   communicationOutcomeLabels,
@@ -47,20 +43,24 @@ export type CreateCommunicationFormValues = {
   type: CommunicationType
   direction: "incoming" | "outgoing"
   outcome: CommunicationOutcome | null
-  company_id: number
-  contact_id: number | null
+  company_id: string
+  contact_id: string | null
   subject: string
   notes: string
   duration_minutes: number | null
   scheduled_at: string | null
 }
 
-export function CreateCommunicationForm({ basePath = "/admin" }: { basePath?: string }) {
+export function CreateCommunicationForm({
+  basePath = "/admin",
+}: {
+  basePath?: string
+}) {
   const companiesQuery = useCompanies()
   const createMutation = useCreateCommunication()
   const navigate = useNavigate()
 
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
     null
   )
 
@@ -69,7 +69,7 @@ export function CreateCommunicationForm({ basePath = "/admin" }: { basePath?: st
       type: "email" as CommunicationType,
       direction: "outgoing" as "incoming" | "outgoing",
       outcome: null as CommunicationOutcome | null,
-      company_id: 0,
+      company_id: "",
       contact_id: null,
       subject: "",
       notes: "",
@@ -179,12 +179,14 @@ export function CreateCommunicationForm({ basePath = "/admin" }: { basePath?: st
               <form.Field name="outcome">
                 {(field) => (
                   <Field>
-                    <FieldLabel htmlFor="outcome">Outcome (optional)</FieldLabel>
+                    <FieldLabel htmlFor="outcome">
+                      Outcome (optional)
+                    </FieldLabel>
                     <Select
                       value={field.state.value ?? "none"}
                       onValueChange={(val) =>
                         field.handleChange(
-                          val === "none" ? null : (val as CommunicationOutcome),
+                          val === "none" ? null : (val as CommunicationOutcome)
                         )
                       }
                     >
@@ -195,7 +197,7 @@ export function CreateCommunicationForm({ basePath = "/admin" }: { basePath?: st
                         <SelectItem value="none">No outcome yet</SelectItem>
                         {(
                           Object.keys(
-                            communicationOutcomeLabels,
+                            communicationOutcomeLabels
                           ) as CommunicationOutcome[]
                         ).map((outcome) => (
                           <SelectItem key={outcome} value={outcome}>
@@ -239,13 +241,10 @@ export function CreateCommunicationForm({ basePath = "/admin" }: { basePath?: st
                       <FieldLabel htmlFor="company_id">Company</FieldLabel>
 
                       <Select
-                        value={
-                          field.state.value > 0 ? String(field.state.value) : ""
-                        }
+                        value={field.state.value ? field.state.value : ""}
                         onValueChange={(val) => {
-                          const id = Number(val)
-                          setSelectedCompanyId(id)
-                          field.handleChange(id)
+                          setSelectedCompanyId(val)
+                          field.handleChange(val)
                         }}
                         disabled={
                           companiesQuery.isPending || companiesQuery.isError
@@ -291,7 +290,7 @@ export function CreateCommunicationForm({ basePath = "/admin" }: { basePath?: st
                         value={
                           field.state.value ? String(field.state.value) : ""
                         }
-                        onValueChange={(val) => field.handleChange(Number(val))}
+                        onValueChange={(val) => field.handleChange(val)}
                         disabled={contactsForCompany.length === 0}
                       >
                         <SelectTrigger id="contact_id">

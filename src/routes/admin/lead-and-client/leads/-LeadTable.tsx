@@ -56,6 +56,7 @@ import useLeadsQuery, {
 import { Spinner } from "@/components/ui/spinner"
 import { useCanWrite } from "@/lib/queries/useCanWrite"
 import { explainDeleteBlock } from "@/lib/delete-guard"
+import { getInitials } from "@/lib/utils"
 import { KpiCards } from "@/components/kpi-cards"
 
 const statusLabels: Record<
@@ -69,9 +70,9 @@ const statusLabels: Record<
 }
 
 export type LeadTableRow = {
-  id: number
+  id: string
   company: {
-    id: number
+    id: string
     name: string
     industry: string
     logoHref?: string
@@ -144,7 +145,7 @@ export default function LeadTable({
   }, [data])
 
   const [deleteTarget, setDeleteTarget] = useState<{
-    id: number
+    id: string
     name: string
   } | null>(null)
 
@@ -178,254 +179,256 @@ export default function LeadTable({
     <div className="flex flex-col gap-4">
       <KpiCards kpis={kpis} />
       <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative min-w-[12rem] flex-1">
-            <Search className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search company or notes..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="w-36">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              {(["new", "qualified", "disqualified"] as const).map((s) => (
-                <SelectItem key={s} value={s}>
-                  {statusLabels[s]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={source} onValueChange={setSource}>
-            <SelectTrigger className="w-36">
-              <SelectValue placeholder="Source" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All sources</SelectItem>
-              {(sourcesQuery.data ?? []).map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button
-            variant={includeConverted ? "secondary" : "outline"}
-            size="sm"
-            onClick={() => setIncludeConverted((v) => !v)}
-          >
-            {includeConverted ? (
-              <Eye className="size-4" />
-            ) : (
-              <EyeOff className="size-4" />
-            )}
-            Show converted
-          </Button>
-          {(hasActiveFilters || includeConverted) && (
-            <Button variant="ghost" size="sm" onClick={resetFilters}>
-              <X />
-              Clear
-            </Button>
-          )}
-          {canWrite && (
-            <CardAction>
-              <Button
-                onClick={() => navigate({ to: `${basePath}/lead/create` })}
-              >
-                <span>Create new lead</span>
-                <MoveUpRight />
-              </Button>
-            </CardAction>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {query.isPending ? (
-          <div className="flex justify-center">
-            <Spinner />
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Company</TableHead>
-                <TableHead>Source</TableHead>
-                <TableHead>Primary Contact</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Sales Representative</TableHead>
-                {canWrite && <TableHead />}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.map((lead) => (
-                <TableRow
-                  key={lead.id}
-                  onClick={() =>
-                    navigate({
-                      to: `${basePath}/lead/$leadId`,
-                      params: { leadId: lead.id.toString() },
-                    })
-                  }
-                >
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      <Avatar>
-                        <AvatarImage src={lead.company.logoHref} />
-                        <AvatarFallback>
-                          {lead.company.logoFallback}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span>{lead.company.name}</span>
-                        <span className="text-xs font-normal text-muted-foreground">
-                          {lead.company.industry}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{lead.source}</TableCell>
-                  <TableCell className="flex flex-col">
-                    <span>{lead.primary_contact?.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {lead.primary_contact?.title}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">
-                      {statusLabels[lead.status]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Avatar>
-                        <AvatarImage
-                          src={lead.sales_representative.profileHref}
-                        />
-                        <AvatarFallback>
-                          {lead.sales_representative.profileFallback}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{lead.sales_representative.name}</span>
-                    </div>
-                  </TableCell>
-                  {canWrite && (
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Ellipsis />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuGroup>
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                navigate({
-                                  to: `${basePath}/lead/$leadId`,
-                                  params: { leadId: lead.id.toString() },
-                                })
-                              }}
-                            >
-                              View
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                setDeleteTarget({
-                                  id: lead.id,
-                                  name: lead.company.name,
-                                })
-                              }}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))}
-              {data?.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center">
-                    No leads found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-
-      <Dialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) {
-            setDeleteTarget(null)
-            deleteMutation.reset()
-          }
-        }}
-      >
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Delete lead?</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete the lead for {deleteTarget?.name}?
-              This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          {deleteError && (
-            <div className="space-y-2">
-              <p className="text-sm text-destructive">{deleteError}</p>
-              {explainDeleteBlock(deleteError).length > 0 && (
-                <ul className="space-y-1">
-                  {explainDeleteBlock(deleteError).map((step) => (
-                    <li key={step} className="text-sm text-muted-foreground">
-                      • {step}
-                    </li>
-                  ))}
-                </ul>
-              )}
+        <CardHeader>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative min-w-[12rem] flex-1">
+              <Search className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search company or notes..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8"
+              />
             </div>
-          )}
-          <DialogFooter>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                {(["new", "qualified", "disqualified"] as const).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {statusLabels[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={source} onValueChange={setSource}>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Source" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All sources</SelectItem>
+                {(sourcesQuery.data ?? []).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button
-              variant="outline"
-              onClick={() => setDeleteTarget(null)}
-              disabled={deleteMutation.isPending}
+              variant={includeConverted ? "secondary" : "outline"}
+              size="sm"
+              onClick={() => setIncludeConverted((v) => !v)}
             >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending && (
-                <Loader2 className="mr-2 size-4 animate-spin" />
+              {includeConverted ? (
+                <Eye className="size-4" />
+              ) : (
+                <EyeOff className="size-4" />
               )}
-              Delete
+              Show converted
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            {(hasActiveFilters || includeConverted) && (
+              <Button variant="ghost" size="sm" onClick={resetFilters}>
+                <X />
+                Clear
+              </Button>
+            )}
+            {canWrite && (
+              <CardAction>
+                <Button
+                  onClick={() => navigate({ to: `${basePath}/lead/create` })}
+                >
+                  <span>Create new lead</span>
+                  <MoveUpRight />
+                </Button>
+              </CardAction>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {query.isPending ? (
+            <div className="flex justify-center">
+              <Spinner />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Company</TableHead>
+                  <TableHead>Source</TableHead>
+                  <TableHead>Primary Contact</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Sales Representative</TableHead>
+                  {canWrite && <TableHead />}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data?.map((lead) => (
+                  <TableRow
+                    key={lead.id}
+                    onClick={() =>
+                      navigate({
+                        to: `${basePath}/lead/$leadId`,
+                        params: { leadId: lead.id.toString() },
+                      })
+                    }
+                  >
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <Avatar>
+                          <AvatarImage src={lead.company.logoHref} />
+                          <AvatarFallback>
+                            {lead.company.logoFallback ??
+                              getInitials(lead.company.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span>{lead.company.name}</span>
+                          <span className="text-xs font-normal text-muted-foreground">
+                            {lead.company.industry}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{lead.source}</TableCell>
+                    <TableCell className="flex flex-col">
+                      <span>{lead.primary_contact?.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {lead.primary_contact?.title}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">
+                        {statusLabels[lead.status]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar>
+                          <AvatarImage
+                            src={lead.sales_representative.profileHref}
+                          />
+                          <AvatarFallback>
+                            {lead.sales_representative.profileFallback ??
+                              getInitials(lead.sales_representative.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span>{lead.sales_representative.name}</span>
+                      </div>
+                    </TableCell>
+                    {canWrite && (
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Ellipsis />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuGroup>
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  navigate({
+                                    to: `${basePath}/lead/$leadId`,
+                                    params: { leadId: lead.id.toString() },
+                                  })
+                                }}
+                              >
+                                View
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  setDeleteTarget({
+                                    id: lead.id,
+                                    name: lead.company.name,
+                                  })
+                                }}
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+                {data?.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center">
+                      No leads found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+
+        <Dialog
+          open={!!deleteTarget}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDeleteTarget(null)
+              deleteMutation.reset()
+            }
+          }}
+        >
+          <DialogContent showCloseButton={false}>
+            <DialogHeader>
+              <DialogTitle>Delete lead?</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete the lead for{" "}
+                {deleteTarget?.name}? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            {deleteError && (
+              <div className="space-y-2">
+                <p className="text-sm text-destructive">{deleteError}</p>
+                {explainDeleteBlock(deleteError).length > 0 && (
+                  <ul className="space-y-1">
+                    {explainDeleteBlock(deleteError).map((step) => (
+                      <li key={step} className="text-sm text-muted-foreground">
+                        • {step}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleteMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending && (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                )}
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </Card>
     </div>
   )

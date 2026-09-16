@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 
-export type AiReportType = "opportunity" | "satisfaction" | "rep_performance"
+export type AiReportType =
+  "business_health" | "rep_performance" | "opportunity" | "satisfaction"
 
 export type AiReportDateRange = "this_week" | "last_month" | "custom"
 
 export type AiReport = {
-  id: number
+  id: string
   type: AiReportType
   type_label: string
   date_range: AiReportDateRange
@@ -66,7 +67,10 @@ export function useGenerateAiReport() {
       from_date?: string
       to_date?: string
     }) => {
-      const { data } = await api.post<{ data: AiReport }>("/api/ai-reports", params)
+      const { data } = await api.post<{ data: AiReport }>(
+        "/api/ai-reports",
+        params
+      )
       return data.data
     },
     onSuccess: () => {
@@ -79,7 +83,7 @@ export function useDeleteAiReport() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await api.delete(`/api/ai-reports/${id}`)
     },
     onSuccess: () => {

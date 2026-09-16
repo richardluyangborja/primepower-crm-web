@@ -15,13 +15,13 @@ export type OpportunityStage =
   | "lost"
 
 export type OpportunitySummary = {
-  id: number
+  id: string
   title: string
   stage: OpportunityStage
   estimated_contract_value: number | null
   expected_close_date: string | null
   assigned_to: {
-    id: number
+    id: string
     name: string
   }
 }

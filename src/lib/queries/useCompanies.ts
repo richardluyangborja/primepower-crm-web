@@ -7,15 +7,15 @@ export default function useCompanies() {
     queryFn: async () => {
       const response = await api.get("/api/companies")
       return response.data.data as {
-        id: number
+        id: string
         name: string
         industry: string
         is_client: boolean
-        contacts: { id: number; name: string; title: string | null }[]
-        leads: { id: number; status: string; company_name: string }[]
-        client: { id: number; status: string; company_name: string } | null
+        contacts: { id: string; name: string; title: string | null }[]
+        leads: { id: string; status: string; company_name: string }[]
+        client: { id: string; status: string; company_name: string } | null
         sales_representative: {
-          id: number
+          id: string
           name: string
         } | null
       }[]

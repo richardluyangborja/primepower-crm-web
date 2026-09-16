@@ -59,9 +59,9 @@ function SurveyTemplateFormInner({
   const [name, setName] = useState(template?.name ?? "")
   const [description, setDescription] = useState(template?.description ?? "")
   const [isActive, setIsActive] = useState(template?.is_active ?? true)
-  const [questions, setQuestions] = useState<SurveyTemplateFormValues["questions"]>(
-    template?.questions?.map((q) => ({ ...q })) ?? [QUESTION_PLACEHOLDER]
-  )
+  const [questions, setQuestions] = useState<
+    SurveyTemplateFormValues["questions"]
+  >(template?.questions?.map((q) => ({ ...q })) ?? [QUESTION_PLACEHOLDER])
 
   const createTemplate = useCreateSurveyTemplate()
   const updateTemplate = useUpdateSurveyTemplate()
@@ -70,7 +70,10 @@ function SurveyTemplateFormInner({
   const isSubmitting = createTemplate.isPending || updateTemplate.isPending
 
   const addQuestion = () => {
-    setQuestions([...questions, { ...QUESTION_PLACEHOLDER, id: `q${questions.length + 1}` }])
+    setQuestions([
+      ...questions,
+      { ...QUESTION_PLACEHOLDER, id: `q${questions.length + 1}` },
+    ])
   }
 
   const removeQuestion = (index: number) => {
@@ -78,7 +81,11 @@ function SurveyTemplateFormInner({
     setQuestions(questions.filter((_, i) => i !== index))
   }
 
-  const updateQuestion = (index: number, field: "text" | "category", value: string) => {
+  const updateQuestion = (
+    index: number,
+    field: "text" | "category",
+    value: string
+  ) => {
     setQuestions(
       questions.map((q, i) => (i === index ? { ...q, [field]: value } : q))
     )
@@ -113,7 +120,7 @@ function SurveyTemplateFormInner({
   }
 
   return (
-    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+    <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
       <DialogHeader>
         <DialogTitle>
           {isEditing ? "Edit Survey Template" : "Create Survey Template"}
@@ -160,7 +167,12 @@ function SurveyTemplateFormInner({
         <div className="space-y-2 border-t pt-4">
           <div className="flex items-center justify-between">
             <Label className="mb-0">Questions</Label>
-            <Button type="button" variant="outline" size="sm" onClick={addQuestion}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addQuestion}
+            >
               <Plus className="mr-1 size-4" />
               Add Question
             </Button>
@@ -168,17 +180,17 @@ function SurveyTemplateFormInner({
           <p className="text-xs text-muted-foreground">
             Minimum 1 question required. Reorder with drag handles.
           </p>
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          <div className="max-h-96 space-y-2 overflow-y-auto">
             {questions.map((question, index) => (
               <div
                 key={question.id}
-                className="flex items-start gap-2 p-3 border rounded-lg bg-muted/30"
+                className="flex items-start gap-2 rounded-lg border bg-muted/30 p-3"
               >
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground mt-1"
+                  className="mt-1 text-muted-foreground hover:text-foreground"
                   onClick={() => removeQuestion(index)}
                   disabled={questions.length <= 1}
                 >
@@ -188,7 +200,7 @@ function SurveyTemplateFormInner({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground mt-1"
+                  className="mt-1 text-muted-foreground hover:text-foreground"
                   onClick={() => index > 0 && moveQuestion(index, index - 1)}
                   disabled={index === 0}
                 >
@@ -198,9 +210,10 @@ function SurveyTemplateFormInner({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground mt-1"
+                  className="mt-1 text-muted-foreground hover:text-foreground"
                   onClick={() =>
-                    index < questions.length - 1 && moveQuestion(index, index + 1)
+                    index < questions.length - 1 &&
+                    moveQuestion(index, index + 1)
                   }
                   disabled={index >= questions.length - 1}
                 >
@@ -208,25 +221,35 @@ function SurveyTemplateFormInner({
                 </Button>
                 <div className="flex-1 space-y-2">
                   <div className="space-y-1">
-                    <Label htmlFor={`q-${index}-text`} className="text-xs font-medium">
+                    <Label
+                      htmlFor={`q-${index}-text`}
+                      className="text-xs font-medium"
+                    >
                       Question Text
                     </Label>
                     <Input
                       id={`q-${index}-text`}
                       value={question.text}
-                      onChange={(e) => updateQuestion(index, "text", e.target.value)}
+                      onChange={(e) =>
+                        updateQuestion(index, "text", e.target.value)
+                      }
                       placeholder="e.g. How satisfied are you with our communication?"
                       required
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor={`q-${index}-category`} className="text-xs font-medium">
+                    <Label
+                      htmlFor={`q-${index}-category`}
+                      className="text-xs font-medium"
+                    >
                       Category
                     </Label>
                     <Input
                       id={`q-${index}-category`}
                       value={question.category}
-                      onChange={(e) => updateQuestion(index, "category", e.target.value)}
+                      onChange={(e) =>
+                        updateQuestion(index, "category", e.target.value)
+                      }
                       placeholder="e.g. Communication"
                       required
                     />

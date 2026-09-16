@@ -31,8 +31,9 @@ function RouteComponent() {
       <header className="py-4">
         <h1 className="font-heading text-lg">Survey Templates</h1>
         <p className="mb-6 text-sm text-muted-foreground">
-          Manage survey templates and their versions. Templates define the questions
-          sent in satisfaction surveys. Editing questions creates a new version.
+          Manage survey templates and their versions. Templates define the
+          questions sent in satisfaction surveys. Editing questions creates a
+          new version.
         </p>
       </header>
       <main>

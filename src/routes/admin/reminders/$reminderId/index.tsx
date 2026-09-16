@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
-import { createFileRoute, useRouter, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import {
   AlertTriangle,
   Bell,
@@ -49,7 +49,7 @@ export function ReminderDetailContent({
   reminderId: string
   basePath?: string
 }) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const query = useReminderDetailsQuery(reminderId)
   const reminder = query.data
   const updateMutation = useMarkReminderComplete()
@@ -74,7 +74,10 @@ export function ReminderDetailContent({
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() => navigate({ to: "/admin/reminders" })}
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>
@@ -121,9 +124,9 @@ export function ReminderDetailContent({
                 reminder={reminder}
                 dueFormatted={dueFormatted}
                 createdAtFormatted={createdAtFormatted}
-                onMarkComplete={() => updateMutation.mutate(Number(reminderId))}
+                onMarkComplete={() => updateMutation.mutate(reminderId)}
                 onMarkIncomplete={() =>
-                  markIncompleteMutation.mutate(Number(reminderId))
+                  markIncompleteMutation.mutate(reminderId)
                 }
                 isMarkingComplete={
                   updateMutation.isPending || markIncompleteMutation.isPending
@@ -206,7 +209,7 @@ function ReminderDetailCard({
                   )}
                   {isMarkingComplete ? "Marking..." : "Mark as Incomplete"}
                 </Button>
-                </>
+              </>
             )}
             {isAdmin && <DeleteReminderButton reminderId={reminder.id} />}
             {canWrite && (

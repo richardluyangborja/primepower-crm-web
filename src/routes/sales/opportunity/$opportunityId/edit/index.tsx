@@ -1,27 +1,36 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "@tanstack/react-router"
-import { createFileRoute } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 import { EditOpportunityForm } from "./-EditOpportunityForm"
 
-export const Route = createFileRoute("/sales/opportunity/$opportunityId/edit/")({
-  component: RouteComponent,
-})
+export const Route = createFileRoute("/sales/opportunity/$opportunityId/edit/")(
+  {
+    component: RouteComponent,
+  }
+)
 
 function RouteComponent() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { opportunityId } = Route.useParams()
 
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() =>
+            navigate({
+              to: "/sales/opportunity/$opportunityId",
+              params: { opportunityId },
+            })
+          }
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>
       </header>
       <main>
-        <EditOpportunityForm opportunityId={Number(opportunityId)} />
+        <EditOpportunityForm opportunityId={opportunityId} />
       </main>
     </div>
   )

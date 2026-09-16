@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import { createFileRoute, useRouter } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useForm } from "@tanstack/react-form"
 import {
   ChevronLeft,
@@ -56,11 +56,7 @@ import { Spinner } from "@/components/ui/spinner"
 import OpportunitiesSummary, {
   type OpportunitySummary,
 } from "@/components/opportunities-summary"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   CommunicationHistorySection,
   type CommunicationEntry,
@@ -69,11 +65,9 @@ import {
   ReminderHistorySection,
   type ReminderEntry,
 } from "@/components/reminders-history"
-import { useNavigate } from "@tanstack/react-router"
 import { StageTransitionModal } from "@/components/stage-transition-modal"
 import type { StatusHistoryEntry } from "@/components/stage-transition-modal"
 import { ReassignDialog } from "@/components/reassign-dialog"
-import { ClientEditDialog } from "@/components/client-edit-dialog"
 import { CompanyEditDialog } from "@/components/company-edit-dialog"
 import { ContactEditDialog } from "@/components/contact-edit-dialog"
 import { ClientDangerZone } from "@/components/client-danger-zone"
@@ -83,13 +77,13 @@ import { useState } from "react"
 import { ActionSuggestionAlert } from "@/components/action-suggestion-alert"
 
 export type ClientInfoPage = {
-  id: number
+  id: string
   status: "active" | "inactive"
   client_since: string
   notes?: string
   recent_activity?: Date
   company: {
-    id: number
+    id: string
     logoHref?: string
     logoFallback?: string
     name: string
@@ -100,7 +94,7 @@ export type ClientInfoPage = {
     website: string
   }
   contacts: {
-    id: number
+    id: string
     profileHref?: string
     profileFallback?: string
     first_name: string
@@ -113,13 +107,13 @@ export type ClientInfoPage = {
   }[]
   opportunities?: OpportunitySummary[]
   lead?: {
-    id: number
+    id: string
     status: "new" | "qualified" | "disqualified" | "converted"
   }
   communications?: CommunicationEntry[]
   reminders?: ReminderEntry[]
   sales_representative: {
-    id: number
+    id: string
     name: string
     profileHref?: string
     profileFallback?: string
@@ -128,7 +122,7 @@ export type ClientInfoPage = {
   trend: "up" | "down" | "stable" | null
   last_survey_date: string | null
   latest_survey?: {
-    id: number
+    id: string
     status: "pending" | "completed" | "expired"
     average_score: string | null
     completed_at: string | null
@@ -181,7 +175,7 @@ export function ClientDetailContent({
   clientId: string
   basePath?: string
 }) {
-  const router = useRouter()
+  const navigate = useNavigate()
   const query = useClientDetailsQuery(clientId)
   const client = query.data!
   const canWrite = useCanWrite()
@@ -189,7 +183,10 @@ export function ClientDetailContent({
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() => navigate({ to: "/admin/lead-and-client/clients" })}
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>
@@ -226,10 +223,7 @@ export function ClientDetailContent({
               </div>
             </header>
             <div className="mt-6 flex flex-col gap-6">
-              <ActionSuggestionAlert
-                entityType="client"
-                entityId={Number(clientId)}
-              />
+              <ActionSuggestionAlert entityType="client" entityId={clientId} />
               <CompanyInfoCard
                 client={client}
                 canWrite={canWrite}
@@ -372,7 +366,6 @@ function ClientInfoCard({
   const canManage = useCanManage()
   const canWrite = useCanWrite()
   const [reassignOpen, setReassignOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [targetStatus, setTargetStatus] = useState<"active" | "inactive">(
     "inactive"
@@ -460,16 +453,6 @@ function ClientInfoCard({
                     : "Mark as Active"}
               </Button>
             )}
-            {canWrite && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setEditOpen(true)}
-              >
-                <Pencil />
-                Edit
-              </Button>
-            )}
           </CardAction>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
@@ -533,22 +516,6 @@ function ClientInfoCard({
         subjectName={`client ${client.company.name}`}
         detailQueryKey={["client_details", String(client.id)]}
       />
-
-      <ClientEditDialog
-        open={editOpen}
-        onOpenChange={setEditOpen}
-        client={{
-          id: client.id,
-          client_since: client.client_since,
-          status: client.status,
-          notes: client.notes,
-          sales_representative: {
-            id: client.sales_representative.id,
-            name: client.sales_representative.name,
-          },
-        }}
-        detailQueryKey={["client_details", String(client.id)]}
-      />
     </section>
   )
 }
@@ -603,7 +570,7 @@ function ContactInfoSection({ client }: { client: ClientInfoPage }) {
 
   const form = useForm({
     defaultValues: {
-      company_id: client.company.id ?? 0,
+      company_id: client.company.id ?? "",
       first_name: "",
       last_name: "",
       title: "",
@@ -622,11 +589,11 @@ function ContactInfoSection({ client }: { client: ClientInfoPage }) {
 
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [contactToDelete, setContactToDelete] = useState<{
-    id: number
+    id: string
     name: string
   } | null>(null)
 
-  const requestDeleteContact = (contact: { id: number; name: string }) => {
+  const requestDeleteContact = (contact: { id: string; name: string }) => {
     setContactToDelete(contact)
     setDeleteConfirmOpen(true)
   }
@@ -638,7 +605,7 @@ function ContactInfoSection({ client }: { client: ClientInfoPage }) {
     setDeleteConfirmOpen(false)
   }
 
-  const handleMarkAsPrimary = async (contactId: number) => {
+  const handleMarkAsPrimary = async (contactId: string) => {
     await markAsPrimaryMutation.mutateAsync(contactId)
   }
 

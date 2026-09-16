@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea"
 import api from "@/lib/api"
 
 export type CompanyEditValues = {
-  id: number
+  id: string
   industry: string
   address: string
   phone: string
@@ -115,7 +115,11 @@ export function CompanyEditDialog({
             <form.Field
               name="industry"
               children={(field) => (
-                <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                <Field
+                  data-invalid={
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  }
+                >
                   <FieldLabel htmlFor={field.name}>Industry</FieldLabel>
                   <Input
                     autoComplete="off"
@@ -124,7 +128,9 @@ export function CompanyEditDialog({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                    aria-invalid={
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    }
                     placeholder="e.g. Technology"
                   />
                   {field.state.meta.errors.length > 0 && (
@@ -139,7 +145,11 @@ export function CompanyEditDialog({
             <form.Field
               name="address"
               children={(field) => (
-                <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                <Field
+                  data-invalid={
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  }
+                >
                   <FieldLabel htmlFor={field.name}>Address</FieldLabel>
                   <Input
                     autoComplete="off"
@@ -148,7 +158,9 @@ export function CompanyEditDialog({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                    aria-invalid={
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    }
                     placeholder="e.g. 123 Main St"
                   />
                   {field.state.meta.errors.length > 0 && (
@@ -163,7 +175,11 @@ export function CompanyEditDialog({
             <form.Field
               name="phone"
               children={(field) => (
-                <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                <Field
+                  data-invalid={
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  }
+                >
                   <FieldLabel htmlFor={field.name}>Phone</FieldLabel>
                   <Input
                     autoComplete="off"
@@ -172,7 +188,9 @@ export function CompanyEditDialog({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                    aria-invalid={
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    }
                     placeholder="e.g. +1 (555) 000-0000"
                   />
                   {field.state.meta.errors.length > 0 && (
@@ -187,7 +205,11 @@ export function CompanyEditDialog({
             <form.Field
               name="email"
               children={(field) => (
-                <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                <Field
+                  data-invalid={
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  }
+                >
                   <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                   <FieldDescription>
                     The company's general contact email.
@@ -200,7 +222,9 @@ export function CompanyEditDialog({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                    aria-invalid={
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    }
                     placeholder="e.g. hello@company.com"
                   />
                   {field.state.meta.errors.length > 0 && (
@@ -215,7 +239,11 @@ export function CompanyEditDialog({
             <form.Field
               name="website"
               children={(field) => (
-                <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                <Field
+                  data-invalid={
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  }
+                >
                   <FieldLabel htmlFor={field.name}>Website</FieldLabel>
                   <Input
                     autoComplete="off"
@@ -224,7 +252,9 @@ export function CompanyEditDialog({
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                    aria-invalid={
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    }
                     placeholder="e.g. https://company.com"
                   />
                   {field.state.meta.errors.length > 0 && (
@@ -239,16 +269,24 @@ export function CompanyEditDialog({
             <form.Field
               name="notes"
               children={(field) => (
-                <Field data-invalid={field.state.meta.isTouched && !field.state.meta.isValid}>
+                <Field
+                  data-invalid={
+                    field.state.meta.isTouched && !field.state.meta.isValid
+                  }
+                >
                   <FieldLabel htmlFor={field.name}>Notes</FieldLabel>
-                  <FieldDescription>Internal notes about this record.</FieldDescription>
+                  <FieldDescription>
+                    Internal notes about this record.
+                  </FieldDescription>
                   <Textarea
                     id={field.name}
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={field.state.meta.isTouched && !field.state.meta.isValid}
+                    aria-invalid={
+                      field.state.meta.isTouched && !field.state.meta.isValid
+                    }
                     rows={4}
                     placeholder="Add any internal notes…"
                   />

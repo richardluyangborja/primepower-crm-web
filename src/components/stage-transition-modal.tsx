@@ -14,20 +14,20 @@ import { Textarea } from "@/components/ui/textarea"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 
 export type StageHistoryEntry = {
-  id: number
+  id: string
   from_stage: string | null
   to_stage: string
   reason: string | null
-  user: { id: number; name: string } | null
+  user: { id: string; name: string } | null
   created_at: string
 }
 
 export type StatusHistoryEntry = {
-  id: number
+  id: string
   from_status: string | null
   to_status: string
   reason: string | null
-  user: { id: number; name: string } | null
+  user: { id: string; name: string } | null
   created_at: string
 }
 

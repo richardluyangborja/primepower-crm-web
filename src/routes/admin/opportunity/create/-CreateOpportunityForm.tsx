@@ -37,16 +37,22 @@ import {
 } from "@/components/ui/card"
 import { useNavigate } from "@tanstack/react-router"
 
-export function CreateOpportunityForm({ basePath = "/admin" }: { basePath?: string }) {
+export function CreateOpportunityForm({
+  basePath = "/admin",
+}: {
+  basePath?: string
+}) {
   const companiesQuery = useCompanies()
   const leadsQuery = useLeads()
   const createOpportunityMutation = useCreateOpportunity()
   const navigate = useNavigate()
-  const [selectedCompanyId, setSelectedCompanyId] = useState(0)
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
+    null
+  )
 
   const form = useForm({
     defaultValues: {
-      company_id: 0,
+      company_id: "",
       lead_id: null,
       title: "",
       description: "",
@@ -64,7 +70,7 @@ export function CreateOpportunityForm({ basePath = "/admin" }: { basePath?: stri
         value as CreateOpportunityPayload
       )
       form.reset()
-      setSelectedCompanyId(0)
+      setSelectedCompanyId(null)
       return navigate({ to: `${basePath}/opportunities` as any })
     },
   })
@@ -93,7 +99,7 @@ export function CreateOpportunityForm({ basePath = "/admin" }: { basePath?: stri
               variant="outline"
               onClick={() => {
                 form.reset()
-                setSelectedCompanyId(0)
+                setSelectedCompanyId(null)
               }}
               disabled={isSubmitting}
             >
@@ -149,14 +155,10 @@ export function CreateOpportunityForm({ basePath = "/admin" }: { basePath?: stri
                         <FieldLabel htmlFor={field.name}>Company</FieldLabel>
 
                         <Select
-                          value={
-                            field.state.value > 0
-                              ? String(field.state.value)
-                              : ""
-                          }
+                          value={field.state.value ? field.state.value : ""}
                           onValueChange={(value) => {
-                            setSelectedCompanyId(Number(value))
-                            field.handleChange(Number(value))
+                            setSelectedCompanyId(value)
+                            field.handleChange(value)
                           }}
                           disabled={
                             companiesQuery.isLoading || companiesQuery.isError
@@ -217,7 +219,7 @@ export function CreateOpportunityForm({ basePath = "/admin" }: { basePath?: stri
                             field.state.value ? String(field.state.value) : ""
                           }
                           onValueChange={(value) =>
-                            field.handleChange(value ? Number(value) : null)
+                            field.handleChange(value ? value : null)
                           }
                           disabled={leadsQuery.isLoading || leadsQuery.isError}
                         >

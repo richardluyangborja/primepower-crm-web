@@ -18,27 +18,6 @@ import { useQueryClient } from "@tanstack/react-query"
 import { Info } from "lucide-react"
 import { getDefaultRouteForRole } from "@/lib/role-redirect"
 
-const demoAccounts = [
-  {
-    role: "Admin",
-    name: "Daniel Balisi",
-    email: "daniel@primepower.com",
-    password: "password",
-  },
-  {
-    role: "Manager",
-    name: "Ana Reyes",
-    email: "ana@primepower.com",
-    password: "password",
-  },
-  {
-    role: "Sales Rep",
-    name: "Maria Santos",
-    email: "maria@primepower.com",
-    password: "password",
-  },
-]
-
 const formSchema = z.object({
   email: z.email().max(32, "Email must be at most 32 characters."),
   password: z.string().max(50, "Description must be at most 50 characters."),
@@ -57,6 +36,7 @@ export function LoginForm({
     mutationFn: async (body: Login) => {
       return api.post("/api/login", body)
     },
+    retry: false,
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["auth_user"] })
       const role = response.data?.two_factor
@@ -94,27 +74,6 @@ export function LoginForm({
           <p className="text-sm text-balance text-muted-foreground">
             Enter your primepower account below to login
           </p>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {demoAccounts.map((account) => (
-            <button
-              key={account.email}
-              type="button"
-              onClick={() => {
-                form.setFieldValue("email", account.email)
-                form.setFieldValue("password", account.password)
-              }}
-              className="flex flex-col items-start gap-1 rounded-lg border border-border p-3 text-left transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            >
-              <span className="text-xs font-medium text-muted-foreground">
-                {account.role}
-              </span>
-              <span className="text-sm font-semibold">{account.name}</span>
-              <span className="text-xs text-muted-foreground">
-                {account.email}
-              </span>
-            </button>
-          ))}
         </div>
         {mutation.isError && (
           <Alert variant="destructive">

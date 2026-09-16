@@ -2,7 +2,7 @@ import api from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 
 export type SalesRepresentative = {
-  id: number
+  id: string
   name: string
 }
 

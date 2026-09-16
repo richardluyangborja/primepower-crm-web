@@ -40,9 +40,9 @@ import useCompanies from "@/lib/queries/useCompanies"
 import { useCreateReminder } from "../-useCreateReminder"
 
 export type CreateReminderFormValues = {
-  company_id: number
+  company_id: string
   related_to_type: "lead" | "client"
-  related_to_id: number
+  related_to_id: string
   title: string
   description: string
   due_date: string
@@ -53,7 +53,7 @@ export type CreateReminderFormValues = {
 
 type SelectedRecord = {
   type: "lead" | "client"
-  id: number
+  id: string
 } | null
 
 function isPastDueDate(dateString: string): boolean {
@@ -64,12 +64,16 @@ function isPastDueDate(dateString: string): boolean {
   return date.getTime() < today.getTime()
 }
 
-export function CreateReminderForm({ basePath = "/admin" }: { basePath?: string }) {
+export function CreateReminderForm({
+  basePath = "/admin",
+}: {
+  basePath?: string
+}) {
   const companiesQuery = useCompanies()
   const createMutation = useCreateReminder()
   const navigate = useNavigate()
 
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
     null
   )
   const [selectedRecord, setSelectedRecord] = useState<SelectedRecord>(null)
@@ -80,9 +84,9 @@ export function CreateReminderForm({ basePath = "/admin" }: { basePath?: string 
 
   const form = useForm({
     defaultValues: {
-      company_id: 0,
+      company_id: "",
       related_to_type: "lead" as "lead" | "client",
-      related_to_id: 0,
+      related_to_id: "",
       title: "",
       description: "",
       due_date: "",
@@ -116,16 +120,16 @@ export function CreateReminderForm({ basePath = "/admin" }: { basePath?: string 
   const hasClient = clientForCompany !== null
   const hasRecords = hasLeads || hasClient
 
-  const handleCompanyChange = (companyId: number) => {
+  const handleCompanyChange = (companyId: string) => {
     setSelectedCompanyId(companyId)
     setSelectedRecord(null)
     form.setFieldValue("company_id", companyId)
-    form.setFieldValue("related_to_id", 0)
+    form.setFieldValue("related_to_id", "")
   }
 
   const handleRecordChange = (value: string) => {
     const [type, idStr] = value.split(":")
-    const id = Number(idStr)
+    const id = idStr
     if (type === "lead" || type === "client") {
       setSelectedRecord({ type, id })
       form.setFieldValue("related_to_type", type)
@@ -167,12 +171,8 @@ export function CreateReminderForm({ basePath = "/admin" }: { basePath?: string 
                       <FieldLabel htmlFor="company_id">Company</FieldLabel>
 
                       <Select
-                        value={
-                          field.state.value > 0 ? String(field.state.value) : ""
-                        }
-                        onValueChange={(val) =>
-                          handleCompanyChange(Number(val))
-                        }
+                        value={field.state.value ? field.state.value : ""}
+                        onValueChange={(val) => handleCompanyChange(val)}
                         disabled={
                           companiesQuery.isPending || companiesQuery.isError
                         }
@@ -425,13 +425,13 @@ export function CreateReminderForm({ basePath = "/admin" }: { basePath?: string 
 
                         <SelectContent>
                           <SelectItem value="">No recurrence</SelectItem>
-                          {(
-                            ["daily", "weekly", "monthly"] as const
-                          ).map((rule) => (
-                            <SelectItem key={rule} value={rule}>
-                              {recurrenceLabels[rule]}
-                            </SelectItem>
-                          ))}
+                          {(["daily", "weekly", "monthly"] as const).map(
+                            (rule) => (
+                              <SelectItem key={rule} value={rule}>
+                                {recurrenceLabels[rule]}
+                              </SelectItem>
+                            )
+                          )}
                         </SelectContent>
                       </Select>
 

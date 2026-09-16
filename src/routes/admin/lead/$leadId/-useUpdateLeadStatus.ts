@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 import type { LeadInfoPage } from "."
 
-export function useUpdateLeadStatus(leadId: number) {
+export function useUpdateLeadStatus(leadId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({

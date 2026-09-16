@@ -22,7 +22,7 @@ import {
 import api from "@/lib/api"
 
 type LeadDangerData = {
-  id: number
+  id: string
   status?: string
   opportunities?: unknown[]
   reminders?: unknown[]

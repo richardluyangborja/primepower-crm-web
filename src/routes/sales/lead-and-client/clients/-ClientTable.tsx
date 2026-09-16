@@ -52,6 +52,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import useClientsQuery, { useDeleteClient } from "./-useClientsQuery"
 import { Spinner } from "@/components/ui/spinner"
 import { explainDeleteBlock } from "@/lib/delete-guard"
+import { getInitials } from "@/lib/utils"
 import { KpiCards } from "@/components/kpi-cards"
 
 const trendLabels: Record<"up" | "down" | "stable", string> = {
@@ -66,7 +67,7 @@ const statusLabels: Record<"active" | "inactive", string> = {
 }
 
 export type ClientTableRow = {
-  id: number
+  id: string
   company: {
     name: string
     industry: string
@@ -129,7 +130,7 @@ export default function ClientTable() {
   }, [data])
 
   const [deleteTarget, setDeleteTarget] = useState<{
-    id: number
+    id: string
     name: string
   } | null>(null)
 
@@ -155,251 +156,253 @@ export default function ClientTable() {
     <div className="flex flex-col gap-4">
       <KpiCards kpis={kpis} />
       <Card>
-      <CardHeader>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative min-w-[12rem] flex-1">
-            <Search className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search company..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger className="w-36">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              {(["active", "inactive"] as const).map((s) => (
-                <SelectItem key={s} value={s}>
-                  {statusLabels[s]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSearch("")
-                setStatus("all")
-              }}
-            >
-              <X />
-              Clear
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        {query.isPending ? (
-          <div className="flex justify-center">
-            <Spinner />
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Company</TableHead>
-                <TableHead>Primary Contact</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Trend</TableHead>
-                <TableHead>Sales Representative</TableHead>
-                <TableHead />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.map((client) => (
-                <TableRow
-                  key={client.id}
-                  onClick={() =>
-                    navigate({
-                      to: "/sales/client/$clientId",
-                      params: { clientId: client.id.toString() },
-                    })
-                  }
-                >
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      <Avatar>
-                        <AvatarImage src={client.company.logoHref} />
-                        <AvatarFallback>
-                          {client.company.logoFallback}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span>{client.company.name}</span>
-                        <span className="text-xs font-normal text-muted-foreground">
-                          {client.company.industry}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="flex flex-col">
-                    <span>{client.primary_contact?.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {client.primary_contact?.title}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">
-                      {statusLabels[client.status]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {client.trend === "up" && (
-                        <>
-                          <TrendingUp className="size-4 text-emerald-500" />
-                          <span className="text-xs text-emerald-500">
-                            {trendLabels["up"]}
-                          </span>
-                        </>
-                      )}
-                      {client.trend === "down" && (
-                        <>
-                          <TrendingDown className="size-4 text-rose-500" />
-                          <span className="text-xs text-rose-500">
-                            {trendLabels["down"]}
-                          </span>
-                        </>
-                      )}
-                      {client.trend === "stable" && (
-                        <>
-                          <Minus className="size-4 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
-                            {trendLabels["stable"]}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Avatar>
-                        <AvatarImage
-                          src={client.sales_representative.profileHref}
-                        />
-                        <AvatarFallback>
-                          {client.sales_representative.profileFallback}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{client.sales_representative.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Ellipsis />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuGroup>
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              navigate({
-                                to: "/sales/client/$clientId",
-                                params: { clientId: client.id.toString() },
-                              })
-                            }}
-                          >
-                            View
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setDeleteTarget({
-                                id: client.id,
-                                name: client.company.name,
-                              })
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {data?.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center">
-                    No clients found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-
-      <Dialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => {
-          if (!open) {
-            setDeleteTarget(null)
-            deleteMutation.reset()
-          }
-        }}
-      >
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Delete client?</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete the client {deleteTarget?.name}?
-              This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          {deleteError && (
-            <div className="space-y-2">
-              <p className="text-sm text-destructive">{deleteError}</p>
-              {explainDeleteBlock(deleteError).length > 0 && (
-                <ul className="space-y-1">
-                  {explainDeleteBlock(deleteError).map((step) => (
-                    <li key={step} className="text-sm text-muted-foreground">
-                      • {step}
-                    </li>
-                  ))}
-                </ul>
-              )}
+        <CardHeader>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative min-w-[12rem] flex-1">
+              <Search className="absolute top-1/2 left-2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search company..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-8"
+              />
             </div>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                {(["active", "inactive"] as const).map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {statusLabels[s]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearch("")
+                  setStatus("all")
+                }}
+              >
+                <X />
+                Clear
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {query.isPending ? (
+            <div className="flex justify-center">
+              <Spinner />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Company</TableHead>
+                  <TableHead>Primary Contact</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Trend</TableHead>
+                  <TableHead>Sales Representative</TableHead>
+                  <TableHead />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data?.map((client) => (
+                  <TableRow
+                    key={client.id}
+                    onClick={() =>
+                      navigate({
+                        to: "/sales/client/$clientId",
+                        params: { clientId: client.id.toString() },
+                      })
+                    }
+                  >
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <Avatar>
+                          <AvatarImage src={client.company.logoHref} />
+                          <AvatarFallback>
+                            {client.company.logoFallback ??
+                              getInitials(client.company.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <span>{client.company.name}</span>
+                          <span className="text-xs font-normal text-muted-foreground">
+                            {client.company.industry}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="flex flex-col">
+                      <span>{client.primary_contact?.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {client.primary_contact?.title}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">
+                        {statusLabels[client.status]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {client.trend === "up" && (
+                          <>
+                            <TrendingUp className="size-4 text-emerald-500" />
+                            <span className="text-xs text-emerald-500">
+                              {trendLabels["up"]}
+                            </span>
+                          </>
+                        )}
+                        {client.trend === "down" && (
+                          <>
+                            <TrendingDown className="size-4 text-rose-500" />
+                            <span className="text-xs text-rose-500">
+                              {trendLabels["down"]}
+                            </span>
+                          </>
+                        )}
+                        {client.trend === "stable" && (
+                          <>
+                            <Minus className="size-4 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">
+                              {trendLabels["stable"]}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar>
+                          <AvatarImage
+                            src={client.sales_representative.profileHref}
+                          />
+                          <AvatarFallback>
+                            {client.sales_representative.profileFallback ??
+                              getInitials(client.sales_representative.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span>{client.sales_representative.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Ellipsis />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuGroup>
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                navigate({
+                                  to: "/sales/client/$clientId",
+                                  params: { clientId: client.id.toString() },
+                                })
+                              }}
+                            >
+                              View
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuGroup>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setDeleteTarget({
+                                  id: client.id,
+                                  name: client.company.name,
+                                })
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {data?.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center">
+                      No clients found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           )}
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteTarget(null)}
-              disabled={deleteMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={confirmDelete}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending && (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              )}
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+
+        <Dialog
+          open={!!deleteTarget}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDeleteTarget(null)
+              deleteMutation.reset()
+            }
+          }}
+        >
+          <DialogContent showCloseButton={false}>
+            <DialogHeader>
+              <DialogTitle>Delete client?</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete the client {deleteTarget?.name}?
+                This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            {deleteError && (
+              <div className="space-y-2">
+                <p className="text-sm text-destructive">{deleteError}</p>
+                {explainDeleteBlock(deleteError).length > 0 && (
+                  <ul className="space-y-1">
+                    {explainDeleteBlock(deleteError).map((step) => (
+                      <li key={step} className="text-sm text-muted-foreground">
+                        • {step}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleteMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending && (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                )}
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </Card>
     </div>
   )

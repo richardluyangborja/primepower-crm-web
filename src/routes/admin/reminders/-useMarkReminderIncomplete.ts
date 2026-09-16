@@ -5,8 +5,10 @@ export function useMarkReminderIncomplete() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (reminderId: number) => {
-      const response = await api.patch(`/api/reminders/${reminderId}/incomplete`)
+    mutationFn: async (reminderId: string) => {
+      const response = await api.patch(
+        `/api/reminders/${reminderId}/incomplete`
+      )
       return response.data.data
     },
     onSuccess: () => {

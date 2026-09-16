@@ -95,7 +95,10 @@ function RouteComponent() {
           </Button>
         </header>
         <main>
-          <AdminOnlyEmptyState backTo="/admin/dashboard" backLabel="Back to dashboard" />
+          <AdminOnlyEmptyState
+            backTo="/admin/dashboard"
+            backLabel="Back to dashboard"
+          />
         </main>
       </div>
     )
@@ -104,10 +107,7 @@ function RouteComponent() {
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button
-          variant="link"
-          onClick={() => navigate({ to: "/admin/users" })}
-        >
+        <Button variant="link" onClick={() => navigate({ to: "/admin/users" })}>
           <ChevronLeft />
           <span>Back to users</span>
         </Button>
@@ -128,8 +128,8 @@ function RouteComponent() {
                 <AlertTitle>Could not create user</AlertTitle>
                 <AlertDescription>
                   {isAxiosError(mutation.error)
-                    ? (mutation.error.response?.data?.message as string) ??
-                      "Validation error"
+                    ? ((mutation.error.response?.data?.message as string) ??
+                      "Validation error")
                     : String(mutation.error)}
                 </AlertDescription>
               </Alert>
@@ -148,7 +148,8 @@ function RouteComponent() {
                     children={(field) => (
                       <Field
                         data-invalid={
-                          field.state.meta.isTouched && !field.state.meta.isValid
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid
                         }
                       >
                         <FieldLabel htmlFor="name">Full name</FieldLabel>
@@ -168,7 +169,8 @@ function RouteComponent() {
                     children={(field) => (
                       <Field
                         data-invalid={
-                          field.state.meta.isTouched && !field.state.meta.isValid
+                          field.state.meta.isTouched &&
+                          !field.state.meta.isValid
                         }
                       >
                         <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -193,7 +195,9 @@ function RouteComponent() {
                         field.state.meta.isTouched && !field.state.meta.isValid
                       }
                     >
-                      <FieldLabel htmlFor="password">Initial password</FieldLabel>
+                      <FieldLabel htmlFor="password">
+                        Initial password
+                      </FieldLabel>
                       <Input
                         id="password"
                         type="text"

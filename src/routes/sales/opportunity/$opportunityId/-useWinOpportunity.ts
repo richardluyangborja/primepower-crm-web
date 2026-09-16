@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 
-export function useWinOpportunity(opportunityId: number) {
+export function useWinOpportunity(opportunityId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({

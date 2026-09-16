@@ -1,9 +1,5 @@
 import { Sparkles } from "lucide-react"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useActionSuggestionsQuery } from "@/lib/queries/useActionSuggestions"
 
 /**
@@ -16,7 +12,7 @@ export function ActionSuggestionAlert({
   entityId,
 }: {
   entityType: "opportunity" | "client"
-  entityId: number
+  entityId: string
 }) {
   const query = useActionSuggestionsQuery()
 

@@ -14,8 +14,8 @@ export type LeadsQueryParams = {
 function cleanParams(params?: LeadsQueryParams) {
   return Object.fromEntries(
     Object.entries(params ?? {}).filter(
-      ([, v]) => v !== undefined && v !== null && v !== "" && v !== false,
-    ),
+      ([, v]) => v !== undefined && v !== null && v !== "" && v !== false
+    )
   )
 }
 
@@ -45,7 +45,7 @@ export function useDeleteLead() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (leadId: number | string) => {
+    mutationFn: async (leadId: string | string) => {
       const response = await api.delete(`/api/leads/${leadId}`)
       return response.data
     },

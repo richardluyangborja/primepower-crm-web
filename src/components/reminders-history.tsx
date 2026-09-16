@@ -21,7 +21,7 @@ import { Link } from "@tanstack/react-router"
 export type ReminderPriority = "low" | "medium" | "high"
 
 export type ReminderEntry = {
-  id: number
+  id: string
   title: string
   description: string | null
   due_date: string
@@ -29,14 +29,14 @@ export type ReminderEntry = {
   status: "pending" | "completed" | "incomplete"
   is_completed: boolean
   completed_at: string | null
-  assigned_to: { id: number; name: string } | null
+  assigned_to: { id: string; name: string } | null
   related_to_type: "lead" | "client" | "opportunity"
-  related_to_id: number
+  related_to_id: string
   related_to_name: string
   related_to_status: string | null
-  company: { id: number; name: string; industry: string }
+  company: { id: string; name: string; industry: string }
   recurrence_rule: "daily" | "weekly" | "monthly" | null
-  recurrence_parent_id: number | null
+  recurrence_parent_id: string | null
   created_at: string
   updated_at: string
 }
@@ -220,7 +220,13 @@ export function ReminderHistorySection({
   )
 }
 
-function ReminderCard({ reminder, basePath = "/admin" }: { reminder: ReminderEntry; basePath?: string }) {
+function ReminderCard({
+  reminder,
+  basePath = "/admin",
+}: {
+  reminder: ReminderEntry
+  basePath?: string
+}) {
   const dueDate = new Date(reminder.due_date)
   const formattedDate = dueDate.toLocaleString([], {
     month: "short",

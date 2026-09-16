@@ -12,12 +12,12 @@ export type CommunicationsQueryParams = {
 }
 
 export default function useCommunicationsQuery(
-  params?: CommunicationsQueryParams,
+  params?: CommunicationsQueryParams
 ) {
   const cleaned = Object.fromEntries(
     Object.entries(params ?? {}).filter(
-      ([, v]) => v !== undefined && v !== null && v !== "",
-    ),
+      ([, v]) => v !== undefined && v !== null && v !== ""
+    )
   )
 
   return useQuery({

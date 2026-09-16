@@ -20,7 +20,7 @@ export function useUpdateReminder() {
       id,
       payload,
     }: {
-      id: number
+      id: string
       payload: UpdateReminderPayload
     }) => {
       const response = await api.patch(`/api/reminders/${id}`, payload)

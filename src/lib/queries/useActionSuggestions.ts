@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/api"
 
 export type OpportunitySuggestedAction = {
-  id: number | null
+  id: string | null
   type: "stalled" | "closing" | "date" | "review"
   title: string | null
   suggest: string
@@ -19,9 +19,30 @@ type OpportunityMetrics = {
   lost_count: number
   lost_value: number
   per_stage: { stage: string; label: string; count: number; value: number }[]
-  stalled: { title: string; company: string; stage: string; days: number; value: number; owner: string }[]
-  closing_soon: { title: string; company: string; stage: string; close_date: string; value: number; owner: string }[]
-  top_deals: { title: string; company: string; stage: string; close_date: string | null; value: number; owner: string }[]
+  stalled: {
+    title: string
+    company: string
+    stage: string
+    days: number
+    value: number
+    owner: string
+  }[]
+  closing_soon: {
+    title: string
+    company: string
+    stage: string
+    close_date: string
+    value: number
+    owner: string
+  }[]
+  top_deals: {
+    title: string
+    company: string
+    stage: string
+    close_date: string | null
+    value: number
+    owner: string
+  }[]
   by_owner: { owner: string; count: number; value: number }[]
 }
 
@@ -33,7 +54,7 @@ type OpportunityInsights = {
 }
 
 export type SatisfactionSuggestedAction = {
-  id: number | null
+  id: string | null
   type: "low_score" | "at_risk" | "pending" | "review"
   title: string | null
   suggest: string
@@ -51,7 +72,12 @@ type SatisfactionMetrics = {
   at_risk_count: number
   score_bands: { band: string; count: number }[]
   by_owner: { owner: string; count: number }[]
-  at_risk: { company: string; owner: string; reason: string; score: number | null }[]
+  at_risk: {
+    company: string
+    owner: string
+    reason: string
+    score: number | null
+  }[]
   low_score: { company: string; owner: string; score: number | null }[]
   pending: { company: string; owner: string; count: number }[]
 }

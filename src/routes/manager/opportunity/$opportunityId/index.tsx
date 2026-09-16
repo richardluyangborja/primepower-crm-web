@@ -7,5 +7,10 @@ export const Route = createFileRoute("/manager/opportunity/$opportunityId/")({
 
 function RouteComponent() {
   const { opportunityId } = Route.useParams()
-  return <OpportunityDetailContent opportunityId={opportunityId} basePath="/manager" />
+  return (
+    <OpportunityDetailContent
+      opportunityId={opportunityId}
+      basePath="/manager"
+    />
+  )
 }

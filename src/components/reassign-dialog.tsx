@@ -37,7 +37,7 @@ export type ReassignDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   endpoint: string
-  currentOwnerId: number
+  currentOwnerId: string
   currentOwnerName: string
   subjectName: string
   detailQueryKey?: string[]
@@ -61,7 +61,7 @@ export function ReassignDialog({
     queryKey: ["sales-representatives"],
     queryFn: async () => {
       const response = await api.get("/api/sales-representatives")
-      return (response.data.data as { id: number; name: string }[]) ?? []
+      return (response.data.data as { id: string; name: string }[]) ?? []
     },
     enabled: open,
   })
@@ -69,7 +69,7 @@ export function ReassignDialog({
   const mutation = useMutation({
     mutationFn: async (values: z.infer<typeof reassignSchema>) => {
       const response = await api.patch(endpoint, {
-        assigned_to_id: Number(values.assigned_to_id),
+        assigned_to_id: values.assigned_to_id,
         note: values.note || null,
       })
       return response.data
@@ -85,7 +85,7 @@ export function ReassignDialog({
     },
     onError: (err) => {
       setError(
-        err instanceof Error ? err.message : "Could not reassign record.",
+        err instanceof Error ? err.message : "Could not reassign record."
       )
     },
   })

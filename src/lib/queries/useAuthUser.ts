@@ -2,10 +2,14 @@ import api from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
 
 export type AuthUser = {
-  id: number
+  id: string
   name: string
   email: string
   role: string
+  is_active: boolean
+  deactivated_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 export default function useAuthUser() {
@@ -16,5 +20,6 @@ export default function useAuthUser() {
       return response.data as AuthUser
     },
     staleTime: Infinity,
+    retry: false,
   })
 }

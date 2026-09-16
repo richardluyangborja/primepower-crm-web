@@ -194,9 +194,7 @@ function SurveyDetailCard({
             <div className="text-right">
               <div className="flex items-center gap-1">
                 <Star className="size-4 fill-primary text-primary" />
-                <span className="text-xl font-bold">
-                  {numScore.toFixed(1)}
-                </span>
+                <span className="text-xl font-bold">{numScore.toFixed(1)}</span>
               </div>
               <span className="text-xs text-muted-foreground">avg score</span>
             </div>
@@ -288,7 +286,9 @@ function SurveyDetailCard({
                 <div className="font-medium">{survey.respondent_name}</div>
               )}
               {survey.respondent_position && (
-                <div className="text-blue-500">{survey.respondent_position}</div>
+                <div className="text-blue-500">
+                  {survey.respondent_position}
+                </div>
               )}
             </div>
           </div>
@@ -322,7 +322,15 @@ function SurveyDetailCard({
   )
 }
 
-function ClientSatisfactionDetail({ clientId, basePath = "/admin", isAdmin = false }: { clientId: number; basePath?: string; isAdmin?: boolean }) {
+function ClientSatisfactionDetail({
+  clientId,
+  basePath = "/admin",
+  isAdmin = false,
+}: {
+  clientId: string
+  basePath?: string
+  isAdmin?: boolean
+}) {
   const readOnly = basePath === "/manager"
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)

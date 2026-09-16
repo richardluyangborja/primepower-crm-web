@@ -37,14 +37,6 @@ import {
 import useReminderDetailsQuery from "../../-useReminderDetailsQuery"
 import { useUpdateReminder } from "../../-useUpdateReminder"
 
-function isPastDueDate(dateString: string): boolean {
-  if (!dateString) return false
-  const date = new Date(`${dateString}T00:00:00`)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  return date.getTime() < today.getTime()
-}
-
 type EditReminderFormValues = {
   title: string
   description: string
@@ -102,15 +94,12 @@ function EditReminderFormInner({
       due_date: reminder.due_date.slice(0, 10),
       priority: reminder.priority,
       recurrence_rule: (reminder.recurrence_rule ?? "") as
-        | "daily"
-        | "weekly"
-        | "monthly"
-        | "",
+        "daily" | "weekly" | "monthly" | "",
     } satisfies EditReminderFormValues,
 
     onSubmit: async ({ value }) => {
       await updateMutation.mutateAsync({
-        id: Number(reminderId),
+        id: reminderId,
         payload: {
           title: value.title,
           description: value.description,
@@ -192,19 +181,7 @@ function EditReminderFormInner({
               </form.Field>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <form.Field
-                  name="due_date"
-                  validators={{
-                    onChange: ({ value }) =>
-                      isPastDueDate(value)
-                        ? "Due date cannot be in the past."
-                        : undefined,
-                    onSubmit: ({ value }) =>
-                      isPastDueDate(value)
-                        ? "Due date cannot be in the past."
-                        : undefined,
-                  }}
-                >
+                <form.Field name="due_date">
                   {(field) => {
                     return (
                       <Field>

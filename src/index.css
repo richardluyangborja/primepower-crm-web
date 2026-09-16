@@ -134,6 +134,10 @@
 }
 /* AI Reports: browser print-to-PDF. Only the .print-report pane prints;
    all app chrome (sidebar, nav, buttons) is hidden. */
+.print-report {
+  display: none;
+}
+
 @media print {
   body * {
     visibility: hidden;
@@ -143,6 +147,7 @@
     visibility: visible;
   }
   .print-report {
+    display: block;
     position: absolute;
     top: 0;
     left: 0;

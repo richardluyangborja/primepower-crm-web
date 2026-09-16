@@ -20,11 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  useUpdateOpportunity,
-  useCompanies,
-  useLeads,
-} from "./-hooks"
+import { useUpdateOpportunity, useCompanies, useLeads } from "./-hooks"
 import {
   createOpportunitySchema,
   type CreateOpportunityFormValues,
@@ -43,18 +39,24 @@ import { useEffect } from "react"
 import useOpportunityDetailsQuery from "../-useOpportunityDetailsQuery"
 import { Spinner } from "@/components/ui/spinner"
 
-export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { opportunityId: number; basePath?: string }) {
+export function EditOpportunityForm({
+  opportunityId,
+  basePath = "/admin",
+}: {
+  opportunityId: string
+  basePath?: string
+}) {
   const companiesQuery = useCompanies()
   const leadsQuery = useLeads()
   const updateOpportunityMutation = useUpdateOpportunity(opportunityId)
   const navigate = useNavigate()
 
-  const detailsQuery = useOpportunityDetailsQuery(String(opportunityId))
+  const detailsQuery = useOpportunityDetailsQuery(opportunityId)
   const opportunity = detailsQuery.data
 
   const form = useForm({
     defaultValues: {
-      company_id: 0,
+      company_id: "",
       lead_id: null,
       title: "",
       description: "",
@@ -75,7 +77,9 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
     },
   })
 
-  const [selectedCompanyId, setSelectedCompanyId] = useState(0)
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
+    null
+  )
 
   useEffect(() => {
     if (opportunity) {
@@ -180,18 +184,13 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
                         <FieldLabel htmlFor={field.name}>Company</FieldLabel>
 
                         <Select
-                          value={
-                            field.state.value > 0
-                              ? String(field.state.value)
-                              : ""
-                          }
+                          value={field.state.value ? field.state.value : ""}
                           onValueChange={(value) => {
-                            setSelectedCompanyId(Number(value))
-                            field.handleChange(Number(value))
+                            setSelectedCompanyId(value)
+                            field.handleChange(value)
                           }}
                           disabled={
-                            companiesQuery.isLoading ||
-                            companiesQuery.isError
+                            companiesQuery.isLoading || companiesQuery.isError
                           }
                         >
                           <SelectTrigger
@@ -221,9 +220,7 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
                         </Select>
 
                         {companiesQuery.isError && (
-                          <FieldError>
-                            Unable to load companies.
-                          </FieldError>
+                          <FieldError>Unable to load companies.</FieldError>
                         )}
 
                         {isInvalid && (
@@ -248,18 +245,12 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
 
                         <Select
                           value={
-                            field.state.value
-                              ? String(field.state.value)
-                              : ""
+                            field.state.value ? String(field.state.value) : ""
                           }
                           onValueChange={(value) =>
-                            field.handleChange(
-                              value ? Number(value) : null
-                            )
+                            field.handleChange(value ? value : null)
                           }
-                          disabled={
-                            leadsQuery.isLoading || leadsQuery.isError
-                          }
+                          disabled={leadsQuery.isLoading || leadsQuery.isError}
                         >
                           <SelectTrigger
                             id={field.name}
@@ -275,14 +266,9 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
                           </SelectTrigger>
 
                           <SelectContent>
-                            <SelectItem value="null">
-                              None
-                            </SelectItem>
+                            <SelectItem value="null">None</SelectItem>
                             {availableLeads?.map((lead) => (
-                              <SelectItem
-                                key={lead.id}
-                                value={String(lead.id)}
-                              >
+                              <SelectItem key={lead.id} value={String(lead.id)}>
                                 {lead.company.name} — #{lead.id}
                               </SelectItem>
                             ))}
@@ -290,9 +276,7 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
                         </Select>
 
                         {leadsQuery.isError && (
-                          <FieldError>
-                            Unable to load leads.
-                          </FieldError>
+                          <FieldError>Unable to load leads.</FieldError>
                         )}
 
                         {isInvalid && (
@@ -312,9 +296,7 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
 
                   return (
                     <Field data-invalid={isInvalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Description
-                      </FieldLabel>
+                      <FieldLabel htmlFor={field.name}>Description</FieldLabel>
 
                       <Textarea
                         autoComplete="off"
@@ -357,9 +339,7 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
                           onBlur={field.handleBlur}
                           onChange={(e) =>
                             field.handleChange(
-                              e.target.value
-                                ? Number(e.target.value)
-                                : null
+                              e.target.value ? Number(e.target.value) : null
                             )
                           }
                           aria-invalid={isInvalid}
@@ -394,9 +374,7 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
                           value={field.state.value ?? ""}
                           onBlur={field.handleBlur}
                           onChange={(e) =>
-                            field.handleChange(
-                              e.target.value || null
-                            )
+                            field.handleChange(e.target.value || null)
                           }
                           aria-invalid={isInvalid}
                         />
@@ -450,9 +428,7 @@ export function EditOpportunityForm({ opportunityId, basePath = "/admin" }: { op
         </CardContent>
         <CardFooter>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting && (
-              <Loader2 className="mr-2 size-4 animate-spin" />
-            )}
+            {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
             {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </CardFooter>

@@ -35,7 +35,7 @@ import useAuthUser from "@/lib/queries/useAuthUser"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 type SalesRepresentative = {
-  id: number
+  id: string
   name: string
 }
 
@@ -76,7 +76,7 @@ const createLeadSchema = z.object({
 
   source: z.string().min(1, "Lead source is required").max(100),
 
-  assigned_to_id: z.number().int().positive("Select a sales representative"),
+  assigned_to_id: z.string().uuid("Select a sales representative"),
 
   notes: z.string().max(5000, "Notes cannot exceed 5000 characters"),
 })
@@ -85,7 +85,7 @@ type CreateLeadFormValues = z.infer<typeof createLeadSchema>
 
 async function getSalesRepresentatives() {
   const response = await api.get<{ data: SalesRepresentative[] }>(
-    "/api/sales-representatives",
+    "/api/sales-representatives"
   )
 
   return response.data.data
@@ -138,7 +138,7 @@ export function CreateLeadForm({
   const userQuery = useAuthUser()
   const navigate = useNavigate()
 
-  const selfId = mode === "self" ? (userQuery.data?.id ?? 0) : 0
+  const selfId = mode === "self" ? (userQuery.data?.id ?? "") : ""
 
   const form = useForm({
     defaultValues: {
@@ -620,12 +620,8 @@ export function CreateLeadForm({
                         </FieldLabel>
 
                         <Select
-                          value={
-                            field.state.value > 0 ? String(field.state.value) : ""
-                          }
-                          onValueChange={(value) =>
-                            field.handleChange(Number(value))
-                          }
+                          value={field.state.value ? field.state.value : ""}
+                          onValueChange={(value) => field.handleChange(value)}
                           disabled={
                             salesRepsQuery.isLoading || salesRepsQuery.isError
                           }

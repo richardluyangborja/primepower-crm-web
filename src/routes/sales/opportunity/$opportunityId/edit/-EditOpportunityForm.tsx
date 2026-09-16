@@ -42,19 +42,19 @@ import { Spinner } from "@/components/ui/spinner"
 export function EditOpportunityForm({
   opportunityId,
 }: {
-  opportunityId: number
+  opportunityId: string
 }) {
   const companiesQuery = useSalesCompanies()
   const leadsQuery = useLeads()
   const updateOpportunityMutation = useUpdateOpportunity(opportunityId)
   const navigate = useNavigate()
 
-  const detailsQuery = useOpportunityDetailsQuery(String(opportunityId))
+  const detailsQuery = useOpportunityDetailsQuery(opportunityId)
   const opportunity = detailsQuery.data
 
   const form = useForm({
     defaultValues: {
-      company_id: 0,
+      company_id: "",
       lead_id: null,
       title: "",
       description: "",
@@ -74,7 +74,9 @@ export function EditOpportunityForm({
     },
   })
 
-  const [selectedCompanyId, setSelectedCompanyId] = useState(0)
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(
+    null
+  )
 
   useEffect(() => {
     if (opportunity) {
@@ -179,14 +181,10 @@ export function EditOpportunityForm({
                         <FieldLabel htmlFor={field.name}>Company</FieldLabel>
 
                         <Select
-                          value={
-                            field.state.value > 0
-                              ? String(field.state.value)
-                              : ""
-                          }
+                          value={field.state.value ? field.state.value : ""}
                           onValueChange={(value) => {
-                            setSelectedCompanyId(Number(value))
-                            field.handleChange(Number(value))
+                            setSelectedCompanyId(value)
+                            field.handleChange(value)
                           }}
                           disabled={
                             companiesQuery.isLoading || companiesQuery.isError
@@ -247,7 +245,7 @@ export function EditOpportunityForm({
                             field.state.value ? String(field.state.value) : ""
                           }
                           onValueChange={(value) =>
-                            field.handleChange(value ? Number(value) : null)
+                            field.handleChange(value ? value : null)
                           }
                           disabled={leadsQuery.isLoading || leadsQuery.isError}
                         >

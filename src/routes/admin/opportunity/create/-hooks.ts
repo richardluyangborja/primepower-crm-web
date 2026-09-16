@@ -8,7 +8,7 @@ export function useCompanies() {
     queryFn: async () => {
       const response = await api.get("/api/companies")
       return response.data.data as {
-        id: number
+        id: string
         name: string
         industry: string
         is_client: boolean
@@ -23,8 +23,8 @@ export function useLeads() {
     queryFn: async () => {
       const response = await api.get("/api/leads")
       return response.data.data as {
-        id: number
-        company: { id: number; name: string }
+        id: string
+        company: { id: string; name: string }
       }[]
     },
   })

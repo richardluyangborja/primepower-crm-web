@@ -13,8 +13,8 @@ function RouteComponent() {
         <p className="mb-6 text-sm text-muted-foreground">
           A chronological record of every operation across leads, clients,
           opportunities, communications, follow-up reminders, and satisfaction
-          surveys. Entries store plain text (no relationships), so the history is
-          preserved even if the related records are later changed or deleted.
+          surveys. Entries store plain text (no relationships), so the history
+          is preserved even if the related records are later changed or deleted.
         </p>
       </header>
       <main>

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 
 export type ContactFormValues = {
-  company_id: number
+  company_id: string
   first_name: string
   last_name: string
   title: string
@@ -20,7 +20,9 @@ export function useCreateContact(clientId: string) {
       return response.data.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sales_client_details", clientId] })
+      queryClient.invalidateQueries({
+        queryKey: ["sales_client_details", clientId],
+      })
     },
   })
 }
@@ -29,11 +31,13 @@ export function useDeleteContact(clientId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (contactId: number) => {
+    mutationFn: async (contactId: string) => {
       await api.delete(`/api/contacts/${contactId}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sales_client_details", clientId] })
+      queryClient.invalidateQueries({
+        queryKey: ["sales_client_details", clientId],
+      })
     },
   })
 }
@@ -42,12 +46,14 @@ export function useMarkAsPrimaryContact(clientId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (contactId: number) => {
+    mutationFn: async (contactId: string) => {
       const response = await api.patch(`/api/contacts/${contactId}`)
       return response.data.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["sales_client_details", clientId] })
+      queryClient.invalidateQueries({
+        queryKey: ["sales_client_details", clientId],
+      })
     },
   })
 }

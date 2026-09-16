@@ -79,7 +79,7 @@ const sidebarConfig: SidebarGroup[] = [
       },
       {
         path: "/manager/ai-report",
-        label: "AI Reports",
+        label: "Management Reports",
         icon: FileText,
       },
     ],
@@ -340,10 +340,6 @@ function AccountDropdown() {
             >
               <UserRound />
               Account
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Bell />
-              Notifications
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />

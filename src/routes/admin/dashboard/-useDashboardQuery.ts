@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 
 export type DashboardData = {
   scope: {
-    rep_id: number | null
+    rep_id: string | null
     from: string | null
     to: string | null
     role: string | null
@@ -64,14 +64,14 @@ export type DashboardData = {
     trend: { month: string; average_score: number }[]
     by_question: { question: string; label: string; average_score: number }[]
     per_rep: {
-      rep_id: number | null
+      rep_id: string | null
       rep_name: string
       surveys: number
       average_score: number | null
     }[]
   }
   performance: {
-    rep_id: number
+    rep_id: string
     rep_name: string
     open_opportunities: number
     pipeline_value: number
@@ -83,7 +83,7 @@ export type DashboardData = {
 }
 
 export type DashboardQueryParams = {
-  repId?: number
+  repId?: string
   from?: string
   to?: string
 }

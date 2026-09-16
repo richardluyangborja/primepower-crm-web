@@ -2,7 +2,9 @@ import useAuthUser from "@/lib/queries/useAuthUser"
 
 export type AppRole = "admin" | "manager" | "sales_rep"
 
-export function getDefaultRouteForRole(role: string | undefined | null): string {
+export function getDefaultRouteForRole(
+  role: string | undefined | null
+): string {
   switch (role) {
     case "admin":
       return "/admin/dashboard"
@@ -15,7 +17,10 @@ export function getDefaultRouteForRole(role: string | undefined | null): string 
   }
 }
 
-export function isAllowedForRole(role: string | null | undefined, pathname: string): boolean {
+export function isAllowedForRole(
+  role: string | null | undefined,
+  pathname: string
+): boolean {
   if (!role) return false
 
   if (pathname.startsWith("/admin")) {

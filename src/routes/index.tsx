@@ -1,23 +1,27 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
-import api from "@/lib/api"
+import api, { isAxiosError } from "@/lib/api"
 import { getDefaultRouteForRole } from "@/lib/role-redirect"
 import { Spinner } from "@/components/ui/spinner"
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => {
+    let role: string | undefined
+
     try {
       const response = await api.get("/api/user")
-      const role = response.data?.role as string | undefined
-      if (!role) {
-        throw redirect({ to: "/login" })
-      }
-      throw redirect({ to: getDefaultRouteForRole(role) })
+      role = response.data?.role
     } catch (error) {
-      if ((error as { status?: number })?.status === 401) {
+      if (isAxiosError(error) && error.response?.status === 401) {
         throw redirect({ to: "/login" })
       }
       throw error
     }
+
+    if (!role) {
+      throw redirect({ to: "/login" })
+    }
+
+    throw redirect({ to: getDefaultRouteForRole(role) })
   },
   component: RouteComponent,
 })

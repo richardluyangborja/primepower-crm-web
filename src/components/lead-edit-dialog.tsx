@@ -33,18 +33,18 @@ import useAuthUser from "@/lib/queries/useAuthUser"
 import useSalesRepresentatives from "@/lib/queries/useSalesRepresentatives"
 
 export type LeadEditValues = {
-  id: number
+  id: string
   source: string
   notes?: string
   sales_representative?: {
-    id: number
+    id: string
     name: string
   }
 }
 
 const editLeadSchema = z.object({
   source: z.string().min(1, "Lead source is required").max(100),
-  assigned_to_id: z.number().int().positive("Select a sales representative"),
+  assigned_to_id: z.string().uuid("Select a sales representative"),
   notes: z.string().max(5000, "Notes cannot exceed 5000 characters"),
 })
 
@@ -80,7 +80,7 @@ export function LeadEditDialog({
   const form = useForm({
     defaultValues: {
       source: lead.source ?? "",
-      assigned_to_id: lead.sales_representative?.id ?? userQuery.data?.id ?? 0,
+      assigned_to_id: lead.sales_representative?.id ?? userQuery.data?.id ?? "",
       notes: lead.notes ?? "",
     },
     validators: {
@@ -157,9 +157,7 @@ export function LeadEditDialog({
                       <FieldDescription>Who owns this lead.</FieldDescription>
                       <Select
                         value={String(field.state.value)}
-                        onValueChange={(value) =>
-                          field.handleChange(Number(value))
-                        }
+                        onValueChange={(value) => field.handleChange(value)}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select a representative" />

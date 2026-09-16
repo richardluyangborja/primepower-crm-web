@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 
 export type ContactFormValues = {
-  company_id: number
+  company_id: string
   first_name: string
   last_name: string
   title: string
@@ -29,7 +29,7 @@ export function useDeleteContact(leadId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (contactId: number) => {
+    mutationFn: async (contactId: string) => {
       await api.delete(`/api/contacts/${contactId}`)
     },
     onSuccess: () => {
@@ -42,7 +42,7 @@ export function useMarkAsPrimaryContact(leadId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (contactId: number) => {
+    mutationFn: async (contactId: string) => {
       const response = await api.patch(`/api/contacts/${contactId}`)
       return response.data.data
     },

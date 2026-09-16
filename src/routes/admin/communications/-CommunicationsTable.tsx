@@ -145,7 +145,7 @@ export default function CommunicationsTable({
   const canWrite = useCanWrite()
 
   const [deleteTarget, setDeleteTarget] = useState<{
-    id: number
+    id: string
     name: string
   } | null>(null)
 

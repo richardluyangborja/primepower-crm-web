@@ -26,11 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   Field,
   FieldError,
@@ -38,7 +34,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { useForm } from "@tanstack/react-form"
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 import {
   ChevronLeft,
@@ -77,9 +73,8 @@ export const Route = createFileRoute("/sales/communications/$communicationId/")(
 )
 
 function RouteComponent() {
-  const router = useRouter()
-  const { communicationId } = Route.useParams()
   const navigate = useNavigate()
+  const { communicationId } = Route.useParams()
   const query = useCommunicationDetailsQuery(communicationId)
   const deleteMutation = useDeleteCommunication()
   const comm = query.data
@@ -91,7 +86,10 @@ function RouteComponent() {
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() => navigate({ to: "/sales/communications" })}
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>
@@ -368,9 +366,7 @@ function EditCommunicationDialog({
       subject: comm.subject ?? "",
       notes: comm.notes ?? "",
       duration_minutes: comm.duration_minutes,
-      scheduled_at: comm.scheduled_at
-        ? comm.scheduled_at.slice(0, 16)
-        : null,
+      scheduled_at: comm.scheduled_at ? comm.scheduled_at.slice(0, 16) : null,
     } as {
       type: CommunicationType
       direction: "incoming" | "outgoing"
@@ -397,7 +393,7 @@ function EditCommunicationDialog({
         if (isAxiosError(error)) {
           setServerError(
             (error.response?.data?.message as string) ??
-              "Could not save changes.",
+              "Could not save changes."
           )
         } else {
           setServerError("Could not save changes.")
@@ -454,7 +450,7 @@ function EditCommunicationDialog({
                       <SelectContent>
                         {(
                           Object.keys(
-                            communicationTypeLabels,
+                            communicationTypeLabels
                           ) as CommunicationType[]
                         ).map((t) => (
                           <SelectItem key={t} value={t}>
@@ -497,7 +493,7 @@ function EditCommunicationDialog({
                       value={field.state.value ?? "none"}
                       onValueChange={(val) =>
                         field.handleChange(
-                          val === "none" ? null : (val as CommunicationOutcome),
+                          val === "none" ? null : (val as CommunicationOutcome)
                         )
                       }
                     >
@@ -508,7 +504,7 @@ function EditCommunicationDialog({
                         <SelectItem value="none">No outcome</SelectItem>
                         {(
                           Object.keys(
-                            communicationOutcomeLabels,
+                            communicationOutcomeLabels
                           ) as CommunicationOutcome[]
                         ).map((o) => (
                           <SelectItem key={o} value={o}>
@@ -557,9 +553,7 @@ function EditCommunicationDialog({
                       value={field.state.value ?? ""}
                       onChange={(e) =>
                         field.handleChange(
-                          e.target.value === ""
-                            ? null
-                            : Number(e.target.value),
+                          e.target.value === "" ? null : Number(e.target.value)
                         )
                       }
                     />
@@ -575,7 +569,7 @@ function EditCommunicationDialog({
                       value={field.state.value ?? ""}
                       onChange={(e) =>
                         field.handleChange(
-                          e.target.value === "" ? null : e.target.value,
+                          e.target.value === "" ? null : e.target.value
                         )
                       }
                     />

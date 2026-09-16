@@ -39,7 +39,7 @@ export function useUpdateSurveyTemplate() {
       id,
       values,
     }: {
-      id: number
+      id: string
       values: SurveyTemplateFormValues
     }) => {
       const response = await api.put(`/api/survey-templates/${id}`, {
@@ -60,7 +60,7 @@ export function useDeleteSurveyTemplate() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await api.delete(`/api/survey-templates/${id}`)
     },
     onSuccess: () => {

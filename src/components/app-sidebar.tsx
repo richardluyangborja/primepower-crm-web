@@ -74,14 +74,14 @@ const sidebarConfig: SidebarGroup[] = [
     group: "Insights",
     items: [
       {
+        path: "/admin/ai-report",
+        label: "Management Reports",
+        icon: FileText,
+      },
+      {
         path: "/admin/action-suggestions",
         label: "Action Suggestions",
         icon: Sparkles,
-      },
-      {
-        path: "/admin/ai-report",
-        label: "AI Reports",
-        icon: FileText,
       },
     ],
   },
@@ -239,7 +239,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {sidebarConfig.map((group) => {
           const items = group.items.filter((item) => {
-            if (item.path === "/admin/users" && !isAdmin) {
+            if (!isAdmin && ["/admin/users"].includes(item.path ?? "")) {
               return false
             }
             return true
@@ -365,13 +365,11 @@ function AccountDropdown() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => navigate({ to: "/admin/account" })}
+            >
               <UserRound />
               Account
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Bell />
-              Notifications
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />

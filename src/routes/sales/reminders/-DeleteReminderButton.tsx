@@ -17,7 +17,7 @@ export function DeleteReminderButton({
   reminderId,
   disabled,
 }: {
-  reminderId: number
+  reminderId: string
   disabled?: boolean
 }) {
   const navigate = useNavigate()
@@ -55,9 +55,7 @@ export function DeleteReminderButton({
             onClick={onConfirm}
             disabled={del.isPending}
           >
-            {del.isPending && (
-              <Loader2 className="mr-2 size-4 animate-spin" />
-            )}
+            {del.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
             Delete
           </Button>
         </DialogFooter>

@@ -8,7 +8,12 @@ export function useSalesCompanies() {
     queryKey: ["sales_companies"],
     queryFn: async () => {
       const response = await api.get("/api/companies/mine")
-      return response.data.data as { id: number; name: string; industry: string; is_client: boolean }[]
+      return response.data.data as {
+        id: string
+        name: string
+        industry: string
+        is_client: boolean
+      }[]
     },
   })
 }
@@ -18,12 +23,15 @@ export function useLeads() {
     queryKey: ["leads"],
     queryFn: async () => {
       const response = await api.get("/api/leads")
-      return response.data.data as { id: number; company: { id: number; name: string } }[]
+      return response.data.data as {
+        id: string
+        company: { id: string; name: string }
+      }[]
     },
   })
 }
 
-export function useUpdateOpportunity(opportunityId: number) {
+export function useUpdateOpportunity(opportunityId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({

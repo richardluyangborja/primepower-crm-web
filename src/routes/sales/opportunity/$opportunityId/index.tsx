@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { createFileRoute, useRouter } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft, CheckCircle2, Info, Pencil } from "lucide-react"
 import useOpportunityDetailsQuery from "./-useOpportunityDetailsQuery"
 import { useWinOpportunity } from "./-useWinOpportunity"
@@ -26,7 +26,7 @@ import { useState } from "react"
 import { ActionSuggestionAlert } from "@/components/action-suggestion-alert"
 
 export type OpportunityInfoPage = {
-  id: number
+  id: string
   title: string
   stage:
     | "initial_contact"
@@ -38,19 +38,19 @@ export type OpportunityInfoPage = {
     | "lost"
   description: string
   company: {
-    id: number
+    id: string
     name: string
   }
   lead: {
-    id: number
+    id: string
     status: "new" | "qualified" | "converted" | "disqualified"
     company: {
-      id: number
+      id: string
       name: string
     }
   } | null
   assigned_to: {
-    id: number
+    id: string
     name: string
   }
   estimated_contract_value: number | null
@@ -61,7 +61,7 @@ export type OpportunityInfoPage = {
   reminders?: ReminderEntry[]
   created_at: string
   contacts: {
-    id: number
+    id: string
     name: string
     title: string
     email: string
@@ -108,7 +108,7 @@ const stageTransitions: Record<string, { label: string; value: string }[]> = {
 }
 
 function RouteComponent() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const { opportunityId } = Route.useParams()
   const query = useOpportunityDetailsQuery(opportunityId)
   const opportunity = query.data!
@@ -116,7 +116,10 @@ function RouteComponent() {
   return (
     <div className="px-4 pb-8">
       <header className="py-4">
-        <Button variant="link" onClick={() => router.history.back()}>
+        <Button
+          variant="link"
+          onClick={() => navigate({ to: "/sales/opportunities" })}
+        >
           <ChevronLeft />
           <span>Back</span>
         </Button>
@@ -130,11 +133,11 @@ function RouteComponent() {
           <div className="mt-6 flex flex-col gap-6">
             <ActionSuggestionAlert
               entityType="opportunity"
-              entityId={Number(opportunityId)}
+              entityId={opportunityId}
             />
             <OpportunityInfoCard
               opportunity={opportunity}
-              opportunityId={Number(opportunityId)}
+              opportunityId={opportunityId}
             />
           </div>
         )}
@@ -148,7 +151,7 @@ function OpportunityInfoCard({
   opportunityId,
 }: {
   opportunity: OpportunityInfoPage
-  opportunityId: number
+  opportunityId: string
 }) {
   const winMutation = useWinOpportunity(opportunityId)
   const stageMutation = useUpdateOpportunityStage(opportunityId)
@@ -239,7 +242,9 @@ function OpportunityInfoCard({
           </div>
           <div>
             <span className="block text-sm text-muted-foreground">
-              Estimated Contract Value
+              {opportunity.stage === "won"
+                ? "Contract Value"
+                : "Estimated Contract Value"}
             </span>
             <span>
               {opportunity.estimated_contract_value
@@ -337,7 +342,7 @@ function StageHistorySection({
       <h3 className="mt-6 mb-3 font-heading text-lg">Stage History</h3>
       <div className="flex flex-col gap-3">
         {histories.map((h) => (
-          <div key={h.id} className="border-l-2 border-muted pl-4">
+          <Card key={h.id} className="p-4">
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-sm font-medium">
@@ -355,7 +360,7 @@ function StageHistorySection({
               )}
             </div>
             {h.reason && <p className="mt-1 text-sm">{h.reason}</p>}
-          </div>
+          </Card>
         ))}
       </div>
     </section>

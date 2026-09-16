@@ -3,6 +3,7 @@ import { SalesSidebar } from "@/components/sales-sidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import api from "@/lib/api"
 import { getDefaultRouteForRole } from "@/lib/role-redirect"
+import { useIdleLogout } from "@/hooks/use-idle-logout"
 
 export const Route = createFileRoute("/sales")({
   beforeLoad: async ({ location }) => {
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/sales")({
 })
 
 function RouteComponent() {
+  useIdleLogout()
   return (
     <SidebarProvider>
       <SalesSidebar />

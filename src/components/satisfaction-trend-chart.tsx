@@ -36,7 +36,9 @@ export function SatisfactionTrendChart({
   surveys: SatisfactionTrendSurvey[]
 }) {
   const points = surveys
-    .filter((survey) => survey.status === "completed" && survey.average_score != null)
+    .filter(
+      (survey) => survey.status === "completed" && survey.average_score != null
+    )
     .map((survey) => ({
       date: new Date(survey.completed_at ?? survey.created_at),
       score: Number(survey.average_score),
