@@ -111,9 +111,12 @@ export function LoginForm({
             <Info />
             <AlertTitle>Login Error!</AlertTitle>
             <AlertDescription>
-              {isAxiosError(mutation.error)
-                ? mutation.error.response?.data.message
-                : mutation.error.name}
+              {isAxiosError(mutation.error) &&
+              mutation.error.response?.status === 419
+                ? "Your login session expired before the request reached the server. Please try again."
+                : isAxiosError(mutation.error)
+                  ? mutation.error.response?.data.message
+                  : mutation.error.name}
             </AlertDescription>
           </Alert>
         )}

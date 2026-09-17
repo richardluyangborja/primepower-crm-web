@@ -21,5 +21,9 @@ export default function useAuthUser() {
     },
     staleTime: Infinity,
     retry: false,
+    // /api/user 401s while logged out are expected. Don't re-fire them on
+    // every window focus / reconnect — that was spamming the console.
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 }

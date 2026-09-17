@@ -1,8 +1,28 @@
 import axios, { isAxiosError } from "axios"
 
 function resolveBaseUrl(): string {
-  if (window.location.hostname === "localhost") {
-    return "http://localhost:8000"
+  // VITE_API_URL="" (empty) => same-origin relative calls, for the
+  // single-artifact deploy where Laravel serves the SPA. Any absolute URL
+  // => split deploy (local :8000 or HostForge backend host).
+  // NOTE: Vite bakes VITE_API_URL at build time from the build env. A prod
+  // bundle built without overriding it would carry "http://localhost:8000",
+  // so ignore loopback values when we're not actually on localhost.
+  const fromEnv = (import.meta.env.VITE_API_URL as string | undefined)?.trim()
+  const isLocalPage =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1")
+
+  if (fromEnv !== undefined && fromEnv !== "") {
+    const isLoopback = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(fromEnv)
+    if (!isLoopback || isLocalPage) {
+      return fromEnv.replace(/\/+$/, "")
+    }
+    // Prod page + baked-in localhost API URL => fall through to prod default.
+  }
+
+  if (fromEnv === "") {
+    return ""
   }
 
   return "https://crm-backend-primepower.hostforgeplatforms.com"
@@ -23,8 +43,8 @@ const api = axios.create({
 let csrfInitialized = false
 let csrfPromise: Promise<void> | null = null
 
-export async function initializeCsrf(): Promise<void> {
-  if (csrfInitialized) {
+export async function initializeCsrf(force = false): Promise<void> {
+  if (csrfInitialized && !force) {
     return
   }
 
@@ -58,10 +78,32 @@ api.interceptors.request.use(async (config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const status = error?.response?.status
     const url: string = error?.config?.url ?? ""
     const path = window.location.pathname
+
+    // First 419 on a mutating request usually means the session/CSRF cookie
+    // went stale (cold jar, expired session, or cross-site cookie blocked on
+    // the split HostForge deploy). Refresh the cookie once and retry so a
+    // valid login doesn't fail on the first click.
+    const canRetryCsrf =
+      status === 419 &&
+      !error?.config?._csrfRetried &&
+      ["post", "put", "patch", "delete"].includes(
+        error?.config?.method?.toLowerCase() ?? "",
+      )
+
+    if (canRetryCsrf) {
+      error.config._csrfRetried = true
+      csrfInitialized = false
+      try {
+        await initializeCsrf(true)
+        return await api.request(error.config)
+      } catch {
+        // Fall through to the normal rejection below.
+      }
+    }
 
     const isAuthRequest =
       url.includes("/api/login") ||
