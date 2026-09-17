@@ -1,26 +1,14 @@
 import axios, { isAxiosError } from "axios"
 
 function resolveBaseUrl(): string {
-  // Explicit build-time override wins.
-  // - Local dev (.env): VITE_API_URL=http://localhost:8000
-  // - Single-artifact prod (Laravel serves the SPA): leave VITE_API_URL empty
-  //   so requests stay same-origin (relative /api/*, /sanctum/*) — no CORS,
-  //   no mixed-content, cookies stay first-party.
-  // - Split prod (separate static host + API host): set VITE_API_URL to the
-  //   absolute API origin, e.g. https://api.example.com
-  const configured = import.meta.env.VITE_API_URL as string | undefined
-  if (configured !== undefined) {
-    return configured
-  }
-
-  // Local dev default when no env is set at all.
   if (window.location.hostname === "localhost") {
     return "http://localhost:8000"
   }
 
-  // Same-origin fallback for single-artifact deployments.
-  return ""
+  return "https://crm-backend-primepower.hostforgeplatforms.com"
 }
+
+
 
 const api = axios.create({
   baseURL: resolveBaseUrl(),
