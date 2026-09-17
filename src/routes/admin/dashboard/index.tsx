@@ -102,6 +102,10 @@ export function DashboardContent({
           <p className="text-sm text-muted-foreground">
             Opportunity pipeline and customer satisfaction at a glance
           </p>
+          <div
+            aria-hidden="true"
+            className="mt-2 h-1 w-16 rounded-full bg-primary"
+          />
         </div>
         {showRepFilter && (
           <div className="w-56">

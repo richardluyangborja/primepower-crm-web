@@ -225,7 +225,6 @@ function RouteComponent() {
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="admin">Administrator</SelectItem>
                           <SelectItem value="manager">Manager</SelectItem>
                           <SelectItem value="sales_rep">
                             Sales Representative

@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 
 // Matches the backend SessionIdleTimeout (SESSION_IDLE_TIMEOUT, seconds).
-const DEFAULT_TIMEOUT_MS = 30 * 60 * 1000
+const DEFAULT_TIMEOUT_MS = 60_000
 
 const ACTIVITY_EVENTS = [
   "mousemove",

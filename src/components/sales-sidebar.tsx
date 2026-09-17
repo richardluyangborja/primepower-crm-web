@@ -26,7 +26,7 @@ import {
   UserRound,
 } from "lucide-react"
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
+import { isActivePath } from "@/lib/sidebar-nav"
 import useAuthUser from "@/lib/queries/useAuthUser"
 import { useUnreadCountQuery } from "@/lib/queries/useNotifications"
 import { NotificationsPanel } from "./notifications-panel"
@@ -148,6 +149,7 @@ const sidebarConfig: SidebarGroup[] = [
 function CollapsibleMenuItem({
   item,
   navigate,
+  pathname,
 }: {
   item: {
     label: string
@@ -155,12 +157,16 @@ function CollapsibleMenuItem({
     children: { path: string; label: string }[]
   }
   navigate: (opts: { to: string }) => void
+  pathname: string
 }) {
   const [isExpanded, setIsExpanded] = React.useState(true)
 
   return (
     <>
-      <SidebarMenuButton onClick={() => setIsExpanded(!isExpanded)}>
+      <SidebarMenuButton
+        onClick={() => setIsExpanded(!isExpanded)}
+        isActive={item.children.some((child) => isActivePath(pathname, child.path))}
+      >
         <item.icon />
         <span>{item.label}</span>
         <ChevronRight
@@ -173,6 +179,7 @@ function CollapsibleMenuItem({
             <SidebarMenuSubItem key={child.path}>
               <SidebarMenuSubButton
                 onClick={() => navigate({ to: child.path })}
+                isActive={isActivePath(pathname, child.path)}
               >
                 <span>{child.label}</span>
               </SidebarMenuSubButton>
@@ -188,6 +195,7 @@ export function SalesSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const userQuery = useAuthUser()
   const unreadCountQuery = useUnreadCountQuery()
   const unreadCount = unreadCountQuery.data ?? 0
@@ -237,12 +245,14 @@ export function SalesSidebar({
                         }
                       }
                       navigate={navigate}
+                      pathname={pathname}
                     />
                   ) : item.tooltip ? (
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <SidebarMenuButton
                           onClick={() => navigate({ to: item.path })}
+                          isActive={isActivePath(pathname, item.path)}
                         >
                           <item.icon />
                           <span>{item.label}</span>
@@ -253,6 +263,7 @@ export function SalesSidebar({
                   ) : (
                     <SidebarMenuButton
                       onClick={() => navigate({ to: item.path })}
+                      isActive={isActivePath(pathname, item.path)}
                     >
                       <item.icon />
                       <span>{item.label}</span>
