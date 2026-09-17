@@ -1,18 +1,25 @@
 import axios, { isAxiosError } from "axios"
 
 function resolveBaseUrl(): string {
-  // Explicit build-time override wins (set VITE_API_URL in prod builds).
+  // Explicit build-time override wins.
+  // - Local dev (.env): VITE_API_URL=http://localhost:8000
+  // - Single-artifact prod (Laravel serves the SPA): leave VITE_API_URL empty
+  //   so requests stay same-origin (relative /api/*, /sanctum/*) — no CORS,
+  //   no mixed-content, cookies stay first-party.
+  // - Split prod (separate static host + API host): set VITE_API_URL to the
+  //   absolute API origin, e.g. https://api.example.com
   const configured = import.meta.env.VITE_API_URL as string | undefined
-  if (configured && configured.length > 0) {
+  if (configured !== undefined) {
     return configured
   }
 
-  // Local dev default; the deployed frontend must set VITE_API_URL.
+  // Local dev default when no env is set at all.
   if (window.location.hostname === "localhost") {
     return "http://localhost:8000"
   }
 
-  return "https://primepower-crm-api-primepower.hostforgeplatforms.com"
+  // Same-origin fallback for single-artifact deployments.
+  return ""
 }
 
 const api = axios.create({
@@ -71,6 +78,7 @@ api.interceptors.response.use(
     const isAuthRequest =
       url.includes("/api/login") ||
       url.includes("/api/logout") ||
+      url.includes("/api/auth/otp/") ||
       url.includes("/sanctum/csrf-cookie")
     const isPublicPage = path.startsWith("/login") || path.startsWith("/survey")
 

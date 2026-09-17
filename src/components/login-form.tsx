@@ -1,3 +1,4 @@
+import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,6 +18,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { useQueryClient } from "@tanstack/react-query"
 import { Info } from "lucide-react"
 import { getDefaultRouteForRole } from "@/lib/role-redirect"
+import { TwoFactorChallenge } from "@/components/two-factor-challenge"
 
 const formSchema = z.object({
   email: z.email().max(32, "Email must be at most 32 characters."),
@@ -25,26 +27,38 @@ const formSchema = z.object({
 
 type Login = z.infer<typeof formSchema>
 
+type ChallengeInfo = {
+  email: string
+  maskedEmail: string
+  expiresInSeconds: number
+}
+
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const [challenge, setChallenge] = React.useState<ChallengeInfo | null>(null)
 
   const mutation = useMutation({
     mutationFn: async (body: Login) => {
-      return api.post("/api/login", body)
+      return api.post("/api/auth/otp/request", body)
     },
     retry: false,
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["auth_user"] })
-      const role = response.data?.two_factor
-        ? null
-        : (response.data?.user?.role ?? response.data?.role)
-      return navigate({ to: getDefaultRouteForRole(role) })
+      setChallenge({
+        email: response.data.email as string,
+        maskedEmail: response.data.masked_email as string,
+        expiresInSeconds: (response.data.expires_in_seconds as number) ?? 600,
+      })
     },
   })
+
+  const handleVerified = (role: string | null) => {
+    queryClient.invalidateQueries({ queryKey: ["auth_user"] })
+    return navigate({ to: getDefaultRouteForRole(role) })
+  }
 
   const form = useForm({
     defaultValues: {
@@ -58,6 +72,23 @@ export function LoginForm({
       await mutation.mutateAsync(value)
     },
   })
+
+  if (challenge) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)}>
+        <TwoFactorChallenge
+          email={challenge.email}
+          maskedEmail={challenge.maskedEmail}
+          expiresInSeconds={challenge.expiresInSeconds}
+          onVerified={handleVerified}
+          onBack={() => {
+            mutation.reset()
+            setChallenge(null)
+          }}
+        />
+      </div>
+    )
+  }
 
   return (
     <form
@@ -140,7 +171,7 @@ export function LoginForm({
         <Field>
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending && <Spinner />}
-            {mutation.isPending ? "Logging in..." : "Login"}
+            {mutation.isPending ? "Checking password & sending code…" : "Login"}
           </Button>
         </Field>
       </FieldGroup>

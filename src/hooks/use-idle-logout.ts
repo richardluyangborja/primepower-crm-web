@@ -3,7 +3,8 @@ import { useNavigate } from "@tanstack/react-router"
 import { useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/api"
 
-const DEFAULT_TIMEOUT_MS = 60_000
+// Matches the backend SessionIdleTimeout (SESSION_IDLE_TIMEOUT, seconds).
+const DEFAULT_TIMEOUT_MS = 30 * 60 * 1000
 
 const ACTIVITY_EVENTS = [
   "mousemove",
